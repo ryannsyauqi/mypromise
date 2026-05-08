@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { mockTemplates } from "@/lib/mock-data";
-import { TemplateField } from "@/lib/types";
+import { FieldSchema } from "@/lib/types";
 import { createClient } from "@/utils/supabase/client";
 
 export default function InvitationForm() {
@@ -62,7 +62,7 @@ export default function InvitationForm() {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  const renderField = (field: TemplateField) => {
+  const renderField = (field: FieldSchema) => {
     const commonClasses = "dashboard-input";
     
     return (
