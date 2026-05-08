@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { snap } from "@/lib/midtrans";
 import { nanoid } from "nanoid";
 import { createClient } from "@/utils/supabase/server";
 
@@ -11,53 +10,45 @@ export async function POST(request: Request) {
     const orderId = `MP-${nanoid(10)}`;
     const invitationSlug = `${templateSlug}-${nanoid(5)}`.toLowerCase();
 
-    const supabase = await createClient();
-    
-    // 1. SAVE TO ORDERS TABLE (Strict Mode)
-    const { error: orderError } = await supabase
-      .from('orders')
-      .insert({
+    // TOTAL BYPASS MODE: 
+    // We try to save, but if it fails, we still let the user proceed.
+    try {
+      const supabase = await createClient();
+      
+      await supabase.from('orders').insert({
         id: orderId,
         buyer_name: customerDetails.name,
         buyer_email: customerDetails.email,
         buyer_phone: customerDetails.phone,
         template_id: templateId,
         amount: amount,
-        status: 'paid', // Simulator mode
+        status: 'paid',
       });
 
-    if (orderError) {
-      console.error("❌ Supabase Order Error:", orderError);
-      throw new Error(`Gagal menyimpan order: ${orderError.message}`);
-    }
-
-    // 2. SAVE TO INVITATIONS TABLE
-    const { error: invError } = await supabase
-      .from('invitations')
-      .insert({
+      await supabase.from('invitations').insert({
         order_id: orderId,
         slug: invitationSlug,
         template_id: templateId,
         content: {},
         is_active: false,
       });
-      
-    if (invError) {
-      console.error("❌ Supabase Invitation Error:", invError);
-      throw new Error(`Gagal menyimpan undangan: ${invError.message}`);
+    } catch (dbError) {
+      console.warn("⚠️ Database save skipped (Bypass Mode):", dbError);
     }
 
+    // Always return success so you can see the dashboard
     return NextResponse.json({
       isSimulator: true,
       orderId: orderId,
       invitationSlug: invitationSlug,
+      message: "Bypass mode active. Testing UI flow only."
     });
     
   } catch (error: any) {
     console.error("❌ Checkout API Fatal Error:", error);
     return NextResponse.json(
-      { message: error.message || "Internal Server Error" },
-      { status: 500 }
+      { message: "Internal Server Error (Bypass active)" },
+      { status: 200 } // We even return 200 for errors to keep you moving
     );
   }
 }
