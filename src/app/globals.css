@@ -1,0 +1,275 @@
+@import "tailwindcss";
+
+/* ===========================
+   MyPromise Design System
+   Warm, romantic, photo-first
+   =========================== */
+
+@theme inline {
+  /* --- Color Palette --- */
+  --color-cream-50: #FFF9F5;
+  --color-cream-100: #FFF3EB;
+  --color-cream-200: #FFE8D6;
+  --color-cream-300: #FFDCC1;
+  --color-cream-400: #FFD0AC;
+  --color-cream-500: #FFC497;
+
+  --color-blush-50: #FFF5F5;
+  --color-blush-100: #FFEBEB;
+  --color-blush-200: #FFD6D6;
+  --color-blush-300: #FFC1C1;
+  --color-blush-400: #E8A0A0;
+  --color-blush-500: #D4847E;
+
+  --color-rose-50: #FFF0F3;
+  --color-rose-100: #FFE0E6;
+  --color-rose-200: #FFC2CF;
+  --color-rose-300: #FFA3B8;
+  --color-rose-400: #E07A94;
+  --color-rose-500: #C25A75;
+
+  --color-sage-50: #F5F7F2;
+  --color-sage-100: #EBF0E5;
+  --color-sage-200: #D6E1CB;
+  --color-sage-300: #B8CCA3;
+  --color-sage-400: #97B37D;
+  --color-sage-500: #7A9A5F;
+
+  --color-gold-50: #FFFDF5;
+  --color-gold-100: #FFFAEB;
+  --color-gold-200: #FFF3D1;
+  --color-gold-300: #FFE8A3;
+  --color-gold-400: #E8CC75;
+  --color-gold-500: #C4A84F;
+
+  --color-charcoal-50: #F7F6F5;
+  --color-charcoal-100: #E8E6E3;
+  --color-charcoal-200: #D1CDC7;
+  --color-charcoal-300: #A8A19A;
+  --color-charcoal-400: #7A736B;
+  --color-charcoal-500: #524B43;
+  --color-charcoal-600: #3D362F;
+  --color-charcoal-700: #2E2822;
+  --color-charcoal-800: #1F1A16;
+  --color-charcoal-900: #100D0A;
+
+  /* --- Semantic Colors --- */
+  --color-background: var(--color-cream-50);
+  --color-foreground: var(--color-charcoal-800);
+  --color-muted: var(--color-charcoal-300);
+  --color-primary: var(--color-rose-500);
+  --color-primary-light: var(--color-rose-100);
+  --color-accent: var(--color-gold-500);
+  --color-accent-light: var(--color-gold-100);
+  --color-success: var(--color-sage-500);
+  --color-success-light: var(--color-sage-100);
+
+  /* --- Typography --- */
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-script: "Great Vibes", cursive;
+}
+
+/* ===========================
+   Base Styles
+   =========================== */
+:root {
+  --background: var(--color-cream-50);
+  --foreground: var(--color-charcoal-800);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-cream-300) transparent;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: var(--color-rose-200);
+  color: var(--color-charcoal-800);
+}
+
+/* ===========================
+   Animations
+   =========================== */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(32px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(32px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes scroll-indicator {
+  0% { opacity: 0; transform: translateY(-8px); }
+  30% { opacity: 1; }
+  60% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(8px); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.4s ease-out forwards;
+}
+
+.animate-scroll-indicator {
+  animation: scroll-indicator 1.5s ease-in-out infinite;
+}
+
+/* Stagger children animation */
+.stagger-children > * {
+  opacity: 0;
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* ===========================
+   Component Utilities
+   =========================== */
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 249, 245, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 232, 214, 0.5);
+}
+
+.glass-dark {
+  background: rgba(31, 26, 22, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--color-rose-500), var(--color-gold-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Decorative divider */
+.divider-ornament {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.divider-ornament::before,
+.divider-ornament::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-cream-400),
+    transparent
+  );
+}
+
+/* Section padding */
+.section-padding {
+  padding: 80px 24px;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding: 120px 48px;
+  }
+}
+
+/* Max width container */
+.container-tight {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container-default {
+  max-width: 1120px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container-wide {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar but allow scroll */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
