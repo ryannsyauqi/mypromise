@@ -4,57 +4,57 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-charcoal-900 text-white py-24">
+    <footer className="bg-charcoal-900 text-white py-20 border-t border-white/5">
       <div className="container-default px-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-16 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-8">
           {/* Brand Column */}
-          <div className="md:col-span-5 space-y-8">
+          <div className="md:col-span-5 space-y-6">
             <Link href="/" className="inline-block">
               <span 
-                className="text-3xl font-bold tracking-tight"
+                className="text-2xl font-bold tracking-tight"
                 style={{ fontFamily: "var(--font-playfair)" }}
               >
-                <span className="gradient-text">My</span>Promise
+                <span className="text-rose-500">My</span>Promise
               </span>
             </Link>
-            <p className="text-white/50 text-lg leading-relaxed max-w-sm">
-              Membantu setiap pasangan mewujudkan undangan pernikahan impian dengan sentuhan digital yang elegan dan personal.
+            <p className="text-white/40 text-sm leading-relaxed max-w-sm">
+              Platform kurasi undangan pernikahan digital eksklusif dengan desain premium dan fitur fungsional terbaik.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {['Instagram', 'WhatsApp', 'TikTok'].map(social => (
                 <a 
                   key={social}
                   href="#" 
-                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all duration-500 group"
+                  className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all duration-300 group"
                 >
                   <span className="sr-only">{social}</span>
-                  <div className="w-4 h-4 bg-white/20 group-hover:bg-white rounded-sm transition-colors" />
+                  <div className="w-3 h-3 bg-white/20 group-hover:bg-white rounded-sm transition-colors" />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="md:col-span-2 space-y-6">
-            <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-white/40">Sitemap</h4>
-            <ul className="space-y-4">
-              <li><Link href="/templates" className="text-white/70 hover:text-rose-400 transition-colors">Koleksi Template</Link></li>
-              <li><Link href="/#pricing" className="text-white/70 hover:text-rose-400 transition-colors">Harga Paket</Link></li>
-              <li><Link href="/#how-it-works" className="text-white/70 hover:text-rose-400 transition-colors">Cara Kerja</Link></li>
+          {/* Sitemap */}
+          <div className="md:col-span-3 space-y-6">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Navigasi</h4>
+            <ul className="space-y-3">
+              <li><Link href="/#designs" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-rose-400 transition-colors">Koleksi Desain</Link></li>
+              <li><Link href="/#features" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-rose-400 transition-colors">Fitur Lengkap</Link></li>
+              <li><Link href="/#how-it-works" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-rose-400 transition-colors">Cara Pemesanan</Link></li>
+              <li><Link href="/templates" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-rose-400 transition-colors">Katalog Produk</Link></li>
             </ul>
           </div>
 
           {/* Contact */}
-          <div className="md:col-span-5 space-y-6">
-            <h4 className="text-sm font-bold uppercase tracking-[0.2em] text-white/40">Consultation</h4>
+          <div className="md:col-span-4 space-y-6">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Kontak Kami</h4>
             <div className="space-y-4">
-              <p className="text-2xl font-bold text-white/90" style={{ fontFamily: "var(--font-playfair)" }}>
-                Punya pertanyaan? <br />
-                Hubungi tim konsultan kami.
+              <p className="text-lg font-bold text-white/90 leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>
+                Siap mewujudkan undangan <br /> impian Anda?
               </p>
               <a 
                 href="https://wa.me/6281234567890" 
-                className="inline-block px-8 py-4 bg-rose-500 text-white font-bold rounded-full hover:bg-rose-600 transition-all duration-300 shadow-xl shadow-rose-500/10"
+                className="inline-block px-8 py-3.5 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-600 transition-all duration-300 shadow-xl shadow-rose-900/20"
               >
                 Chat via WhatsApp
               </a>
@@ -63,13 +63,13 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-24 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-white/30 text-xs tracking-widest uppercase">
-            &copy; {currentYear} MyPromise.id — Part of Love Story Digital.
+        <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-white/20 text-[9px] font-black tracking-[0.2em] uppercase">
+            &copy; {currentYear} MyPromise.id — Studio Desain Undangan Digital.
           </p>
-          <div className="flex gap-8 text-[10px] uppercase tracking-widest text-white/30">
-            <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
+          <div className="flex gap-8 text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
+            <Link href="#" className="hover:text-white transition-colors">Kebijakan Privasi</Link>
+            <Link href="#" className="hover:text-white transition-colors">Syarat & Ketentuan</Link>
           </div>
         </div>
       </div>

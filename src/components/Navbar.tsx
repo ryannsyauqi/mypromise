@@ -24,9 +24,9 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
   const isLightText = variant === "dark-bg" && !scrolled;
 
   const navLinks = [
-    { label: "Desain", href: "/#designs" },
+    { label: "Koleksi", href: "/#designs" },
     { label: "Fitur", href: "/#features" },
-    { label: "Testimoni", href: "/#testimonials" },
+    { label: "Pemesanan", href: "/#how-it-works" },
   ];
 
   return (
@@ -46,7 +46,7 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
             className="text-2xl font-bold tracking-tight transition-colors duration-300"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
-            <span className="gradient-text">My</span>
+            <span className="text-rose-500">My</span>
             <span className={isLightText ? "text-white" : "text-charcoal-800"}>Promise</span>
           </span>
         </Link>
@@ -57,7 +57,7 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
             <Link
               key={link.label}
               href={link.href}
-              className={`text-sm font-bold uppercase tracking-widest transition-colors duration-300 hover:text-rose-500 ${
+              className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 hover:text-rose-500 ${
                 isLightText ? "text-white/90" : "text-charcoal-600"
               }`}
             >
@@ -66,9 +66,9 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
           ))}
           <Link
             href="/templates"
-            className="px-6 py-2.5 bg-rose-500 text-white text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-rose-600 transition-all duration-300 shadow-lg shadow-rose-900/10"
+            className="px-8 py-3 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-600 transition-all duration-300 shadow-lg shadow-rose-900/10"
           >
-            Pesan Sekarang
+            Lihat Katalog
           </Link>
         </div>
 
@@ -104,12 +104,12 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
           mobileOpen ? "max-h-80 border-t border-cream-200" : "max-h-0"
         }`}
       >
-        <div className="px-6 py-4 flex flex-col gap-3">
+        <div className="px-6 py-6 flex flex-col gap-4">
           {navLinks.map((link) => (
             <Link
               key={link.label}
               href={link.href}
-              className="text-charcoal-700 text-sm font-bold uppercase tracking-widest py-2 hover:text-rose-500 transition-colors"
+              className="text-charcoal-700 text-xs font-black uppercase tracking-[0.2em] py-2 hover:text-rose-500 transition-colors"
               onClick={() => setMobileOpen(false)}
             >
               {link.label}
@@ -117,10 +117,10 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
           ))}
           <Link
             href="/templates"
-            className="mt-2 px-6 py-3 bg-rose-500 text-white text-xs font-bold uppercase tracking-widest rounded-xl text-center hover:bg-rose-600 transition-all duration-300 shadow-md"
+            className="mt-2 px-6 py-4 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl text-center hover:bg-rose-600 transition-all duration-300 shadow-md"
             onClick={() => setMobileOpen(false)}
           >
-            Pesan Sekarang
+            Lihat Katalog
           </Link>
         </div>
       </div>
