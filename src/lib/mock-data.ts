@@ -14,7 +14,7 @@ export const mockTemplates: Template[] = [
     slug: "minimalist-elegance",
     description:
       "Desain bersih dan elegan dengan tipografi serif yang mewah. Foto pasangan menjadi fokus utama dengan overlay hangat dan layout yang modern.",
-    price: 175000,
+    price: 119000,
     is_active: true,
     field_schema: [
       { key: "groom_name", label: "Nama Panggilan Mempelai Pria", type: "text", required: true },
@@ -47,7 +47,7 @@ export const mockTemplates: Template[] = [
     slug: "javanese-royal",
     description:
       "Sentuhan tradisional Jawa yang anggun dengan motif batik halus dan ornamen emas. Cocok untuk pernikahan adat yang elegan.",
-    price: 175000,
+    price: 149000,
     is_active: true,
     field_schema: [],
     thumbnail_url: "/images/templates/javanese-royal.png",
@@ -61,7 +61,7 @@ export const mockTemplates: Template[] = [
     slug: "garden-romance",
     description:
       "Tema taman romantis dengan ilustrasi bunga watercolor dan nuansa pastel yang lembut. Sempurna untuk pasangan yang menyukai keindahan alam.",
-    price: 175000,
+    price: 199000,
     is_active: true,
     field_schema: [],
     thumbnail_url: "/images/templates/garden-romance.png",
@@ -75,7 +75,7 @@ export const mockTemplates: Template[] = [
     slug: "modern-luxe",
     description:
       "Desain ultra-modern dengan aksen gold dan layout yang dramatis. Foto full-bleed dengan tipografi bold untuk pasangan yang berani tampil beda.",
-    price: 175000,
+    price: 119000,
     is_active: true,
     field_schema: [],
     thumbnail_url: "/images/templates/modern-luxe.png",
@@ -89,7 +89,7 @@ export const mockTemplates: Template[] = [
     slug: "rustic-charm",
     description:
       "Nuansa rustic dengan tekstur kayu, tanaman hijau, dan cahaya hangat. Ideal untuk outdoor wedding atau intimate garden party.",
-    price: 175000,
+    price: 149000,
     is_active: true,
     field_schema: [],
     thumbnail_url: "/images/templates/rustic-charm.png",
@@ -103,7 +103,7 @@ export const mockTemplates: Template[] = [
     slug: "islamic-grace",
     description:
       "Desain Islami yang anggun dengan kaligrafi bismillah, ornamen geometris, dan warna hijau sage yang menenangkan.",
-    price: 175000,
+    price: 199000,
     is_active: true,
     field_schema: [],
     thumbnail_url: "/images/templates/islamic-grace.png",

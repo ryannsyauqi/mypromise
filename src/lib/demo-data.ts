@@ -31,10 +31,11 @@ export const demoInvitationData = {
   photo_bride: "/images/demo/bride.png",
 };
 
-export const demoWishes = [
-  { name: "Pak Rudi", message: "Selamat untuk kalian berdua! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah. Aamiin 🤍", time: "2 jam lalu", attendance: "hadir" as const },
-  { name: "Bu Sari", message: "Barakallah! Semoga pernikahannya diberkahi Allah SWT. InsyaAllah hadir ya!", time: "5 jam lalu", attendance: "hadir" as const },
-  { name: "Tante Lina", message: "Selamat ya nak! Doakan Tante bisa hadir ya 🙏", time: "1 hari lalu", attendance: "belum_pasti" as const },
-  { name: "Mas Adi", message: "Congrats Budi & Ayu! Semoga langgeng sampai Jannah. Aamiin!", time: "1 hari lalu", attendance: "hadir" as const },
-  { name: "Mbak Dian", message: "Ya Allah barakallah! Bahagia banget liat kalian akhirnya nikah. Semoga jadi keluarga yang penuh cinta 💕", time: "2 hari lalu", attendance: "hadir" as const },
+export const demoWishes: { name: string; message: string; time: string; attendance: "hadir" | "tidak_hadir" | "belum_pasti" }[] = [
+  { name: "Pak Rudi", message: "Selamat untuk kalian berdua! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah. Aamiin 🤍", time: "2 jam lalu", attendance: "hadir" },
+  { name: "Bu Sari", message: "Barakallah! Semoga pernikahannya diberkahi Allah SWT. InsyaAllah hadir ya!", time: "5 jam lalu", attendance: "hadir" },
+  { name: "Tante Lina", message: "Selamat ya nak! Doakan Tante bisa hadir ya 🙏", time: "1 hari lalu", attendance: "belum_pasti" },
+  { name: "Mas Adi", message: "Congrats Budi & Ayu! Semoga langgeng sampai Jannah. Aamiin!", time: "1 hari lalu", attendance: "hadir" },
+  { name: "Om Benny", message: "Sayangnya Om tidak bisa hadir karena ada tugas ke luar kota. Tapi doa Om selalu menyertai kalian 🤲", time: "2 hari lalu", attendance: "tidak_hadir" },
+  { name: "Mbak Dian", message: "Ya Allah barakallah! Bahagia banget liat kalian akhirnya nikah. Semoga jadi keluarga yang penuh cinta 💕", time: "2 hari lalu", attendance: "hadir" },
 ];

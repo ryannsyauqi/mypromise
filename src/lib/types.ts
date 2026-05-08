@@ -60,6 +60,7 @@ export interface Order {
   notes: string | null;
   revision_count: number;
   midtrans_order_id: string | null;
+  expires_at: string | null;
   created_at: string;
   updated_at: string;
   // Joined

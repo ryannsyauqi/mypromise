@@ -18,7 +18,7 @@ export default function TemplatesPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar variant="light-bg" />
 
       {/* Header */}
       <section className="pt-32 pb-12 bg-cream-50">

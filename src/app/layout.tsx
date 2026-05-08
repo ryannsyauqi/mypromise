@@ -63,10 +63,16 @@ export default function RootLayout({
   return (
     <html
       lang="id"
+      data-scroll-behavior="smooth"
       className={`${playfair.variable} ${jakarta.variable} ${greatVibes.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" style={{ fontFamily: "var(--font-jakarta)" }}>
         {children}
+        <script
+          src="https://app.sandbox.midtrans.com/snap/snap.js"
+          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+          defer
+        ></script>
       </body>
     </html>
   );
