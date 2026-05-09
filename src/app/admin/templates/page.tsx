@@ -11,6 +11,11 @@ export default function AdminTemplatesPage() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Search, Filter, & Sort States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all"); // all, active, archived
+  const [sortBy, setSortBy] = useState("newest"); // newest, price-high, price-low, name
+
   const supabase = createClient();
 
   useEffect(() => {
@@ -30,7 +35,26 @@ export default function AdminTemplatesPage() {
     }
   }
 
+  // Derived filtered and sorted templates
+  const filteredTemplates = templates
+    .filter((t) => {
+      const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                           t.slug.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = filterStatus === "all" || 
+                           (filterStatus === "active" && t.is_active) || 
+                           (filterStatus === "archived" && !t.is_active);
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (sortBy === "newest") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      if (sortBy === "price-high") return b.price - a.price;
+      if (sortBy === "price-low") return a.price - b.price;
+      if (sortBy === "name") return a.name.localeCompare(b.name);
+      return 0;
+    });
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // ... existing logic ...
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -145,9 +169,44 @@ export default function AdminTemplatesPage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div>
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Katalog Template</h1>
-        <p className="text-slate-500 mt-2 font-medium">Kelola produk, harga, dan ketersediaan di website.</p>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Katalog Template</h1>
+          <p className="text-slate-500 mt-2 font-medium">Kelola produk, harga, dan ketersediaan di website.</p>
+        </div>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="Cari template..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-rose-500 w-full sm:w-64 transition-all"
+            />
+            <svg className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <select 
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-rose-500 transition-all cursor-pointer"
+          >
+            <option value="all">Semua Status</option>
+            <option value="active">Active</option>
+            <option value="archived">Archived</option>
+          </select>
+          <select 
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-rose-500 transition-all cursor-pointer"
+          >
+            <option value="newest">Terbaru</option>
+            <option value="price-high">Harga Tertinggi</option>
+            <option value="price-low">Harga Terendah</option>
+            <option value="name">Nama A-Z</option>
+          </select>
+        </div>
       </div>
 
       <input 
@@ -171,7 +230,7 @@ export default function AdminTemplatesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {templates.map((template) => (
+              {filteredTemplates.length > 0 ? filteredTemplates.map((template) => (
                 <tr key={template.id} className={`hover:bg-slate-50/30 transition-colors group ${editingId === template.id ? 'bg-rose-50/30' : ''}`}>
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
@@ -305,7 +364,13 @@ export default function AdminTemplatesPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )) : (
+                <tr>
+                  <td colSpan={5} className="px-8 py-20 text-center text-slate-400 font-medium italic">
+                    Tidak ada template yang ditemukan.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
