@@ -31,13 +31,12 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
           ? "glass shadow-sm py-3"
           : variant === "light-bg"
             ? "bg-cream-50/80 backdrop-blur-sm py-5"
             : "bg-transparent py-5"
-      }`}
+        }`}
     >
       <div className="container-default flex items-center justify-between px-6">
         {/* Logo */}
@@ -57,19 +56,18 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
             <Link
               key={link.label}
               href={link.href}
-              className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 hover:text-rose-500 ${
-                isLightText ? "text-white/90" : "text-charcoal-600"
-              }`}
+              className={`text-[10px] font-black uppercase tracking-[0.2em] transition-colors duration-300 hover:text-rose-500 ${isLightText ? "text-white/90" : "text-charcoal-600"
+                }`}
             >
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/templates"
+          <a
+            href="#designs"
             className="px-8 py-3 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-600 transition-all duration-300 shadow-lg shadow-rose-900/10"
           >
             Lihat Katalog
-          </Link>
+          </a>
         </div>
 
         {/* Mobile hamburger */}
@@ -80,19 +78,16 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
         >
           <div className="flex flex-col gap-1.5">
             <span
-              className={`block w-6 h-0.5 transition-all duration-300 ${
-                isLightText ? "bg-white" : "bg-charcoal-800"
-              } ${mobileOpen ? "rotate-45 translate-y-2" : ""}`}
+              className={`block w-6 h-0.5 transition-all duration-300 ${isLightText ? "bg-white" : "bg-charcoal-800"
+                } ${mobileOpen ? "rotate-45 translate-y-2" : ""}`}
             />
             <span
-              className={`block w-6 h-0.5 transition-all duration-300 ${
-                isLightText ? "bg-white" : "bg-charcoal-800"
-              } ${mobileOpen ? "opacity-0" : ""}`}
+              className={`block w-6 h-0.5 transition-all duration-300 ${isLightText ? "bg-white" : "bg-charcoal-800"
+                } ${mobileOpen ? "opacity-0" : ""}`}
             />
             <span
-              className={`block w-6 h-0.5 transition-all duration-300 ${
-                isLightText ? "bg-white" : "bg-charcoal-800"
-              } ${mobileOpen ? "-rotate-45 -translate-y-2" : ""}`}
+              className={`block w-6 h-0.5 transition-all duration-300 ${isLightText ? "bg-white" : "bg-charcoal-800"
+                } ${mobileOpen ? "-rotate-45 -translate-y-2" : ""}`}
             />
           </div>
         </button>
@@ -100,9 +95,8 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
 
       {/* Mobile menu */}
       <div
-        className={`md:hidden glass overflow-hidden transition-all duration-400 ${
-          mobileOpen ? "max-h-80 border-t border-cream-200" : "max-h-0"
-        }`}
+        className={`md:hidden glass overflow-hidden transition-all duration-400 ${mobileOpen ? "max-h-80 border-t border-cream-200" : "max-h-0"
+          }`}
       >
         <div className="px-6 py-6 flex flex-col gap-4">
           {navLinks.map((link) => (
@@ -115,13 +109,13 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/templates"
+          <a
+            href="#designs"
             className="mt-2 px-6 py-4 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl text-center hover:bg-rose-600 transition-all duration-300 shadow-md"
             onClick={() => setMobileOpen(false)}
           >
             Lihat Katalog
-          </Link>
+          </a>
         </div>
       </div>
     </nav>

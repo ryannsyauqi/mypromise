@@ -57,7 +57,50 @@ export default function AdminPage() {
     loadAdminData();
   }, []);
 
-  if (loading) return <div className="p-10 text-slate-400 font-bold animate-pulse">Loading HQ Data...</div>;
+  if (loading) return (
+    <div className="space-y-10 animate-fade-in">
+      {/* Welcome Header Skeleton */}
+      <div className="flex justify-between items-end">
+        <div>
+          <div className="h-8 w-48 bg-slate-200 rounded-lg animate-pulse"></div>
+          <div className="h-4 w-64 bg-slate-100 rounded-lg animate-pulse mt-3"></div>
+        </div>
+        <div className="h-8 w-32 bg-slate-100 rounded-full animate-pulse"></div>
+      </div>
+
+      {/* Stats Grid Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-start mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-slate-100 animate-pulse"></div>
+              <div className="h-6 w-12 bg-slate-100 rounded-lg animate-pulse"></div>
+            </div>
+            <div className="h-3 w-24 bg-slate-100 rounded mb-3 animate-pulse"></div>
+            <div className="h-8 w-32 bg-slate-200 rounded-lg animate-pulse"></div>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent Orders Table Skeleton */}
+      <div className="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+        <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+          <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
+          <div className="h-8 w-24 bg-slate-100 rounded-full animate-pulse"></div>
+        </div>
+        <div className="p-8 space-y-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex justify-between items-center">
+              <div className="h-4 w-20 bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-6 w-48 bg-slate-100 rounded animate-pulse"></div>
+              <div className="h-6 w-24 bg-slate-100 rounded-full animate-pulse"></div>
+              <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-10 animate-fade-in">

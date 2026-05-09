@@ -27,7 +27,7 @@ export async function PATCH(request: Request) {
   try {
     const supabase = createAdminClient();
     const body = await request.json();
-    const { id, name, price, is_active } = body;
+    const { id, name, price, is_active, thumbnail_url } = body;
 
     if (!id) {
       return NextResponse.json({ message: "Template ID is required" }, { status: 400 });
@@ -38,7 +38,8 @@ export async function PATCH(request: Request) {
       .update({
         name,
         price,
-        is_active
+        is_active,
+        thumbnail_url
       })
       .eq('id', id)
       .select()

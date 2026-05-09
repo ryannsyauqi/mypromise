@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 export default function AdminTemplatesPage() {
   const [templates, setTemplates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", price: 0, is_active: true });
+  const [editForm, setEditForm] = useState({ name: "", price: 0, is_active: true, thumbnail_url: "" });
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const supabase = createClient();
 
   useEffect(() => {
     fetchTemplates();
@@ -25,12 +30,60 @@ export default function AdminTemplatesPage() {
     }
   }
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      
+      const formData = new FormData();
+      formData.append("file", file);
+
+      console.log("📤 Uploading via Server API...");
+
+      const response = await fetch("/api/admin/templates/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to upload");
+      }
+
+      const { publicUrl } = await response.json();
+      setEditForm(prev => ({ ...prev, thumbnail_url: publicUrl }));
+
+      // Automatically save to database immediately after upload
+      console.log("💾 Automatically saving to database...");
+      await fetch("/api/admin/templates", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          id: editingId, 
+          ...editForm, 
+          thumbnail_url: publicUrl 
+        }),
+      });
+
+      fetchTemplates(); // Refresh the list
+      
+    } catch (error: any) {
+      console.error("Upload error detail:", error);
+      alert(`Gagal mengupload: ${error.message || "Error tidak diketahui"}.`);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const startEdit = (template: any) => {
     setEditingId(template.id);
     setEditForm({
       name: template.name,
       price: template.price,
       is_active: template.is_active,
+      thumbnail_url: template.thumbnail_url || "",
     });
   };
 
@@ -51,7 +104,44 @@ export default function AdminTemplatesPage() {
     }
   };
 
-  if (loading) return <div className="p-10 text-slate-400 font-bold animate-pulse">Loading Catalog...</div>;
+  if (loading) return (
+    <div className="space-y-8 animate-fade-in">
+      <div>
+        <div className="h-8 w-48 bg-slate-200 rounded-lg animate-pulse"></div>
+        <div className="h-4 w-64 bg-slate-100 rounded-lg animate-pulse mt-3"></div>
+      </div>
+
+      <div className="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+        <div className="p-8 border-b border-slate-100 bg-slate-50/30 flex justify-between">
+          <div className="h-4 w-32 bg-slate-200 rounded animate-pulse"></div>
+          <div className="h-4 w-24 bg-slate-200 rounded animate-pulse"></div>
+          <div className="h-4 w-24 bg-slate-200 rounded animate-pulse"></div>
+          <div className="h-4 w-24 bg-slate-200 rounded animate-pulse"></div>
+          <div className="h-4 w-16 bg-slate-200 rounded animate-pulse"></div>
+        </div>
+        <div className="p-8 space-y-8">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex justify-between items-center">
+              <div className="flex gap-4 items-center">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 animate-pulse"></div>
+                <div className="space-y-2">
+                  <div className="h-5 w-32 bg-slate-200 rounded animate-pulse"></div>
+                  <div className="h-3 w-20 bg-slate-100 rounded animate-pulse"></div>
+                </div>
+              </div>
+              <div className="h-6 w-24 bg-slate-100 rounded-lg animate-pulse"></div>
+              <div className="h-5 w-24 bg-slate-200 rounded animate-pulse"></div>
+              <div className="h-6 w-20 bg-slate-100 rounded-full animate-pulse"></div>
+              <div className="flex gap-2">
+                <div className="h-8 w-8 bg-slate-100 rounded-lg animate-pulse"></div>
+                <div className="h-8 w-8 bg-slate-100 rounded-lg animate-pulse"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -59,6 +149,14 @@ export default function AdminTemplatesPage() {
         <h1 className="text-3xl font-black text-slate-900 tracking-tight">Katalog Template</h1>
         <p className="text-slate-500 mt-2 font-medium">Kelola produk, harga, dan ketersediaan di website.</p>
       </div>
+
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        className="hidden" 
+        accept="image/*"
+        onChange={handleImageUpload}
+      />
 
       <div className="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
@@ -77,25 +175,56 @@ export default function AdminTemplatesPage() {
                 <tr key={template.id} className={`hover:bg-slate-50/30 transition-colors group ${editingId === template.id ? 'bg-rose-50/30' : ''}`}>
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
+                      <div className="relative w-12 h-12 rounded-xl bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
                         <img 
-                          src={template.thumbnail_url || "/images/placeholder.png"} 
+                          src={(editingId === template.id ? editForm.thumbnail_url : template.thumbnail_url) || "/images/placeholder.png"} 
                           alt={template.name}
                           className="w-full h-full object-cover"
                         />
-                      </div>
-                      <div className="flex flex-col">
-                        {editingId === template.id ? (
-                          <input 
-                            type="text" 
-                            value={editForm.name}
-                            onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                            className="px-2 py-1 bg-white border border-slate-200 rounded text-sm font-bold focus:outline-none focus:border-rose-500"
-                          />
-                        ) : (
-                          <span className="font-bold text-slate-900 text-sm">{template.name}</span>
+                        {editingId === template.id && (
+                          <button 
+                            onClick={() => fileInputRef.current?.click()}
+                            className="absolute inset-0 bg-charcoal-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <svg className={`w-5 h-5 text-white ${uploading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                          </button>
                         )}
-                        <span className="text-[10px] font-mono text-slate-400 uppercase tracking-tighter mt-0.5">/{template.slug}</span>
+                      </div>
+                      <div className="flex flex-col gap-1.5 min-w-[200px]">
+                        {editingId === template.id ? (
+                          <>
+                            <input 
+                              type="text" 
+                              value={editForm.name}
+                              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                              placeholder="Nama Template"
+                              className="px-2 py-1 bg-white border border-slate-200 rounded text-sm font-bold focus:outline-none focus:border-rose-500 w-full"
+                            />
+                            <div className="flex items-center gap-2">
+                              <input 
+                                type="text" 
+                                value={editForm.thumbnail_url}
+                                readOnly
+                                placeholder="Thumbnail URL"
+                                className="px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[9px] font-mono focus:outline-none w-full text-slate-400"
+                              />
+                              <button 
+                                onClick={() => fileInputRef.current?.click()}
+                                className="px-2 py-1 bg-rose-500 text-white text-[9px] font-bold rounded uppercase whitespace-nowrap"
+                              >
+                                {uploading ? '...' : 'Upload'}
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <span className="font-bold text-slate-900 text-sm">{template.name}</span>
+                            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-tighter mt-0.5">/{template.slug}</span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </td>

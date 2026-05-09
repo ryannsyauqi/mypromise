@@ -10,7 +10,7 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="md:col-span-5 space-y-6">
             <Link href="/" className="inline-block">
-              <span 
+              <span
                 className="text-2xl font-bold tracking-tight"
                 style={{ fontFamily: "var(--font-playfair)" }}
               >
@@ -22,9 +22,9 @@ export default function Footer() {
             </p>
             <div className="flex gap-3">
               {['Instagram', 'WhatsApp', 'TikTok'].map(social => (
-                <a 
+                <a
                   key={social}
-                  href="#" 
+                  href="#"
                   className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all duration-300 group"
                 >
                   <span className="sr-only">{social}</span>
@@ -34,14 +34,12 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Sitemap */}
           <div className="md:col-span-3 space-y-6">
             <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Navigasi</h4>
             <ul className="space-y-3">
               <li><Link href="/#designs" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-rose-400 transition-colors">Koleksi Desain</Link></li>
               <li><Link href="/#features" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-rose-400 transition-colors">Fitur Lengkap</Link></li>
               <li><Link href="/#how-it-works" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-rose-400 transition-colors">Cara Pemesanan</Link></li>
-              <li><Link href="/templates" className="text-[11px] font-bold uppercase tracking-wider text-white/60 hover:text-rose-400 transition-colors">Katalog Produk</Link></li>
             </ul>
           </div>
 
@@ -52,8 +50,8 @@ export default function Footer() {
               <p className="text-lg font-bold text-white/90 leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>
                 Siap mewujudkan undangan <br /> impian Anda?
               </p>
-              <a 
-                href="https://wa.me/6281234567890" 
+              <a
+                href="https://wa.me/6281234567890"
                 className="inline-block px-8 py-3.5 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-600 transition-all duration-300 shadow-xl shadow-rose-900/20"
               >
                 Chat via WhatsApp
