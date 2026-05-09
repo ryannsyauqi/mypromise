@@ -77,8 +77,18 @@ export default async function CheckoutPage(props: PageProps<"/checkout/[slug]">)
                   <div className="space-y-3 mb-8">
                     <div className="flex justify-between text-sm">
                       <span className="text-charcoal-400">Harga Paket</span>
-                      <span className="text-charcoal-800 font-medium">Rp {template.price.toLocaleString("id-ID")}</span>
+                      <span className={`text-charcoal-800 font-medium ${template.original_price && template.original_price > template.price ? 'line-through text-slate-300' : ''}`}>
+                        Rp {((template.original_price && template.original_price > template.price) ? template.original_price : template.price).toLocaleString("id-ID")}
+                      </span>
                     </div>
+                    {template.original_price && template.original_price > template.price && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-charcoal-400">Potongan Harga</span>
+                        <span className="text-rose-500 font-bold italic">
+                          - Rp {(template.original_price - template.price).toLocaleString("id-ID")}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-sm">
                       <span className="text-charcoal-400">Biaya Layanan</span>
                       <span className="text-sage-500 font-medium">Gratis</span>

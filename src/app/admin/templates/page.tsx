@@ -7,7 +7,7 @@ export default function AdminTemplatesPage() {
   const [templates, setTemplates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", price: 0, is_active: true, thumbnail_url: "" });
+  const [editForm, setEditForm] = useState({ name: "", price: 0, original_price: 0, is_active: true, thumbnail_url: "" });
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -106,6 +106,7 @@ export default function AdminTemplatesPage() {
     setEditForm({
       name: template.name,
       price: template.price,
+      original_price: template.original_price || 0,
       is_active: template.is_active,
       thumbnail_url: template.thumbnail_url || "",
     });
@@ -119,12 +120,15 @@ export default function AdminTemplatesPage() {
         body: JSON.stringify({ id, ...editForm }),
       });
 
-      if (!response.ok) throw new Error("Failed to update template");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update template");
+      }
       
       setEditingId(null);
       fetchTemplates();
-    } catch (error) {
-      alert("Gagal mengupdate template");
+    } catch (error: any) {
+      alert(`Gagal mengupdate template: ${error.message}`);
     }
   };
 
@@ -222,92 +226,124 @@ export default function AdminTemplatesPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Template</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kategori</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Harga</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Aksi</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Preview</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nama Template</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Slug</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kategori</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Harga Promo</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Harga Coret</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredTemplates.length > 0 ? filteredTemplates.map((template) => (
                 <tr key={template.id} className={`hover:bg-slate-50/30 transition-colors group ${editingId === template.id ? 'bg-rose-50/30' : ''}`}>
-                  <td className="px-8 py-5">
-                    <div className="flex items-center gap-4">
-                      <div className="relative w-12 h-12 rounded-xl bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
-                        <img 
-                          src={(editingId === template.id ? editForm.thumbnail_url : template.thumbnail_url) || "/images/placeholder.png"} 
-                          alt={template.name}
-                          className="w-full h-full object-cover"
-                        />
-                        {editingId === template.id && (
-                          <button 
-                            onClick={() => fileInputRef.current?.click()}
-                            className="absolute inset-0 bg-charcoal-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <svg className={`w-5 h-5 text-white ${uploading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
-                      <div className="flex flex-col gap-1.5 min-w-[200px]">
-                        {editingId === template.id ? (
-                          <>
-                            <input 
-                              type="text" 
-                              value={editForm.name}
-                              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                              placeholder="Nama Template"
-                              className="px-2 py-1 bg-white border border-slate-200 rounded text-sm font-bold focus:outline-none focus:border-rose-500 w-full"
-                            />
-                            <div className="flex items-center gap-2">
-                              <input 
-                                type="text" 
-                                value={editForm.thumbnail_url}
-                                readOnly
-                                placeholder="Thumbnail URL"
-                                className="px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[9px] font-mono focus:outline-none w-full text-slate-400"
-                              />
-                              <button 
-                                onClick={() => fileInputRef.current?.click()}
-                                className="px-2 py-1 bg-rose-500 text-white text-[9px] font-bold rounded uppercase whitespace-nowrap"
-                              >
-                                {uploading ? '...' : 'Upload'}
-                              </button>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <span className="font-bold text-slate-900 text-sm">{template.name}</span>
-                            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-tighter mt-0.5">/{template.slug}</span>
-                          </>
-                        )}
-                      </div>
+                  {/* Column 1: Preview */}
+                  <td className="px-6 py-5">
+                    <div className="relative w-12 h-12 rounded-xl bg-slate-100 overflow-hidden border border-slate-200 shrink-0">
+                      <img 
+                        src={(editingId === template.id ? editForm.thumbnail_url : template.thumbnail_url) || "/images/placeholder.png"} 
+                        alt={template.name}
+                        className="w-full h-full object-cover"
+                      />
+                      {editingId === template.id && (
+                        <button 
+                          onClick={() => fileInputRef.current?.click()}
+                          className="absolute inset-0 bg-charcoal-900/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <svg className={`w-5 h-5 text-white ${uploading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   </td>
-                  <td className="px-8 py-5 text-xs font-medium text-slate-500">
-                    <span className="px-2.5 py-1 bg-slate-100 rounded-lg uppercase tracking-wider text-[9px] font-bold">
+
+                  {/* Column 2: Nama Template */}
+                  <td className="px-6 py-5">
+                    {editingId === template.id ? (
+                      <input 
+                        type="text" 
+                        value={editForm.name}
+                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                        placeholder="Nama Template"
+                        className="px-2 py-1 bg-white border border-slate-200 rounded text-sm font-bold focus:outline-none focus:border-rose-500 w-full min-w-[150px]"
+                      />
+                    ) : (
+                      <span className="font-bold text-slate-900 text-sm whitespace-nowrap">{template.name}</span>
+                    )}
+                  </td>
+
+                  {/* Column 3: Slug */}
+                  <td className="px-6 py-5">
+                    {editingId === template.id ? (
+                      <div className="flex items-center gap-2 min-w-[120px]">
+                        <input 
+                          type="text" 
+                          value={editForm.thumbnail_url}
+                          readOnly
+                          placeholder="Thumbnail URL"
+                          className="px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[9px] font-mono focus:outline-none w-full text-slate-400"
+                        />
+                        <button 
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-2 py-1 bg-rose-500 text-white text-[9px] font-bold rounded uppercase whitespace-nowrap"
+                        >
+                          {uploading ? '...' : 'URL'}
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-[10px] font-mono text-slate-400 uppercase tracking-tighter">/{template.slug}</span>
+                    )}
+                  </td>
+
+                  {/* Column 4: Kategori */}
+                  <td className="px-6 py-5">
+                    <span className="px-2.5 py-1 bg-slate-100 rounded-lg uppercase tracking-wider text-[9px] font-bold text-slate-500 whitespace-nowrap">
                       {template.category}
                     </span>
                   </td>
-                  <td className="px-8 py-5">
+
+                  {/* Column 5: Harga Promo */}
+                  <td className="px-6 py-5">
                     {editingId === template.id ? (
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-slate-400 font-bold">Rp</span>
+                      <div className="flex items-center gap-1.5 min-w-[100px]">
+                        <span className="text-[10px] text-slate-400 font-bold">Rp</span>
                         <input 
                           type="number" 
                           value={editForm.price}
                           onChange={(e) => setEditForm({ ...editForm, price: parseInt(e.target.value) })}
-                          className="w-24 px-2 py-1 bg-white border border-slate-200 rounded text-sm font-bold focus:outline-none focus:border-rose-500"
+                          className="w-full px-2 py-1 bg-white border border-slate-200 rounded text-sm font-bold focus:outline-none focus:border-rose-500"
                         />
                       </div>
                     ) : (
-                      <span className="text-sm font-black text-slate-900">Rp {template.price.toLocaleString("id-ID")}</span>
+                      <span className="text-sm font-black text-slate-900 whitespace-nowrap">Rp {template.price.toLocaleString("id-ID")}</span>
                     )}
                   </td>
-                  <td className="px-8 py-5">
+
+                  {/* Column 6: Harga Coret */}
+                  <td className="px-6 py-5">
+                    {editingId === template.id ? (
+                      <div className="flex items-center gap-1.5 min-w-[100px]">
+                        <span className="text-[10px] text-slate-400 font-bold">Rp</span>
+                        <input 
+                          type="number" 
+                          value={editForm.original_price}
+                          onChange={(e) => setEditForm({ ...editForm, original_price: parseInt(e.target.value) })}
+                          className="w-full px-2 py-1 bg-slate-50 border border-slate-200 rounded text-[11px] font-bold focus:outline-none focus:border-rose-300 text-slate-400"
+                        />
+                      </div>
+                    ) : (
+                      <span className="text-[11px] text-slate-400 line-through whitespace-nowrap">
+                        {template.original_price && template.original_price > template.price ? `Rp ${template.original_price.toLocaleString("id-ID")}` : '-'}
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Column 7: Status */}
+                  <td className="px-6 py-5">
                     {editingId === template.id ? (
                       <button 
                         onClick={() => setEditForm({ ...editForm, is_active: !editForm.is_active })}
@@ -321,7 +357,9 @@ export default function AdminTemplatesPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-8 py-5 text-right">
+
+                  {/* Column 8: Aksi */}
+                  <td className="px-6 py-5 text-right">
                     <div className="flex justify-end gap-2">
                       {editingId === template.id ? (
                         <>
@@ -366,7 +404,7 @@ export default function AdminTemplatesPage() {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={5} className="px-8 py-20 text-center text-slate-400 font-medium italic">
+                  <td colSpan={8} className="px-8 py-20 text-center text-slate-400 font-medium italic">
                     Tidak ada template yang ditemukan.
                   </td>
                 </tr>

@@ -133,68 +133,58 @@ export default function AdminOrdersPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Order & Customer</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Template</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kontak</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Total</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">No. Order</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Customer</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Template</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Email</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">WhatsApp</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Payment</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Progress</th>
+                <th className="px-6 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-8 py-20 text-center text-slate-400 italic font-medium">
+                  <td colSpan={8} className="px-8 py-20 text-center text-slate-400 italic font-medium">
                     {searchQuery || paymentFilter !== "all" ? "Tidak ada pesanan yang sesuai filter." : "Belum ada transaksi di database."}
                   </td>
                 </tr>
               ) : (
                 filteredOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-slate-50/30 transition-colors group">
-                    <td className="px-8 py-6">
+                    <td className="px-6 py-6">
+                      <span className="font-mono text-[10px] font-black text-slate-400 uppercase tracking-tighter">#{order.order_number}</span>
+                    </td>
+                    <td className="px-6 py-6">
                       <div className="flex flex-col">
-                        <span className="font-mono text-[10px] font-bold text-slate-400 mb-1">{order.order_number}</span>
-                        <span className="font-bold text-slate-900 text-sm">{order.buyer_name}</span>
-                        <span className="text-[10px] text-slate-400 mt-1 uppercase font-medium">
-                          {new Date(order.created_at).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' })}
+                        <span className="font-bold text-slate-900 text-sm whitespace-nowrap">{order.buyer_name}</span>
+                        <span className="text-[9px] text-slate-400 mt-0.5 uppercase font-medium">
+                          {new Date(order.created_at).toLocaleDateString("id-ID", { day: 'numeric', month: 'short' })}
                         </span>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-800">{order.templates?.name || "Template Unknown"}</span>
-                        <span className="text-[10px] text-slate-400 font-mono uppercase tracking-tighter mt-0.5">/{order.templates?.slug || "unknown"}</span>
-                      </div>
+                    <td className="px-6 py-6">
+                      <span className="text-xs font-bold text-slate-800 whitespace-nowrap">{order.templates?.name || "Template"}</span>
                     </td>
-                    <td className="px-8 py-6">
-                      <div className="flex flex-col gap-1">
-                      <span className="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
-                        <span className="text-slate-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                          </svg>
-                        </span> {order.buyer_email}
+                    <td className="px-6 py-6">
+                      <span className="text-[11px] text-slate-500 font-medium lowercase">{order.buyer_email}</span>
+                    </td>
+                    <td className="px-6 py-6">
+                      <span className="text-[11px] text-slate-500 font-medium">+62 {order.buyer_phone}</span>
+                    </td>
+                    <td className="px-6 py-6">
+                      <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                        {order.payment_status}
                       </span>
-                      <span className="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
-                        <span className="text-slate-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm-5 21c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm5-4H7V4h10v14z"/>
-                          </svg>
-                        </span> +62 {order.buyer_phone}
+                    </td>
+                    <td className="px-6 py-6">
+                      <span className="px-2.5 py-1 bg-slate-100 rounded-lg text-[9px] font-black uppercase tracking-widest text-slate-500 whitespace-nowrap">
+                        {order.order_status.replace('_', ' ')}
                       </span>
-                      </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <div className="flex flex-col gap-1.5">
-                        <span className={`w-fit px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                          {order.payment_status}
-                        </span>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">
-                          {order.order_status.replace('_', ' ')}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <span className="text-sm font-black text-slate-900">Rp {order.amount.toLocaleString("id-ID")}</span>
+                    <td className="px-6 py-6 text-right">
+                      <span className="text-sm font-black text-slate-900 whitespace-nowrap">Rp {order.amount.toLocaleString("id-ID")}</span>
                     </td>
                   </tr>
                 ))

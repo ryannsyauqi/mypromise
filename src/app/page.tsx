@@ -62,7 +62,7 @@ export default function HomePage() {
                 DIGITAL WEDDING INVITATION
               </span>
               <h1
-                className="text-5xl md:text-7xl lg:text-8xl font-bold text-white leading-[0.9] tracking-tighter"
+                className="text-4xl md:text-7xl lg:text-8xl font-bold text-white leading-[1.1] tracking-tighter"
                 style={{ fontFamily: "var(--font-playfair)" }}
               >
                 Undangan Digital <br />
@@ -96,9 +96,9 @@ export default function HomePage() {
       </section>
 
       {/* ===== USP: COMPACT & HIGH-IMPACT ===== */}
-      <section className="py-16 bg-white">
+      <section className="py-10 bg-white">
         <div className="container-default px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 title: "Desain Eksklusif",
@@ -128,12 +128,12 @@ export default function HomePage() {
                 )
               }
             ].map((usp, i) => (
-              <div key={i} className="flex gap-6">
+              <div key={i} className="flex gap-4">
                 <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                   {usp.icon}
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-2xl font-bold text-charcoal-900 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>{usp.title}</h3>
+                  <h3 className="text-xl md:text-2xl font-bold text-charcoal-900 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>{usp.title}</h3>
                   <p className="text-charcoal-500 text-xs leading-relaxed">{usp.desc}</p>
                 </div>
               </div>
@@ -143,16 +143,16 @@ export default function HomePage() {
       </section>
 
       {/* ===== FITUR UNGGULAN: SPLIT LAYOUT ===== */}
-      <section id="features" className="py-24 bg-cream-50/40">
+      <section id="features" className="py-16 bg-cream-50/40">
         <div className="container-default px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
             {/* Left Column: Narrative */}
             <div className="space-y-6">
               <div className="space-y-4">
-                <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-rose-500">Fitur Lengkap</h2>
-                <h3 className="text-4xl md:text-6xl font-bold text-charcoal-900 leading-[1.1]" style={{ fontFamily: "var(--font-playfair)" }}>
+                <span className="text-[11px] font-black uppercase tracking-[0.5em] text-rose-500">Fitur Lengkap</span>
+                <h2 className="text-[32px] md:text-6xl font-bold text-charcoal-900 leading-[1.1]" style={{ fontFamily: "var(--font-playfair)" }}>
                   Semua yang Kamu <br /> Butuhkan.
-                </h3>
+                </h2>
               </div>
               <p className="text-charcoal-500 text-base leading-relaxed max-w-md">
                 Kami menyediakan fitur lengkap untuk memastikan pengalaman terbaik bagi kamu dan seluruh tamu undangan. Ciptakan momen spesial yang tak terlupakan dengan teknologi undangan digital terkini.
@@ -160,7 +160,7 @@ export default function HomePage() {
             </div>
 
             {/* Right Column: Checklists */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 bg-white p-10 rounded-[40px] border border-rose-100/30 shadow-sm">
+            <div className="grid grid-cols-2 gap-x-4 md:gap-x-8 gap-y-4 md:gap-y-6">
               {[
                 "Desain Premium",
                 "Sapaan Personal",
@@ -200,15 +200,15 @@ export default function HomePage() {
       </section>
 
       {/* ===== KATALOG: REFINED CATALOGUE ===== */}
-      <section id="designs" className="py-24 bg-white">
+      <section id="designs" className="py-16 bg-white">
         <div className="container-default px-6">
-          <div className="mb-16 text-center">
-            <h2 className="text-3xl md:text-5xl font-bold text-charcoal-900" style={{ fontFamily: "var(--font-playfair)" }}>
+          <div className="mb-10 md:mb-16 text-center">
+            <h2 className="text-[32px] md:text-5xl font-bold text-charcoal-900" style={{ fontFamily: "var(--font-playfair)" }}>
               Pilih Desain Undanganmu
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
             {loading ? (
               [...Array(3)].map((_, i) => (
                 <div key={i} className="aspect-[4/5] bg-slate-100 animate-pulse rounded-3xl" />
@@ -223,30 +223,29 @@ export default function HomePage() {
       </section>
 
       {/* ===== CARA PESAN: COMPACT STRIP (NUMBERED CIRCLES) ===== */}
-      <section id="how-it-works" className="py-24 bg-cream-50/50 border-y border-cream-100">
+      <section id="how-it-works" className="py-16 bg-cream-50/50 border-y border-cream-100">
         <div className="container-default px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12 items-center">
             <div className="lg:col-span-1">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-rose-500 mb-2">Cara Pesan</h2>
-              <h3 className="text-3xl md:text-5xl font-bold text-charcoal-900 leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>
-                Proses Cepat <br />
-                & Praktis
-              </h3>
+              <span className="text-[11px] font-black uppercase tracking-[0.5em] text-rose-500 mb-2 block">Cara Pesan</span>
+              <h2 className="text-[32px] md:text-5xl font-bold text-charcoal-900 leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>
+                Proses Cepat & Praktis
+              </h2>
             </div>
-            <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-8">
               {[
                 { title: "Pilih Desain", desc: "Pilih dari koleksi desain premium kami." },
                 { title: "Pembayaran", desc: "Lakukan pembayaran aman dan mudah." },
                 { title: "Isi Data", desc: "Lengkapi detail acara dan foto kamu." },
                 { title: "Undangan Ready", desc: "Undangan siap dibagikan ke kerabat." }
               ].map((step, i) => (
-                <div key={i} className="flex flex-col gap-4 group">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-rose-500 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-rose-500/20">
+                <div key={i} className="flex items-start gap-4 lg:flex-col lg:gap-4 group">
+                  <div className="flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 rounded-xl bg-rose-500 flex items-center justify-center text-white text-xs lg:text-sm font-bold shadow-lg shadow-rose-500/20">
                     {i + 1}
                   </div>
-                  <div className="space-y-1">
-                    <h4 className="text-base font-bold text-charcoal-900">{step.title}</h4>
-                    <p className="text-[11px] text-charcoal-500 leading-relaxed">{step.desc}</p>
+                  <div className="space-y-0.5 lg:space-y-1">
+                    <h4 className="text-sm lg:text-base font-bold text-charcoal-900">{step.title}</h4>
+                    <p className="text-[10px] lg:text-[11px] text-charcoal-500 leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
               ))}
@@ -256,13 +255,13 @@ export default function HomePage() {
       </section>
 
       {/* ===== TESTIMONIALS: CLEAN & DIRECT ===== */}
-      <section id="testimonials" className="py-24 bg-white">
+      <section id="testimonials" className="py-16 bg-white">
         <div className="container-default px-6">
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-4">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-rose-500">Testimoni</h2>
-            <h3 className="text-3xl md:text-5xl font-bold text-charcoal-900" style={{ fontFamily: "var(--font-playfair)" }}>
+            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-rose-500">Testimoni</span>
+            <h2 className="text-[32px] md:text-5xl font-bold text-charcoal-900" style={{ fontFamily: "var(--font-playfair)" }}>
               Our Happy Couples
-            </h3>
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -271,7 +270,7 @@ export default function HomePage() {
               { name: "Budi & Citra", text: "Paling kebantu sama fitur RSVP-nya, jadi gak perlu catat manual lagi siapa aja yang mau datang. Harganya juga sangat terjangkau buat kualitas se-premium ini. Thank you!" },
               { name: "Dina & Erwan", text: "Gak nyangka bikin undangan digital bisa semudah ini. Fitur maps-nya integrasi langsung ke Google Maps, praktis banget. Sangat recommended buat yang mau sat set!" }
             ].map((item, i) => (
-              <div key={i} className="p-10 bg-cream-50/50 rounded-[2.5rem] border border-cream-100 space-y-6 shadow-sm hover:shadow-md transition-shadow">
+              <div key={i} className="p-6 md:p-10 bg-cream-50/50 rounded-[2.5rem] border border-cream-100 space-y-6 shadow-sm hover:shadow-md transition-shadow">
                 <p className="text-charcoal-600 italic leading-relaxed text-sm">"{item.text}"</p>
                 <div className="flex items-center gap-4 pt-6 border-t border-cream-100">
                   <span className="text-xs font-black uppercase tracking-widest text-charcoal-900">{item.name}</span>
@@ -292,10 +291,10 @@ export default function HomePage() {
 
         <div className="container-tight px-6 relative z-10 text-center space-y-8">
           <div className="space-y-3">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.5em] text-rose-400">Siap Memulai?</h2>
-            <h3 className="text-3xl md:text-5xl font-bold text-white leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>
+            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-rose-400">Siap Memulai?</span>
+            <h2 className="text-[32px] md:text-5xl font-bold text-white leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>
               Buat Undangan Digital Impian Kamu.
-            </h3>
+            </h2>
             <p className="text-white/40 text-[13px] max-w-md mx-auto">
               Hanya butuh hitungan menit untuk membuat undangan digital eksklusif yang berkesan bagi seluruh tamu kamu.
             </p>

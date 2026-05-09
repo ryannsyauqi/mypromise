@@ -20,8 +20,9 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // On light-bg pages, text should always be dark
-  const isLightText = variant === "dark-bg" && !scrolled;
+  // Text should be white if we're on a dark-bg hero (not scrolled) 
+  // OR if we're scrolled (since the scrolled bg is now charcoal-900/80)
+  const isLightText = variant === "dark-bg" || scrolled;
 
   const navLinks = [
     { label: "Koleksi", href: "/#designs" },
@@ -32,7 +33,7 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-          ? "glass shadow-sm py-3"
+          ? "bg-charcoal-900/90 backdrop-blur-md border-b border-white/5 py-3"
           : variant === "light-bg"
             ? "bg-cream-50/80 backdrop-blur-sm py-5"
             : "bg-transparent py-5"
@@ -95,7 +96,7 @@ export default function Navbar({ variant = "dark-bg" }: NavbarProps) {
 
       {/* Mobile menu */}
       <div
-        className={`md:hidden glass overflow-hidden transition-all duration-400 ${mobileOpen ? "max-h-80 border-t border-cream-200" : "max-h-0"
+        className={`md:hidden overflow-hidden transition-all duration-400 ${mobileOpen ? "max-h-80 glass border-t border-white/10" : "max-h-0 border-t-0"
           }`}
       >
         <div className="px-6 py-6 flex flex-col gap-4">

@@ -25,6 +25,7 @@ export interface Template {
   slug: string;
   description: string;
   price: number;
+  original_price?: number;
   is_active: boolean;
   field_schema: FieldSchema[];
   thumbnail_url: string;
