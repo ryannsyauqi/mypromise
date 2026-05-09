@@ -15,8 +15,8 @@ export default function TemplateCard({ template, index }: TemplateCardProps) {
       className="group relative flex flex-col bg-white rounded-[2rem] overflow-hidden border border-cream-100 transition-all duration-700 hover:shadow-[0_20px_40px_rgba(255,232,214,0.4)] hover:-translate-y-1 animate-fade-in"
       style={{ animationDelay: `${0.05 * index}s` }}
     >
-      {/* Image Container - Landscape Ratio 4:3 */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      {/* Image Container - Square Ratio 1:1 */}
+      <div className="relative aspect-square overflow-hidden">
         <Image
           src={template.thumbnail_url || "/images/placeholder.png"}
           alt={template.name}
