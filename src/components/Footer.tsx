@@ -18,7 +18,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-white/40 text-sm leading-relaxed max-w-sm">
-              Platform kurasi undangan pernikahan digital eksklusif dengan desain premium dan fitur fungsional terbaik.
+              Platform undangan digital eksklusif dengan desain estetik dan fitur yang memudahkan momen bahagia kamu.
             </p>
             <div className="flex gap-3">
               {['Instagram', 'WhatsApp', 'TikTok'].map(social => (
@@ -48,7 +48,7 @@ export default function Footer() {
             <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30">Kontak Kami</h4>
             <div className="space-y-4">
               <p className="text-lg font-bold text-white/90 leading-snug" style={{ fontFamily: "var(--font-playfair)" }}>
-                Siap mewujudkan undangan <br /> impian Anda?
+                Siap mewujudkan undangan <br /> impian kamu?
               </p>
               <a
                 href="https://wa.me/6281234567890"
