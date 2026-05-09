@@ -60,6 +60,45 @@ function getGoogleCalendarUrl(title: string, date: string, time: string, venue: 
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
+const Icons = {
+  Rings: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-gold-500 mx-auto">
+      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5s-3 1.34-3 3 1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+    </svg>
+  ),
+  Party: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="text-gold-500 mx-auto">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+    </svg>
+  ),
+  MapPin: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+    </svg>
+  ),
+  Check: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  ),
+  Copy: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  ),
+  Calendar: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/>
+    </svg>
+  ),
+  Heart: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="inline text-rose-400 mx-1">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+  ),
+};
+
 export default function MinimalistTemplate({ data, guestName, isDemo }: MinimalistTemplateProps) {
   const [isOpened, setIsOpened] = useState(false);
   const displayName = guestName || "Tamu Undangan";
@@ -219,8 +258,8 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {/* Akad */}
               <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-cream-200">
-                <span className="text-3xl mb-4 block">💍</span>
-                <h3 className="text-xl font-bold text-charcoal-800 mb-4" style={{ fontFamily: "var(--font-playfair)" }}>
+                <Icons.Rings />
+                <h3 className="text-xl font-bold text-charcoal-800 mb-4 mt-4" style={{ fontFamily: "var(--font-playfair)" }}>
                   Akad Nikah
                 </h3>
                 <p className="text-charcoal-600 font-semibold text-sm">{formatEventDate(data.akad_date)}</p>
@@ -233,13 +272,13 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 bg-cream-100 text-charcoal-600 text-xs font-medium rounded-full hover:bg-cream-200 transition-all"
                 >
-                  📅 Simpan ke Kalender
+                  <Icons.Calendar /> Simpan ke Kalender
                 </a>
               </div>
               {/* Reception */}
               <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-cream-200">
-                <span className="text-3xl mb-4 block">🎉</span>
-                <h3 className="text-xl font-bold text-charcoal-800 mb-4" style={{ fontFamily: "var(--font-playfair)" }}>
+                <Icons.Party />
+                <h3 className="text-xl font-bold text-charcoal-800 mb-4 mt-4" style={{ fontFamily: "var(--font-playfair)" }}>
                   Resepsi
                 </h3>
                 <p className="text-charcoal-600 font-semibold text-sm">{formatEventDate(data.reception_date)}</p>
@@ -252,7 +291,7 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 bg-cream-100 text-charcoal-600 text-xs font-medium rounded-full hover:bg-cream-200 transition-all"
                 >
-                  📅 Simpan ke Kalender
+                  <Icons.Calendar /> Simpan ke Kalender
                 </a>
               </div>
             </div>
@@ -265,7 +304,7 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-6 py-3 border-2 border-rose-400 text-rose-500 font-semibold text-sm rounded-full hover:bg-rose-500 hover:text-white transition-all duration-300"
                 >
-                  📍 Buka di Google Maps
+                  <Icons.MapPin /> Buka di Google Maps
                 </a>
               </div>
             )}
@@ -301,12 +340,13 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
                       <span className="text-charcoal-300 text-xs">{wish.time}</span>
                     </div>
                     <p className="text-charcoal-500 text-sm leading-relaxed">{wish.message}</p>
-                    <span className={`inline-block mt-2 text-xs px-2 py-0.5 rounded-full ${
-                      wish.attendance === "hadir" ? "bg-sage-100 text-sage-500" :
-                      wish.attendance === "tidak_hadir" ? "bg-blush-100 text-blush-500" :
-                      "bg-gold-100 text-gold-500"
+                    <span className={`inline-flex items-center gap-1.5 mt-2 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${
+                      wish.attendance === "hadir" ? "bg-emerald-50 text-emerald-600" :
+                      wish.attendance === "tidak_hadir" ? "bg-rose-50 text-rose-500" :
+                      "bg-amber-50 text-amber-600"
                     }`}>
-                      {wish.attendance === "hadir" ? "✅ Hadir" : wish.attendance === "tidak_hadir" ? "Tidak Hadir" : "🤔 Belum Pasti"}
+                      {wish.attendance === "hadir" && <Icons.Check />}
+                      {wish.attendance === "hadir" ? "Hadir" : wish.attendance === "tidak_hadir" ? "Tidak Hadir" : "Belum Pasti"}
                     </span>
                   </div>
                 ))}
@@ -336,9 +376,9 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
                       <p className="text-charcoal-400 text-xs">a.n. {parts[2]}</p>
                       <button
                         onClick={() => navigator.clipboard.writeText(parts[1] || "")}
-                        className="mt-3 text-xs text-rose-500 font-medium hover:text-rose-400 transition-colors"
+                        className="inline-flex items-center gap-1.5 mt-3 text-xs text-rose-500 font-bold hover:text-rose-400 transition-colors"
                       >
-                        📋 Salin Nomor Rekening
+                        <Icons.Copy /> Salin Nomor
                       </button>
                     </div>
                   );
@@ -368,9 +408,9 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
 
         {/* — Footer Branding — */}
         <div className="py-6 bg-charcoal-800 text-center">
-          <p className="text-charcoal-400 text-xs">
-            Dibuat dengan 🤍 oleh{" "}
-            <a href="https://mypromise.id" className="text-rose-400 hover:text-rose-300 transition-colors">
+          <p className="text-charcoal-400 text-xs flex items-center justify-center gap-1">
+            Dibuat dengan <Icons.Heart /> oleh{" "}
+            <a href="https://mypromise.id" className="text-rose-400 font-bold hover:text-rose-300 transition-colors ml-1">
               MyPromise
             </a>
           </p>
@@ -379,3 +419,4 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
     </div>
   );
 }
+

@@ -5,6 +5,41 @@ import { mockTemplates } from "@/lib/mock-data";
 import { FieldSchema } from "@/lib/types";
 import { createClient } from "@/utils/supabase/client";
 
+const Icons = {
+  Couple: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 12c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm10 2h-6c-1.1 0-2 .9-2 2v5h2v-5h2v5h2v-5h2v-5c0-1.1-.9-2-2-2z"/>
+    </svg>
+  ),
+  Event: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/>
+    </svg>
+  ),
+  Sparkles: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2l2.45 7.55L22 12l-7.55 2.45L12 22l-2.45-7.55L2 12l7.55-2.45L12 2z"/>
+    </svg>
+  ),
+  Camera: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 12c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zm9-8h-3.17L16 2H8L6.17 4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+    </svg>
+  ),
+  Check: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  ),
+  Error: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+  ),
+};
+
 export default function InvitationForm() {
   const supabase = createClient();
   const template = mockTemplates[0]; // Logic fetch template by order
@@ -16,7 +51,6 @@ export default function InvitationForm() {
   // Fetch existing data on mount
   useEffect(() => {
     async function loadData() {
-      // For now, we fetch the first invitation found (in real app, use auth user)
       const { data, error } = await supabase
         .from('invitations')
         .select('*')
@@ -51,7 +85,6 @@ export default function InvitationForm() {
     }
   };
 
-  // Grouping fields by "Type" for better UI, or you can group by specific logic
   const groomBrideFields = template.field_schema.filter(f => f.key.startsWith('groom') || f.key.startsWith('bride'));
   const eventFields = template.field_schema.filter(f => f.key.startsWith('akad') || f.key.startsWith('reception') || f.key.includes('maps'));
   const otherFields = template.field_schema.filter(f => !groomBrideFields.includes(f) && !eventFields.includes(f));
@@ -99,10 +132,10 @@ export default function InvitationForm() {
       {/* Sidebar Tabs */}
       <div className="lg:w-64 bg-cream-50/50 border-r border-cream-100 flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar">
         {[
-          { id: "mempelai", label: "Mempelai", icon: "👩‍❤️‍👨" },
-          { id: "acara", label: "Acara", icon: "💍" },
-          { id: "lainnya", label: "Lainnya", icon: "✨" },
-          { id: "media", label: "Media & Foto", icon: "📸" },
+          { id: "mempelai", label: "Mempelai", icon: <Icons.Couple /> },
+          { id: "acara", label: "Acara", icon: <Icons.Event /> },
+          { id: "lainnya", label: "Lainnya", icon: <Icons.Sparkles /> },
+          { id: "media", label: "Media & Foto", icon: <Icons.Camera /> },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -113,7 +146,7 @@ export default function InvitationForm() {
                 : "text-charcoal-400 hover:text-charcoal-700"
             }`}
           >
-            <span className="text-lg">{tab.icon}</span>
+            <span>{tab.icon}</span>
             <span className="hidden sm:inline">{tab.label}</span>
           </button>
         ))}
@@ -122,14 +155,14 @@ export default function InvitationForm() {
       <div className="flex-grow p-8 md:p-12">
         <form onSubmit={handleSubmit} className="space-y-8 max-w-2xl">
           {saveStatus === "success" && (
-            <div className="p-4 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 text-sm font-bold animate-fade-in">
-              ✅ Perubahan berhasil disimpan!
+            <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 text-sm font-bold animate-fade-in">
+              <Icons.Check /> Perubahan berhasil disimpan!
             </div>
           )}
           
           {saveStatus === "error" && (
-            <div className="p-4 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 text-sm font-bold animate-fade-in">
-              ❌ Gagal menyimpan. Silakan coba lagi.
+            <div className="flex items-center gap-3 p-4 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 text-sm font-bold animate-fade-in">
+              <Icons.Error /> Gagal menyimpan. Silakan coba lagi.
             </div>
           )}
           {activeTab === "mempelai" && (
@@ -153,7 +186,7 @@ export default function InvitationForm() {
           {activeTab === "media" && (
             <div className="space-y-8 animate-fade-in text-center py-12">
                <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-3xl">📸</span>
+                <Icons.Camera />
               </div>
               <h3 className="font-bold text-charcoal-800 text-lg">Upload Foto Terindah Anda</h3>
               <p className="text-charcoal-400 text-sm">Media di-render secara otomatis dari storage.</p>
@@ -180,3 +213,4 @@ export default function InvitationForm() {
     </div>
   );
 }
+

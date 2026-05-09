@@ -27,7 +27,7 @@ export default function DashboardPage() {
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold text-charcoal-800" style={{ fontFamily: "var(--font-playfair)" }}>
-          Halo, Budi & Ayu! 👋
+          Halo, Budi & Ayu!
         </h1>
         <p className="text-charcoal-400 mt-2">Selamat datang di dashboard MyPromise. Mari buat undangan impian Anda.</p>
       </div>

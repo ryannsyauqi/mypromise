@@ -91,9 +91,14 @@ export default async function CheckoutPage(props: PageProps<"/checkout/[slug]">)
                     </div>
                   </div>
                   
-                  <div className="bg-rose-50 rounded-2xl p-4 border border-rose-100">
-                    <p className="text-xs text-rose-600 leading-relaxed">
-                      💡 Setelah pembayaran berhasil, Anda akan diarahkan ke dashboard untuk mengisi konten undangan dan mengunggah foto.
+                  <div className="bg-rose-50 rounded-2xl p-5 border border-rose-100 flex gap-3">
+                    <div className="shrink-0 text-rose-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                      </svg>
+                    </div>
+                    <p className="text-[11px] font-bold text-rose-800 leading-relaxed uppercase tracking-wider">
+                      Setelah pembayaran berhasil, Anda akan diarahkan ke dashboard untuk mengisi konten undangan dan mengunggah foto.
                     </p>
                   </div>
                 </div>

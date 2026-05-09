@@ -70,12 +70,20 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex flex-col gap-1">
-                        <span className="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
-                          <span className="opacity-50">📧</span> {order.buyer_email}
-                        </span>
-                        <span className="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
-                          <span className="opacity-50">📱</span> +62 {order.buyer_phone}
-                        </span>
+                      <span className="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
+                        <span className="text-slate-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                          </svg>
+                        </span> {order.buyer_email}
+                      </span>
+                      <span className="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
+                        <span className="text-slate-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm-5 21c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm5-4H7V4h10v14z"/>
+                          </svg>
+                        </span> +62 {order.buyer_phone}
+                      </span>
                       </div>
                     </td>
                     <td className="px-8 py-6">
