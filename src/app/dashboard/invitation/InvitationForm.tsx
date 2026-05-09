@@ -42,39 +42,40 @@ const Icons = {
 
 export default function InvitationForm() {
   const supabase = createClient();
-  const template = mockTemplates[0]; // Logic fetch template by order
-  const [invitationId, setInvitationId] = useState<string | null>(null);
+  const [data, setData] = useState<any>(null);
   const [formData, setFormData] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [activeTab, setActiveTab] = useState("mempelai");
 
-  // Fetch existing data on mount
   useEffect(() => {
     async function loadData() {
-      const { data, error } = await supabase
+      const { data: invData, error } = await supabase
         .from('invitations')
-        .select('*')
+        .select('*, orders(*, templates(*))')
+        .order('created_at', { ascending: false })
         .limit(1)
         .single();
       
-      if (data) {
-        setInvitationId(data.id);
-        setFormData(data.content || {});
+      if (invData) {
+        setData(invData);
+        setFormData(invData.content || {});
       }
+      setLoading(false);
     }
     loadData();
   }, [supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!invitationId) return;
+    if (!data?.id) return;
 
     setSaveStatus("saving");
     
     const { error } = await supabase
       .from('invitations')
       .update({ content: formData })
-      .eq('id', invitationId);
+      .eq('id', data.id);
 
     if (error) {
       console.error(error);
@@ -85,127 +86,169 @@ export default function InvitationForm() {
     }
   };
 
-  const groomBrideFields = template.field_schema.filter(f => f.key.startsWith('groom') || f.key.startsWith('bride'));
-  const eventFields = template.field_schema.filter(f => f.key.startsWith('akad') || f.key.startsWith('reception') || f.key.includes('maps'));
-  const otherFields = template.field_schema.filter(f => !groomBrideFields.includes(f) && !eventFields.includes(f));
+  const template = data?.orders?.templates;
+  const fieldSchema = template?.field_schema || [];
 
-  const [activeTab, setActiveTab] = useState("mempelai");
+  const groomBrideFields = fieldSchema.filter((f: any) => f.key.startsWith('groom') || f.key.startsWith('bride'));
+  const eventFields = fieldSchema.filter((f: any) => f.key.startsWith('akad') || f.key.startsWith('reception') || f.key.includes('maps') || f.key.includes('date'));
+  const otherFields = fieldSchema.filter((f: any) => !groomBrideFields.includes(f) && !eventFields.includes(f));
 
   const handleInputChange = (key: string, value: string) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
   const renderField = (field: FieldSchema) => {
-    const commonClasses = "dashboard-input";
+    const commonClasses = "w-full px-6 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all bg-slate-50/50 font-bold text-charcoal-800 placeholder:text-slate-300 placeholder:font-medium text-sm";
     
     return (
-      <div key={field.key} className="space-y-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-charcoal-500">
-          {field.label} {field.required && <span className="text-rose-500">*</span>}
+      <div key={field.key} className="space-y-2.5">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+          {field.label} 
+          {field.required && <span className="text-rose-500">*</span>}
         </label>
         
         {field.type === "textarea" ? (
           <textarea 
-            className={commonClasses} 
-            rows={3}
+            className={`${commonClasses} min-h-[120px] resize-none`}
             required={field.required}
             value={formData[field.key] || ""}
             onChange={(e) => handleInputChange(field.key, e.target.value)}
+            placeholder={field.placeholder || "Tuliskan di sini..."}
           />
         ) : (
           <input 
             type={field.type} 
             className={commonClasses}
             required={field.required}
-            placeholder={field.hint}
+            placeholder={field.placeholder || field.hint}
             value={formData[field.key] || ""}
             onChange={(e) => handleInputChange(field.key, e.target.value)}
           />
         )}
-        {field.hint && <p className="text-[10px] text-charcoal-300 italic">{field.hint}</p>}
+        {field.hint && <p className="text-[9px] text-slate-300 font-bold uppercase tracking-wider">{field.hint}</p>}
       </div>
     );
   };
 
+  if (loading) return (
+    <div className="flex items-center justify-center p-20">
+      <div className="w-8 h-8 border-3 border-rose-500/20 border-t-rose-500 rounded-full animate-spin"></div>
+    </div>
+  );
+
   return (
-    <div className="flex flex-col lg:flex-row min-h-[600px]">
+    <div className="flex flex-col lg:flex-row bg-white rounded-[40px] shadow-xl shadow-charcoal-900/[0.02] border border-slate-100 overflow-hidden">
       {/* Sidebar Tabs */}
-      <div className="lg:w-64 bg-cream-50/50 border-r border-cream-100 flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar">
+      <div className="lg:w-72 bg-slate-50/50 border-r border-slate-100 flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar p-3">
         {[
-          { id: "mempelai", label: "Mempelai", icon: <Icons.Couple /> },
-          { id: "acara", label: "Acara", icon: <Icons.Event /> },
-          { id: "lainnya", label: "Lainnya", icon: <Icons.Sparkles /> },
-          { id: "media", label: "Media & Foto", icon: <Icons.Camera /> },
+          { id: "mempelai", label: "Profil Mempelai", icon: <Icons.Couple /> },
+          { id: "acara", label: "Detail Acara", icon: <Icons.Event /> },
+          { id: "lainnya", label: "Konten Tambahan", icon: <Icons.Sparkles /> },
+          { id: "media", label: "Media & Galeri", icon: <Icons.Camera /> },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 lg:flex-none flex items-center gap-3 px-6 py-5 text-sm font-bold uppercase tracking-widest transition-all ${
+            className={`flex-1 lg:flex-none flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-2xl mb-1 ${
               activeTab === tab.id
-                ? "bg-white text-rose-500 border-b-2 lg:border-b-0 lg:border-r-4 border-rose-500"
-                : "text-charcoal-400 hover:text-charcoal-700"
+                ? "bg-white text-rose-500 shadow-sm border border-slate-100"
+                : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
             }`}
           >
             <span>{tab.icon}</span>
-            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="hidden sm:inline whitespace-nowrap">{tab.label}</span>
           </button>
         ))}
       </div>
 
       <div className="flex-grow p-8 md:p-12">
-        <form onSubmit={handleSubmit} className="space-y-8 max-w-2xl">
+        <form onSubmit={handleSubmit} className="space-y-10 max-w-2xl">
           {saveStatus === "success" && (
-            <div className="flex items-center gap-3 p-4 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 text-sm font-bold animate-fade-in">
-              <Icons.Check /> Perubahan berhasil disimpan!
+            <div className="flex items-center gap-3 p-5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100/50 text-[10px] font-black uppercase tracking-widest animate-fade-in">
+              <Icons.Check /> Perubahan Berhasil Disimpan
             </div>
           )}
           
           {saveStatus === "error" && (
-            <div className="flex items-center gap-3 p-4 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 text-sm font-bold animate-fade-in">
-              <Icons.Error /> Gagal menyimpan. Silakan coba lagi.
+            <div className="flex items-center gap-3 p-5 bg-rose-50 text-rose-600 rounded-2xl border border-rose-100/50 text-[10px] font-black uppercase tracking-widest animate-fade-in">
+              <Icons.Error /> Gagal Menyimpan. Silakan Coba Lagi.
             </div>
           )}
+
           {activeTab === "mempelai" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
-              {groomBrideFields.map(renderField)}
+            <div className="space-y-10 animate-fade-in">
+              <div>
+                <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Profil Mempelai</h2>
+                <p className="text-xs text-slate-400 font-medium">Lengkapi detail profil untuk calon pengantin pria dan wanita.</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {groomBrideFields.map(renderField)}
+              </div>
             </div>
           )}
 
           {activeTab === "acara" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
-              {eventFields.map(renderField)}
+            <div className="space-y-10 animate-fade-in">
+              <div>
+                <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Waktu & Lokasi Acara</h2>
+                <p className="text-xs text-slate-400 font-medium">Pastikan detail waktu dan alamat sudah benar agar tamu tidak tersesat.</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {eventFields.map(renderField)}
+              </div>
             </div>
           )}
 
           {activeTab === "lainnya" && (
-            <div className="space-y-6 animate-fade-in">
-              {otherFields.map(renderField)}
+            <div className="space-y-10 animate-fade-in">
+              <div>
+                <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Cerita & Pesan Tambahan</h2>
+                <p className="text-xs text-slate-400 font-medium">Tambahkan sentuhan personal untuk menyapa para tamu undangan.</p>
+              </div>
+              <div className="space-y-8">
+                {otherFields.map(renderField)}
+              </div>
             </div>
           )}
 
           {activeTab === "media" && (
-            <div className="space-y-8 animate-fade-in text-center py-12">
-               <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Icons.Camera />
+            <div className="space-y-10 animate-fade-in">
+              <div>
+                <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Media & Galeri Foto</h2>
+                <p className="text-xs text-slate-400 font-medium">Unggah foto-foto terbaik kamu untuk menghiasi undangan digital.</p>
               </div>
-              <h3 className="font-bold text-charcoal-800 text-lg">Upload Foto Terindah Anda</h3>
-              <p className="text-charcoal-400 text-sm">Media di-render secara otomatis dari storage.</p>
-              <button type="button" className="px-8 py-4 border-2 border-dashed border-cream-200 rounded-3xl text-charcoal-400 font-bold">
-                Pilih File
-              </button>
+              
+              <div className="text-center py-16 bg-slate-50/50 rounded-[32px] border-2 border-dashed border-slate-100 border-spacing-4">
+                 <div className="w-16 h-16 bg-white text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-slate-100">
+                  <Icons.Camera />
+                </div>
+                <h3 className="font-bold text-charcoal-900 text-lg">Pilih Foto Galeri</h3>
+                <p className="text-slate-400 text-xs mt-2 font-medium max-w-xs mx-auto mb-8">
+                  Format JPG, PNG, atau WEBP. Maksimum 5MB per file.
+                </p>
+                <button type="button" className="px-10 py-4 bg-white border border-slate-100 text-charcoal-900 font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-slate-50 transition-all shadow-sm">
+                  Pilih File
+                </button>
+              </div>
             </div>
           )}
 
-          <div className="pt-8 border-t border-cream-100 flex justify-between items-center">
-            <button type="button" className="text-charcoal-400 font-bold text-xs uppercase tracking-widest">
-              Draft Tersimpan Otomatis
-            </button>
+          <div className="pt-10 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-2 text-emerald-500">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-[10px] font-black uppercase tracking-widest">Sistem Ready</span>
+            </div>
             <button
               type="submit"
-              disabled={saveStatus === "saving" || !invitationId}
-              className="px-10 py-4 bg-rose-500 text-white font-bold rounded-2xl hover:bg-rose-600 transition-all shadow-xl shadow-rose-900/10 disabled:opacity-50"
+              disabled={saveStatus === "saving" || !data?.id}
+              className="w-full md:w-auto px-12 py-5 bg-charcoal-900 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-rose-500 transition-all duration-500 shadow-xl shadow-charcoal-900/10 disabled:opacity-50 flex items-center justify-center gap-3"
             >
-              {saveStatus === "saving" ? "Menyimpan..." : "Simpan Perubahan"}
+              {saveStatus === "saving" ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Menyimpan...
+                </>
+              ) : "Simpan Perubahan"}
             </button>
           </div>
         </form>

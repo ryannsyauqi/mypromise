@@ -6,55 +6,66 @@ export default function SuccessPage(props: PageProps<"/checkout/success">) {
   // We can use searchParams to get order_id if needed
   
   return (
-    <div className="min-h-screen bg-cream-50">
+    <div className="min-h-screen bg-[#FAFAFA]">
       <Navbar variant="light-bg" />
       
-      <main className="pt-40 pb-24 flex items-center justify-center">
-        <div className="container-tight px-6 text-center">
-          <div className="w-24 h-24 bg-sage-100 text-sage-500 rounded-full flex items-center justify-center mx-auto mb-8 animate-scale-in">
-            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <main className="pt-24 pb-24 flex items-center justify-center">
+        <div className="max-w-xl w-full px-6 text-center">
+          <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-rose-500/5 border border-rose-100/50 animate-scale-in">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
             </svg>
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-bold text-charcoal-800 mb-6" style={{ fontFamily: "var(--font-playfair)" }}>
-            Pembayaran Berhasil!
-          </h1>
+          <div className="mb-8">
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-rose-500 mb-2 block">Order Confirmed</span>
+            <h1 className="text-3xl md:text-5xl font-bold text-charcoal-900 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>
+              Terima Kasih!
+            </h1>
+            <p className="text-slate-500 text-sm md:text-base mt-4 leading-relaxed max-w-md mx-auto font-medium">
+              Pesanan kamu telah berhasil diterima. Tautan pengisian konten sudah dikirim ke WhatsApp & Email kamu.
+            </p>
+          </div>
           
-          <p className="text-charcoal-400 text-lg mb-10 leading-relaxed max-w-lg mx-auto">
-            Selamat! Pesanan Anda telah kami terima. Link untuk mengisi konten undangan telah kami kirimkan ke nomor WhatsApp dan Email Anda.
-          </p>
-          
-          <div className="bg-white rounded-3xl p-8 shadow-sm border border-cream-200 mb-10 max-w-md mx-auto">
-            <h3 className="font-bold text-charcoal-800 mb-4 uppercase tracking-widest text-xs">Langkah Selanjutnya</h3>
-            <div className="space-y-4 text-left">
-              <div className="flex gap-4">
-                <span className="w-6 h-6 rounded-full bg-rose-50 text-rose-500 text-xs font-bold flex items-center justify-center shrink-0">1</span>
-                <p className="text-sm text-charcoal-600">Cek pesan masuk di WhatsApp/Email.</p>
+          <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-xl shadow-charcoal-900/[0.02] border border-slate-100 mb-10 text-left">
+            <h3 className="font-black text-charcoal-900 mb-8 uppercase tracking-[0.2em] text-[10px] flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+              Langkah Selanjutnya
+            </h3>
+            <div className="space-y-6">
+              <div className="flex gap-5 group">
+                <span className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 text-xs font-black flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-500">1</span>
+                <div>
+                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Cek WhatsApp / Email</h4>
+                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Buka pesan masuk untuk melihat tautan dashboard kamu.</p>
+                </div>
               </div>
-              <div className="flex gap-4">
-                <span className="w-6 h-6 rounded-full bg-rose-50 text-rose-500 text-xs font-bold flex items-center justify-center shrink-0">2</span>
-                <p className="text-sm text-charcoal-600">Klik link dashboard untuk mengisi data pernikahan.</p>
+              <div className="flex gap-5 group">
+                <span className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 text-xs font-black flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-500">2</span>
+                <div>
+                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Lengkapi Data Pernikahan</h4>
+                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Isi detail acara dan unggah momen-momen terbaik kamu.</p>
+                </div>
               </div>
-              <div className="flex gap-4">
-                <span className="w-6 h-6 rounded-full bg-rose-50 text-rose-500 text-xs font-bold flex items-center justify-center shrink-0">3</span>
-                <p className="text-sm text-charcoal-600">Unggah foto-foto terbaik Anda.</p>
+              <div className="flex gap-5 group">
+                <span className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 text-xs font-black flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-500">3</span>
+                <div>
+                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Undangan Ready Untuk Disebar</h4>
+                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Selesaikan konten dan bagikan kebahagiaan kamu sekarang!</p>
+                </div>
               </div>
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/"
-              className="px-8 py-4 bg-charcoal-800 text-white font-bold rounded-xl hover:bg-charcoal-700 transition-all duration-300"
-            >
-              Kembali ke Beranda
-            </Link>
+          <div className="flex justify-center">
             <Link
               href="/dashboard"
-              className="px-8 py-4 bg-rose-500 text-white font-bold rounded-xl hover:bg-rose-600 transition-all duration-300 shadow-lg shadow-rose-900/10"
+              className="w-full md:w-auto px-12 py-5 bg-rose-500 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-rose-600 transition-all duration-500 shadow-xl shadow-rose-900/10 flex items-center justify-center gap-3"
             >
-              Masuk ke Dashboard
+              Mulai Isi Data
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
             </Link>
           </div>
         </div>

@@ -10,62 +10,96 @@ interface Guest {
 }
 
 export default function GuestList() {
-  const [guests, setGuests] = useState<Guest[]>([
-    { id: "1", name: "Pak Rudi", status: "hadir", guest_count: 2 },
-    { id: "2", name: "Bu Sari", status: "hadir", guest_count: 3 },
-    { id: "3", name: "Tante Lina", status: "belum_pasti", guest_count: 0 },
-    { id: "4", name: "Mas Adi", status: "pending", guest_count: 0 },
-  ]);
+  const supabase = createClient();
+  const [guests, setGuests] = useState<any[]>([]);
+  const [invitation, setInvitation] = useState<any>(null);
   const [newGuestName, setNewGuestName] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const addGuest = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function loadData() {
+      // Get latest invitation first
+      const { data: invData } = await supabase
+        .from('invitations')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (invData) {
+        setInvitation(invData);
+        // Get guests for this invitation/order
+        const { data: guestData } = await supabase
+          .from('guests')
+          .select('*')
+          .eq('order_id', invData.order_id)
+          .order('created_at', { ascending: false });
+        
+        if (guestData) setGuests(guestData);
+      }
+      setLoading(false);
+    }
+    loadData();
+  }, [supabase]);
+
+  const addGuest = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newGuestName.trim()) return;
+    if (!newGuestName.trim() || !invitation) return;
 
-    const newGuest: Guest = {
-      id: Date.now().toString(),
-      name: newGuestName,
-      status: "pending",
-      guest_count: 0,
-    };
+    const urlParam = newGuestName.toLowerCase().replace(/\s+/g, '-');
+    const { data: newGuest, error } = await supabase
+      .from('guests')
+      .insert({
+        order_id: invitation.order_id,
+        name: newGuestName,
+        url_param: urlParam,
+        full_url: `${window.location.origin}/invitation/${invitation.slug}?to=${urlParam}`
+      })
+      .select()
+      .single();
 
-    setGuests([newGuest, ...guests]);
-    setNewGuestName("");
-  };
-
-  const copyInvitationLink = (guestName: string) => {
-    const baseUrl = window.location.origin;
-    // For demo, we use the minimalist slug
-    const invitationUrl = `${baseUrl}/demo/minimalist-elegance?to=${encodeURIComponent(guestName)}`;
-    
-    navigator.clipboard.writeText(invitationUrl);
-    alert(`Link untuk ${guestName} berhasil disalin!`);
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "hadir": return <span className="px-3 py-1 bg-sage-100 text-sage-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Hadir</span>;
-      case "tidak_hadir": return <span className="px-3 py-1 bg-blush-100 text-blush-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Tidak Hadir</span>;
-      case "belum_pasti": return <span className="px-3 py-1 bg-gold-100 text-gold-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Belum Pasti</span>;
-      default: return <span className="px-3 py-1 bg-charcoal-50 text-charcoal-400 rounded-full text-[10px] font-bold uppercase tracking-wider">Belum Dibuka</span>;
+    if (!error && newGuest) {
+      setGuests([newGuest, ...guests]);
+      setNewGuestName("");
     }
   };
 
+  const copyInvitationLink = (guest: any) => {
+    navigator.clipboard.writeText(guest.full_url);
+    alert(`Link untuk ${guest.name} berhasil disalin!`);
+  };
+
+  const getStatusBadge = (status: string) => {
+    const baseClasses = "px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-[0.1em] border transition-all duration-500";
+    switch (status) {
+      case "hadir": return <span className={`${baseClasses} bg-emerald-50 text-emerald-600 border-emerald-100/50`}>Hadir</span>;
+      case "tidak_hadir": return <span className={`${baseClasses} bg-rose-50 text-rose-600 border-rose-100/50`}>Tidak Hadir</span>;
+      case "belum_pasti": return <span className={`${baseClasses} bg-amber-50 text-amber-600 border-amber-100/50`}>Belum Pasti</span>;
+      default: return <span className={`${baseClasses} bg-slate-50 text-slate-400 border-slate-100`}>Belum Dibuka</span>;
+    }
+  };
+
+  if (loading) return (
+    <div className="p-20 text-center">
+      <div className="w-8 h-8 border-3 border-rose-500/20 border-t-rose-500 rounded-full animate-spin mx-auto"></div>
+    </div>
+  );
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-white">
       {/* Add Guest Header */}
-      <div className="p-8 border-b border-cream-100 bg-cream-50/30">
-        <form onSubmit={addGuest} className="flex gap-4">
+      <div className="p-8 md:p-10 border-b border-slate-100 bg-slate-50/30">
+        <form onSubmit={addGuest} className="flex flex-col sm:flex-row gap-4 max-w-3xl">
           <input
             type="text"
             value={newGuestName}
             onChange={(e) => setNewGuestName(e.target.value)}
             placeholder="Tulis nama tamu... (Contoh: Bpk. Rudi & Keluarga)"
-            className="flex-grow dashboard-input"
+            className="flex-grow w-full px-6 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all bg-white font-bold text-charcoal-800 placeholder:text-slate-300 placeholder:font-medium text-sm"
           />
           <button
             type="submit"
-            className="px-8 py-4 bg-charcoal-800 text-white font-bold rounded-2xl hover:bg-charcoal-700 transition-all text-sm whitespace-nowrap"
+            className="px-10 py-4 bg-charcoal-900 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-rose-500 transition-all duration-500 shadow-xl shadow-charcoal-900/10 whitespace-nowrap"
           >
             Tambah Tamu
           </button>
@@ -76,56 +110,60 @@ export default function GuestList() {
       <div className="overflow-x-auto no-scrollbar">
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-cream-100">
-              <th className="px-8 py-5 text-xs font-bold uppercase tracking-[0.2em] text-charcoal-400">Nama Tamu</th>
-              <th className="px-8 py-5 text-xs font-bold uppercase tracking-[0.2em] text-charcoal-400">Status RSVP</th>
-              <th className="px-8 py-5 text-xs font-bold uppercase tracking-[0.2em] text-charcoal-400">Jumlah Tamu</th>
-              <th className="px-8 py-5 text-xs font-bold uppercase tracking-[0.2em] text-charcoal-400 text-right">Aksi</th>
+            <tr className="border-b border-slate-100">
+              <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Nama Tamu</th>
+              <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Status RSVP</th>
+              <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Aksi</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-cream-50">
-            {guests.map((guest) => (
-              <tr key={guest.id} className="hover:bg-cream-50/30 transition-colors group">
-                <td className="px-8 py-5">
-                  <p className="font-bold text-charcoal-800">{guest.name}</p>
-                </td>
-                <td className="px-8 py-5">
-                  {getStatusBadge(guest.status)}
-                </td>
-                <td className="px-8 py-5">
-                  <span className="text-charcoal-500 font-medium">{guest.guest_count || "-"}</span>
-                </td>
-                <td className="px-8 py-5 text-right">
-                  <button
-                    onClick={() => copyInvitationLink(guest.name)}
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-cream-200 text-charcoal-600 text-xs font-bold rounded-xl hover:bg-white hover:border-rose-400 hover:text-rose-500 transition-all"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                    </svg>
-                    Salin Link
-                  </button>
+          <tbody className="divide-y divide-slate-50">
+            {guests.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="px-10 py-20 text-center">
+                  <p className="text-slate-400 font-medium text-sm">Belum ada tamu yang ditambahkan.</p>
                 </td>
               </tr>
-            ))}
+            ) : (
+              guests.map((guest) => (
+                <tr key={guest.id} className="hover:bg-slate-50/50 transition-colors group">
+                  <td className="px-10 py-6">
+                    <p className="font-bold text-charcoal-900 text-sm">{guest.name}</p>
+                    <p className="text-[10px] text-slate-400 mt-1 font-medium">{guest.url_param}</p>
+                  </td>
+                  <td className="px-10 py-6">
+                    {getStatusBadge(guest.status || 'pending')}
+                  </td>
+                  <td className="px-10 py-6 text-right">
+                    <button
+                      onClick={() => copyInvitationLink(guest)}
+                      className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white border border-slate-100 text-charcoal-900 text-[10px] font-black uppercase tracking-[0.1em] rounded-xl hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all duration-500 shadow-sm"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                      </svg>
+                      Salin Link
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Summary Footer */}
-      <div className="p-8 bg-cream-50/50 flex flex-wrap gap-8 border-t border-cream-100">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-charcoal-300 mb-1">Total Tamu</p>
-          <p className="text-xl font-bold text-charcoal-800">{guests.length}</p>
+      <div className="p-10 bg-slate-50/50 flex flex-wrap gap-12 border-t border-slate-100">
+        <div className="space-y-1">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Total Tamu</p>
+          <p className="text-2xl font-black text-charcoal-900">{guests.length}</p>
         </div>
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-charcoal-300 mb-1">Sudah Konfirmasi</p>
-          <p className="text-xl font-bold text-sage-500">{guests.filter(g => g.status === 'hadir').length}</p>
+        <div className="space-y-1">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Sudah Konfirmasi</p>
+          <p className="text-2xl font-black text-emerald-500">{guests.filter(g => g.status === 'hadir').length}</p>
         </div>
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-charcoal-300 mb-1">Total Pack</p>
-          <p className="text-xl font-bold text-charcoal-800">{guests.reduce((acc, g) => acc + g.guest_count, 0)}</p>
+        <div className="space-y-1">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">Belum Mengisi</p>
+          <p className="text-2xl font-black text-slate-400">{guests.filter(g => !g.status || g.status === 'pending').length}</p>
         </div>
       </div>
     </div>

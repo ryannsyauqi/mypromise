@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     try {
       const supabase = createAdminClient();
       
-      const { error: orderError } = await supabase.from('orders').insert({
+      const { data: orderData, error: orderError } = await supabase.from('orders').insert({
         order_number: orderId,
         buyer_name: customerDetails.name,
         buyer_email: customerDetails.email,
@@ -24,18 +24,31 @@ export async function POST(request: Request) {
         payment_status: 'paid',
         order_status: 'awaiting_content',
         inv_slug: invitationSlug,
-      });
+      }).select().single();
 
       if (orderError) {
         console.error("❌ Database Insert Error:", orderError);
         throw orderError;
       }
 
-      console.log("✅ Order saved successfully:", orderId);
+      // Create initial invitation content
+      const { error: invError } = await supabase.from('invitations').insert({
+        order_id: orderData.id,
+        slug: invitationSlug,
+        template_id: templateId,
+        content: {
+          groom_name: customerDetails.name.split(' & ')[0] || customerDetails.name,
+          bride_name: customerDetails.name.split(' & ')[1] || "",
+        }
+      });
+
+      if (invError) {
+        console.error("❌ Invitation Insert Error:", invError);
+      }
+
+      console.log("✅ Order & Invitation saved successfully:", orderId);
     } catch (dbError) {
       console.error("❌ Database save failed:", dbError);
-      // In bypass mode we might want to continue, but here we should probably report it
-      // so the user knows why it's not in the admin.
     }
 
     return NextResponse.json({
