@@ -77,10 +77,13 @@ export default function CheckoutForm({ template }: CheckoutFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-bold text-charcoal-700 uppercase tracking-wider mb-2">
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="space-y-5">
+        <div className="group">
+          <label htmlFor="name" className="flex items-center gap-2 text-[10px] font-black text-charcoal-400 uppercase tracking-[0.2em] mb-2.5 transition-colors group-focus-within:text-rose-500">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
             Nama Lengkap
           </label>
           <input
@@ -90,14 +93,17 @@ export default function CheckoutForm({ template }: CheckoutFormProps) {
             required
             value={formData.name}
             onChange={handleChange}
-            placeholder="Contoh: Budi Pratama"
-            className="w-full px-5 py-4 rounded-xl border border-cream-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all bg-cream-50/30 font-medium"
+            placeholder="Masukkan nama lengkap kamu"
+            className="w-full px-6 py-4.5 rounded-2xl border border-cream-200 focus:outline-none focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all bg-cream-50/20 font-bold text-charcoal-800 placeholder:text-charcoal-300 placeholder:font-medium"
           />
         </div>
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-bold text-charcoal-700 uppercase tracking-wider mb-2">
-            Email
+        <div className="group">
+          <label htmlFor="email" className="flex items-center gap-2 text-[10px] font-black text-charcoal-400 uppercase tracking-[0.2em] mb-2.5 transition-colors group-focus-within:text-rose-500">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Email Aktif
           </label>
           <input
             type="email"
@@ -106,17 +112,20 @@ export default function CheckoutForm({ template }: CheckoutFormProps) {
             required
             value={formData.email}
             onChange={handleChange}
-            placeholder="budi@example.com"
-            className="w-full px-5 py-4 rounded-xl border border-cream-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all bg-cream-50/30 font-medium"
+            placeholder="nama@email.com"
+            className="w-full px-6 py-4.5 rounded-2xl border border-cream-200 focus:outline-none focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all bg-cream-50/20 font-bold text-charcoal-800 placeholder:text-charcoal-300 placeholder:font-medium"
           />
         </div>
 
-        <div>
-          <label htmlFor="phone" className="block text-sm font-bold text-charcoal-700 uppercase tracking-wider mb-2">
+        <div className="group">
+          <label htmlFor="phone" className="flex items-center gap-2 text-[10px] font-black text-charcoal-400 uppercase tracking-[0.2em] mb-2.5 transition-colors group-focus-within:text-rose-500">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
             Nomor WhatsApp
           </label>
           <div className="relative">
-            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-charcoal-400 font-medium">+62</span>
+            <span className="absolute left-6 top-1/2 -translate-y-1/2 text-charcoal-400 font-black text-sm">+62</span>
             <input
               type="tel"
               id="phone"
@@ -124,28 +133,36 @@ export default function CheckoutForm({ template }: CheckoutFormProps) {
               required
               value={formData.phone}
               onChange={handleChange}
-              placeholder="81234567890"
-              className="w-full pl-16 pr-5 py-4 rounded-xl border border-cream-200 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all bg-cream-50/30 font-medium"
+              placeholder="812xxxxxxx"
+              className="w-full pl-16 pr-6 py-4.5 rounded-2xl border border-cream-200 focus:outline-none focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all bg-cream-50/20 font-bold text-charcoal-800 placeholder:text-charcoal-300 placeholder:font-medium"
             />
           </div>
-          <p className="mt-2 text-[11px] text-charcoal-400 leading-relaxed uppercase tracking-wider">
-            Pastikan nomor WhatsApp aktif untuk menerima link pengisian konten.
-          </p>
+          <div className="mt-3 flex items-start gap-2 text-[10px] text-charcoal-400 leading-relaxed font-medium uppercase tracking-wider">
+            <svg className="w-3 h-3 text-rose-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            Tautan pengisian konten akan dikirim ke nomor ini.
+          </div>
         </div>
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-5 bg-rose-500 text-white font-bold rounded-xl hover:bg-rose-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-rose-900/10 flex items-center justify-center gap-3"
+        className="group relative w-full py-5 bg-rose-500 text-white font-black uppercase tracking-[0.2em] text-xs rounded-2xl hover:bg-rose-600 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-rose-900/10 flex items-center justify-center gap-3"
       >
         {loading ? (
           <>
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            Memproses...
+            <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin" />
+            Processing
           </>
         ) : (
-          `Bayar Rp ${(template.price / 1000).toFixed(0)}k Sekarang`
+          <>
+            Lanjutkan Pembayaran
+            <svg className="w-4 h-4 transition-transform duration-500 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </>
         )}
       </button>
     </form>
