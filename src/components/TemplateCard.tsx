@@ -24,12 +24,7 @@ export default function TemplateCard({ template, index }: TemplateCardProps) {
           className="object-cover transition-transform duration-1000 group-hover:scale-105"
         />
         
-        {/* Category Badge - Minimalist */}
-        <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 bg-white/20 backdrop-blur-xl text-white text-[8px] font-black uppercase tracking-[0.2em] rounded-full border border-white/30">
-            {template.category}
-          </span>
-        </div>
+
 
         {/* Overlay on Hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

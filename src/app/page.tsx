@@ -11,14 +11,7 @@ import { Template } from "@/lib/types";
 
 export default function HomePage() {
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
-
-  const slides = [
-    "/images/hero/hero-slider1.jpeg",
-    "/images/hero/hero-slider2.jpeg",
-    "/images/hero/hero-slider3.jpeg",
-  ];
 
   useEffect(() => {
     async function fetchTemplates() {
@@ -41,41 +34,27 @@ export default function HomePage() {
     }
 
     fetchTemplates();
-
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [slides.length]);
+  }, []);
 
   return (
-    <div className="bg-cream-50 overflow-x-hidden selection:bg-rose-100 selection:text-rose-900">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
-      {/* ===== HERO: DIRECT & CINEMATIC (LEFT ALIGNED) ===== */}
-      <section className="relative h-[75vh] flex items-center overflow-hidden">
-        {/* Slider Background */}
+      {/* Hero Section - Static Cinematic */}
+      <section className="relative h-[75vh] flex items-center overflow-hidden bg-charcoal-900">
+        {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          {slides.map((slide, index) => (
-            <div
-              key={slide}
-              className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100" : "opacity-0"
-                }`}
-            >
-              <Image
-                src={slide}
-                alt={`Hero ${index + 1}`}
-                fill
-                className={`object-cover ${index === currentSlide ? "animate-[slow-zoom_20s_infinite_alternate]" : ""}`}
-                priority={index === 0}
-              />
-            </div>
-          ))}
+          <Image
+            src="/images/hero/hero.jpg"
+            alt="MyPromise Hero"
+            fill
+            className="object-cover object-center"
+            priority
+          />
           {/* Dark Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-charcoal-900/80 via-charcoal-900/40 to-transparent" />
         </div>
 
-        {/* Hero Content */}
         <div className="container-default px-6 relative z-10 w-full">
           <div className="max-w-3xl space-y-8 animate-fade-in">
             <div className="space-y-3">
@@ -111,19 +90,6 @@ export default function HomePage() {
                 <Image src="/whatsapp-icon.png" alt="WA" width={18} height={18} className="brightness-0 invert" />
                 Hubungi Admin
               </a>
-            </div>
-
-            {/* Slider Indicators (Left Aligned) */}
-            <div className="flex gap-2 pt-8">
-              {slides.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`w-8 h-1 rounded-full transition-all duration-500 ${idx === currentSlide ? "bg-rose-500 w-12" : "bg-white/30"
-                    }`}
-                  aria-label={`Slide ${idx + 1}`}
-                />
-              ))}
             </div>
           </div>
         </div>
@@ -274,7 +240,7 @@ export default function HomePage() {
                     {i + 1}
                   </div>
                   <div className="space-y-1">
-                    <h4 className="text-base font-bold text-charcoal-900 uppercase tracking-wider">{step.title}</h4>
+                    <h4 className="text-base font-bold text-charcoal-900">{step.title}</h4>
                     <p className="text-[11px] text-charcoal-500 leading-relaxed">{step.desc}</p>
                   </div>
                 </div>
