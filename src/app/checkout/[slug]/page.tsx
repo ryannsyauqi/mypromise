@@ -1,25 +1,31 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { mockTemplates, INVITATION_PRICE } from "@/lib/mock-data";
+import { createClient } from "@/utils/supabase/server";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CheckoutForm from "./CheckoutForm";
+import { Template } from "@/lib/types";
 
 export async function generateMetadata(
   props: PageProps<"/checkout/[slug]">
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const template = mockTemplates.find((t) => t.slug === slug);
-
   return {
-    title: template ? `Checkout: ${template.name}` : "Checkout",
+    title: `Checkout | MyPromise`,
     description: "Selesaikan pemesanan undangan digital MyPromise Anda.",
   };
 }
 
 export default async function CheckoutPage(props: PageProps<"/checkout/[slug]">) {
   const { slug } = await props.params;
-  const template = mockTemplates.find((t) => t.slug === slug);
+  
+  const supabase = await createClient();
+  const { data: template } = await supabase
+    .from("templates")
+    .select("*")
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .single();
 
   if (!template) {
     notFound();
@@ -43,7 +49,7 @@ export default async function CheckoutPage(props: PageProps<"/checkout/[slug]">)
                   <h2 className="text-xl font-bold text-charcoal-800 mb-6" style={{ fontFamily: "var(--font-playfair)" }}>
                     Data Pembeli
                   </h2>
-                  <CheckoutForm template={template} />
+                  <CheckoutForm template={template as Template} />
                 </div>
               </div>
               
@@ -71,7 +77,7 @@ export default async function CheckoutPage(props: PageProps<"/checkout/[slug]">)
                   <div className="space-y-3 mb-8">
                     <div className="flex justify-between text-sm">
                       <span className="text-charcoal-400">Harga Paket</span>
-                      <span className="text-charcoal-800 font-medium">Rp {INVITATION_PRICE.toLocaleString("id-ID")}</span>
+                      <span className="text-charcoal-800 font-medium">Rp {template.price.toLocaleString("id-ID")}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-charcoal-400">Biaya Layanan</span>
@@ -80,7 +86,7 @@ export default async function CheckoutPage(props: PageProps<"/checkout/[slug]">)
                     <div className="pt-3 border-t border-cream-100 flex justify-between items-baseline">
                       <span className="text-charcoal-800 font-bold">Total</span>
                       <span className="text-2xl font-bold text-rose-500" style={{ fontFamily: "var(--font-playfair)" }}>
-                        Rp {INVITATION_PRICE.toLocaleString("id-ID")}
+                        Rp {template.price.toLocaleString("id-ID")}
                       </span>
                     </div>
                   </div>
