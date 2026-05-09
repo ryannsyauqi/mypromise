@@ -1,49 +1,38 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
 
 export default function AdminPage() {
-  const supabase = createClient();
   const [stats, setStats] = useState<any[]>([]);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadAdminData() {
-      // 1. Fetch Orders Count
-      const { count: orderCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true });
+      try {
+        const response = await fetch("/api/admin/stats");
+        if (!response.ok) throw new Error("Failed to fetch admin stats");
+        
+        const data = await response.json();
+        const { orderCount, totalRevenue, recentOrders: orders } = data;
 
-      // 2. Fetch Total Revenue
-      const { data: revenueData } = await supabase
-        .from('orders')
-        .select('amount')
-        .eq('status', 'paid');
-      
-      const totalRevenue = revenueData?.reduce((acc, curr) => acc + curr.amount, 0) || 0;
+        setStats([
+          { label: "Total Omzet", value: `Rp ${totalRevenue.toLocaleString("id-ID")}`, change: "+100%", icon: "💰" },
+          { label: "Total Pesanan", value: orderCount || 0, change: "New", icon: "🛒" },
+          { label: "Undangan Aktif", value: orderCount || 0, change: "New", icon: "✨" },
+          { label: "Rata-rata Order", value: totalRevenue ? `Rp ${(totalRevenue / (orderCount || 1)).toLocaleString("id-ID")}` : "0", change: "New", icon: "📈" },
+        ]);
 
-      // 3. Fetch Recent Orders
-      const { data: orders } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      setStats([
-        { label: "Total Omzet", value: `Rp ${totalRevenue.toLocaleString("id-ID")}`, change: "+100%", icon: "💰" },
-        { label: "Total Pesanan", value: orderCount || 0, change: "New", icon: "🛒" },
-        { label: "Undangan Aktif", value: orderCount || 0, change: "New", icon: "✨" },
-        { label: "Rata-rata Order", value: totalRevenue ? `Rp ${(totalRevenue / (orderCount || 1)).toLocaleString("id-ID")}` : "0", change: "New", icon: "📈" },
-      ]);
-
-      if (orders) setRecentOrders(orders);
-      setLoading(false);
+        if (orders) setRecentOrders(orders);
+      } catch (error) {
+        console.error("Error loading admin data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadAdminData();
-  }, [supabase]);
+  }, []);
 
   if (loading) return <div className="p-10 text-slate-400 font-bold animate-pulse">Loading HQ Data...</div>;
 
@@ -95,11 +84,11 @@ export default function AdminPage() {
               ) : (
                 recentOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="px-8 py-5 text-xs font-mono font-bold text-slate-500">{order.id}</td>
+                    <td className="px-8 py-5 text-xs font-mono font-bold text-slate-500">{order.order_number}</td>
                     <td className="px-8 py-5 text-sm font-bold text-slate-800">{order.buyer_name}</td>
                     <td className="px-8 py-5">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-gold-50 text-gold-600'}`}>
-                        {order.status}
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-gold-50 text-gold-600'}`}>
+                        {order.payment_status}
                       </span>
                     </td>
                     <td className="px-8 py-5 text-sm font-black text-slate-900 text-right">Rp {order.amount.toLocaleString("id-ID")}</td>

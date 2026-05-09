@@ -1,25 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
 
 export default function AdminOrdersPage() {
-  const supabase = createClient();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchOrders() {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (data) setOrders(data);
-      setLoading(false);
+      try {
+        const response = await fetch("/api/admin/orders");
+        if (!response.ok) throw new Error("Failed to fetch orders");
+        const data = await response.json();
+        if (data.orders) setOrders(data.orders);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchOrders();
-  }, [supabase]);
+  }, []);
 
   if (loading) return <div className="p-10 text-slate-400 font-bold animate-pulse">Fetching Orders...</div>;
 
@@ -54,7 +55,7 @@ export default function AdminOrdersPage() {
                   <tr key={order.id} className="hover:bg-slate-50/30 transition-colors group">
                     <td className="px-8 py-6">
                       <div className="flex flex-col">
-                        <span className="font-mono text-[10px] font-bold text-slate-400 mb-1">{order.id}</span>
+                        <span className="font-mono text-[10px] font-bold text-slate-400 mb-1">{order.order_number}</span>
                         <span className="font-bold text-slate-900 text-sm">{order.buyer_name}</span>
                         <span className="text-xs text-slate-400 mt-1">{order.buyer_phone}</span>
                       </div>
@@ -65,8 +66,8 @@ export default function AdminOrdersPage() {
                       </span>
                     </td>
                     <td className="px-8 py-6">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-gold-50 text-gold-600'}`}>
-                        {order.status}
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                        {order.payment_status}
                       </span>
                     </td>
                     <td className="px-8 py-6">
