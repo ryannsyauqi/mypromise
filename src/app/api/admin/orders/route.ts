@@ -7,7 +7,7 @@ export async function GET() {
 
     const { data: orders, error } = await supabase
       .from('orders')
-      .select('*')
+      .select('*, templates(name, slug)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;

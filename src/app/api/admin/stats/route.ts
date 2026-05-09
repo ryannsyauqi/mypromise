@@ -25,7 +25,7 @@ export async function GET() {
     // 3. Fetch Recent Orders
     const { data: orders, error: ordersError } = await supabase
       .from('orders')
-      .select('*')
+      .select('*, templates(name, slug)')
       .order('created_at', { ascending: false })
       .limit(5);
 

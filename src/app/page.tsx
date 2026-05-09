@@ -6,11 +6,13 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TemplateCard from "@/components/TemplateCard";
-import { mockTemplates } from "@/lib/mock-data";
+import { createClient } from "@/utils/supabase/client";
+import { Template } from "@/lib/types";
 
 export default function HomePage() {
-  const featuredTemplates = mockTemplates.slice(0, 6);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const slides = [
     "/images/hero/hero-slider1.jpeg",
@@ -19,6 +21,27 @@ export default function HomePage() {
   ];
 
   useEffect(() => {
+    async function fetchTemplates() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("templates")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false })
+          .limit(6);
+        
+        if (error) throw error;
+        if (data) setTemplates(data as Template[]);
+      } catch (err) {
+        console.error("Error fetching templates:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTemplates();
+
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
@@ -204,9 +227,15 @@ export default function HomePage() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
-            {featuredTemplates.map((t, i) => (
-              <TemplateCard key={t.id} template={t} index={i} />
-            ))}
+            {loading ? (
+              [...Array(3)].map((_, i) => (
+                <div key={i} className="aspect-[4/5] bg-slate-100 animate-pulse rounded-3xl" />
+              ))
+            ) : (
+              templates.map((t, i) => (
+                <TemplateCard key={t.id} template={t} index={i} />
+              ))
+            )}
           </div>
         </div>
       </section>

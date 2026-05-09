@@ -39,10 +39,10 @@ export default function AdminOrdersPage() {
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
                 <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Order & Customer</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Waktu</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Template</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kontak</th>
                 <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total</th>
-                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                <th className="px-8 py-5 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Total</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -57,27 +57,39 @@ export default function AdminOrdersPage() {
                       <div className="flex flex-col">
                         <span className="font-mono text-[10px] font-bold text-slate-400 mb-1">{order.order_number}</span>
                         <span className="font-bold text-slate-900 text-sm">{order.buyer_name}</span>
-                        <span className="text-xs text-slate-400 mt-1">{order.buyer_phone}</span>
+                        <span className="text-[10px] text-slate-400 mt-1 uppercase font-medium">
+                          {new Date(order.created_at).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
                       </div>
                     </td>
                     <td className="px-8 py-6">
-                      <span className="text-sm text-slate-500 font-medium">
-                        {new Date(order.created_at).toLocaleDateString("id-ID")}
-                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-slate-800">{order.templates?.name || "Template Unknown"}</span>
+                        <span className="text-[10px] text-slate-400 font-mono uppercase tracking-tighter mt-0.5">/{order.templates?.slug || "unknown"}</span>
+                      </div>
                     </td>
                     <td className="px-8 py-6">
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
-                        {order.payment_status}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
+                          <span className="opacity-50">📧</span> {order.buyer_email}
+                        </span>
+                        <span className="text-xs text-slate-600 flex items-center gap-1.5 font-medium">
+                          <span className="opacity-50">📱</span> +62 {order.buyer_phone}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-8 py-6">
-                      <span className="text-sm font-black text-slate-900">Rp {order.amount.toLocaleString("id-ID")}</span>
+                      <div className="flex flex-col gap-1.5">
+                        <span className={`w-fit px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                          {order.payment_status}
+                        </span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest pl-1">
+                          {order.order_status.replace('_', ' ')}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-8 py-6 text-right">
-                      <div className="flex justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-rose-500 transition-colors">👁️</button>
-                        <button className="p-2 text-slate-400 hover:text-emerald-500 transition-colors">✅</button>
-                      </div>
+                      <span className="text-sm font-black text-slate-900">Rp {order.amount.toLocaleString("id-ID")}</span>
                     </td>
                   </tr>
                 ))

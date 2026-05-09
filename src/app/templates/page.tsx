@@ -1,20 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import TemplateCard from "@/components/TemplateCard";
-import { mockTemplates } from "@/lib/mock-data";
+import { createClient } from "@/utils/supabase/client";
+import { Template } from "@/lib/types";
 
 const categories = ["Semua", "Minimalist", "Traditional", "Romantic"];
 
 export default function TemplatesPage() {
   const [activeCategory, setActiveCategory] = useState("Semua");
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTemplates() {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("templates")
+          .select("*")
+          .eq("is_active", true)
+          .order("created_at", { ascending: false });
+        
+        if (error) throw error;
+        if (data) setTemplates(data as Template[]);
+      } catch (err) {
+        console.error("Error fetching templates:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTemplates();
+  }, []);
 
   const filtered =
     activeCategory === "Semua"
-      ? mockTemplates
-      : mockTemplates.filter((t) => t.category === activeCategory);
+      ? templates
+      : templates.filter((t) => t.category === activeCategory);
 
   return (
     <>
@@ -59,14 +84,20 @@ export default function TemplatesPage() {
       </section>
 
       {/* Grid */}
-      <section className="section-padding bg-cream-50">
+      <section className="section-padding bg-cream-50 min-h-[40vh]">
         <div className="container-default px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filtered.map((t, i) => (
-              <TemplateCard key={t.id} template={t} index={i} />
-            ))}
+            {loading ? (
+              [...Array(6)].map((_, i) => (
+                <div key={i} className="aspect-[4/5] bg-white animate-pulse rounded-3xl border border-cream-200" />
+              ))
+            ) : (
+              filtered.map((t, i) => (
+                <TemplateCard key={t.id} template={t} index={i} />
+              ))
+            )}
           </div>
-          {filtered.length === 0 && (
+          {!loading && filtered.length === 0 && (
             <p className="text-center text-charcoal-400 py-20">
               Belum ada template untuk kategori ini.
             </p>

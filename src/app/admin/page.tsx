@@ -61,6 +61,36 @@ export default function AdminPage() {
         ))}
       </div>
 
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-rose-500 p-8 rounded-[40px] text-white flex flex-col justify-between hover:scale-[1.02] transition-transform cursor-pointer shadow-xl shadow-rose-500/20" onClick={() => window.location.href='/admin/orders'}>
+          <div>
+            <span className="text-3xl">📦</span>
+            <h3 className="text-xl font-black mt-4">Kelola Pesanan</h3>
+            <p className="text-rose-100 text-xs font-medium mt-1">Cek pembayaran & detail customer</p>
+          </div>
+          <span className="mt-8 text-[10px] font-black uppercase tracking-[0.2em] bg-white/20 w-fit px-3 py-1 rounded-full">Go to Orders →</span>
+        </div>
+        
+        <div className="bg-slate-900 p-8 rounded-[40px] text-white flex flex-col justify-between hover:scale-[1.02] transition-transform cursor-pointer shadow-xl shadow-slate-900/20" onClick={() => window.location.href='/admin/templates'}>
+          <div>
+            <span className="text-3xl">🎨</span>
+            <h3 className="text-xl font-black mt-4">Edit Katalog</h3>
+            <p className="text-slate-400 text-xs font-medium mt-1">Update harga & status template</p>
+          </div>
+          <span className="mt-8 text-[10px] font-black uppercase tracking-[0.2em] bg-white/20 w-fit px-3 py-1 rounded-full">Go to Catalog →</span>
+        </div>
+
+        <div className="bg-white border border-slate-200 p-8 rounded-[40px] text-slate-900 flex flex-col justify-between hover:border-slate-300 transition-all cursor-pointer shadow-sm" onClick={() => window.location.href='/'}>
+          <div>
+            <span className="text-3xl">🌐</span>
+            <h3 className="text-xl font-black mt-4">Lihat Website</h3>
+            <p className="text-slate-500 text-xs font-medium mt-1">Buka landing page utama</p>
+          </div>
+          <span className="mt-8 text-[10px] font-black uppercase tracking-[0.2em] bg-slate-100 text-slate-500 w-fit px-3 py-1 rounded-full">View Site ↗</span>
+        </div>
+      </div>
+
       {/* Recent Orders Table */}
       <div className="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
         <div className="p-8 border-b border-slate-100 flex justify-between items-center">
@@ -71,7 +101,7 @@ export default function AdminPage() {
             <thead>
               <tr className="bg-slate-50/50">
                 <th className="px-8 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Order ID</th>
-                <th className="px-8 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Customer</th>
+                <th className="px-8 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Customer & Template</th>
                 <th className="px-8 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
                 <th className="px-8 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest text-right">Amount</th>
               </tr>
@@ -85,7 +115,14 @@ export default function AdminPage() {
                 recentOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-8 py-5 text-xs font-mono font-bold text-slate-500">{order.order_number}</td>
-                    <td className="px-8 py-5 text-sm font-bold text-slate-800">{order.buyer_name}</td>
+                    <td className="px-8 py-5">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-slate-800">{order.buyer_name}</span>
+                        <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                          {order.templates?.name || "Unknown Template"}
+                        </span>
+                      </div>
+                    </td>
                     <td className="px-8 py-5">
                       <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.payment_status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-gold-50 text-gold-600'}`}>
                         {order.payment_status}

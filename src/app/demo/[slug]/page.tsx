@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { mockTemplates } from "@/lib/mock-data";
+import { createClient } from "@/utils/supabase/server";
 import { demoInvitationData } from "@/lib/demo-data";
 import DemoClient from "./DemoClient";
 
@@ -7,7 +7,12 @@ export async function generateMetadata(
   props: PageProps<"/demo/[slug]">
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const template = mockTemplates.find((t) => t.slug === slug);
+  const supabase = await createClient();
+  const { data: template } = await supabase
+    .from("templates")
+    .select("name, description")
+    .eq("slug", slug)
+    .single();
 
   return {
     title: template ? `Demo: ${template.name}` : "Demo Template",
@@ -20,7 +25,12 @@ export default async function DemoPage(props: PageProps<"/demo/[slug]">) {
   const searchParams = await props.searchParams;
   const guestName = typeof searchParams.to === "string" ? decodeURIComponent(searchParams.to.replace(/\+/g, " ")) : undefined;
 
-  const template = mockTemplates.find((t) => t.slug === slug);
+  const supabase = await createClient();
+  const { data: template } = await supabase
+    .from("templates")
+    .select("*")
+    .eq("slug", slug)
+    .single();
 
   if (!template) {
     return (
