@@ -80,6 +80,25 @@ CREATE TABLE order_content (
 CREATE INDEX idx_order_content_order_id ON order_content(order_id);
 
 -- =============================================
+-- 3b. Invitations
+-- =============================================
+CREATE TABLE invitations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  slug TEXT UNIQUE NOT NULL,
+  template_id UUID REFERENCES templates(id),
+  content JSONB NOT NULL DEFAULT '{}'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_invitations_order_id ON invitations(order_id);
+
+CREATE TRIGGER invitations_updated_at
+  BEFORE UPDATE ON invitations
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- =============================================
 -- 4. Guests
 -- =============================================
 CREATE TABLE guests (
@@ -160,6 +179,7 @@ CREATE TRIGGER check_slug_reserved
 ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_content ENABLE ROW LEVEL SECURITY;
+ALTER TABLE invitations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE guests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_files ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rsvp_responses ENABLE ROW LEVEL SECURITY;
@@ -178,6 +198,16 @@ CREATE POLICY "Content of live orders is viewable"
   USING (EXISTS (
     SELECT 1 FROM orders WHERE orders.id = order_content.order_id AND orders.is_live = true
   ));
+
+-- Public access for invitations via UUID (No Auth model)
+CREATE POLICY "Public access to invitations"
+  ON invitations FOR SELECT USING (true);
+
+CREATE POLICY "Public update to invitations"
+  ON invitations FOR UPDATE USING (true);
+
+CREATE POLICY "Public insert to invitations"
+  ON invitations FOR INSERT WITH CHECK (true);
 
 -- Public read for guests of live orders
 CREATE POLICY "Guests of live orders are viewable"

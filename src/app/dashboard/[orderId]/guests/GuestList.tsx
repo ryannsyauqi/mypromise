@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react";
-
-interface Guest {
-  id: string;
-  name: string;
-  status: "pending" | "hadir" | "tidak_hadir" | "belum_pasti";
-  guest_count: number;
-}
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function GuestList() {
+  const params = useParams();
+  const orderId = params.orderId as string;
   const supabase = createClient();
   const [guests, setGuests] = useState<any[]>([]);
   const [invitation, setInvitation] = useState<any>(null);
@@ -18,49 +15,54 @@ export default function GuestList() {
 
   useEffect(() => {
     async function loadData() {
-      // Get latest invitation first
+      if (!orderId) return;
+
+      // We still need the invitation for the slug/base URL
+      // Since this is a client component, we use the regular client.
+      // We might need to fetch this from a server component too if RLS blocks it.
       const { data: invData } = await supabase
         .from('invitations')
         .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1)
+        .eq('order_id', orderId)
         .single();
       
       if (invData) {
         setInvitation(invData);
-        // Get guests for this invitation/order
-        const { data: guestData } = await supabase
-          .from('guests')
-          .select('*')
-          .eq('order_id', invData.order_id)
-          .order('created_at', { ascending: false });
-        
-        if (guestData) setGuests(guestData);
+        // Get guests via API
+        const response = await fetch(`/api/guests?order_id=${orderId}`);
+        const guestData = await response.json();
+        if (Array.isArray(guestData)) setGuests(guestData);
       }
       setLoading(false);
     }
     loadData();
-  }, [supabase]);
+  }, [supabase, orderId]);
 
   const addGuest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGuestName.trim() || !invitation) return;
 
     const urlParam = newGuestName.toLowerCase().replace(/\s+/g, '-');
-    const { data: newGuest, error } = await supabase
-      .from('guests')
-      .insert({
-        order_id: invitation.order_id,
-        name: newGuestName,
-        url_param: urlParam,
-        full_url: `${window.location.origin}/invitation/${invitation.slug}?to=${urlParam}`
-      })
-      .select()
-      .single();
+    
+    try {
+      const response = await fetch("/api/guests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order_id: orderId,
+          name: newGuestName,
+          url_param: urlParam,
+          full_url: `${window.location.origin}/invitation/${invitation.slug}?to=${urlParam}`
+        }),
+      });
 
-    if (!error && newGuest) {
-      setGuests([newGuest, ...guests]);
-      setNewGuestName("");
+      const newGuest = await response.json();
+      if (response.ok) {
+        setGuests([newGuest, ...guests]);
+        setNewGuestName("");
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 

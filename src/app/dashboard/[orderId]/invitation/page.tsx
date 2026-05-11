@@ -1,4 +1,5 @@
-import Navbar from "@/components/Navbar";
+"use client";
+
 import InvitationForm from "./InvitationForm";
 
 export default function EditInvitationPage() {

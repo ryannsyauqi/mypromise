@@ -1,9 +1,49 @@
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { createAdminClient } from "@/utils/supabase/admin";
 
-export default function SuccessPage(props: PageProps<"/checkout/success">) {
-  // We can use searchParams to get order_id if needed
+export const dynamic = "force-dynamic";
+
+export default async function SuccessPage({
+  searchParams,
+}: {
+  searchParams: any;
+}) {
+  // Handle searchParams being either a Promise (Next.js 15+) or a plain object
+  const resolvedSearchParams = searchParams instanceof Promise ? await searchParams : searchParams;
+  const orderIdParam = resolvedSearchParams?.order_id;
+  const orderNumber = Array.isArray(orderIdParam) ? orderIdParam[0] : orderIdParam;
+  
+  let dashboardUrl = "/dashboard";
+
+  if (orderNumber) {
+    try {
+      const supabase = createAdminClient();
+      // Using ilike for more robust matching
+      const { data: order, error } = await supabase
+        .from('orders')
+        .select('id')
+        .ilike('order_number', orderNumber)
+        .single();
+      
+      if (error) {
+        console.error("SuccessPage resolution error for", orderNumber, ":", error);
+      }
+      
+      if (order?.id) {
+        dashboardUrl = `/dashboard/${order.id}`;
+      } else {
+        console.warn("SuccessPage: Order not found for number:", orderNumber);
+      }
+    } catch (err) {
+      console.error("SuccessPage fatal error:", err);
+    }
+  } else {
+    console.warn("SuccessPage: No order_id found in searchParams");
+  }
+  
+  console.log("SuccessPage Debug - Final dashboardUrl:", dashboardUrl);
   
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
@@ -59,7 +99,7 @@ export default function SuccessPage(props: PageProps<"/checkout/success">) {
           
           <div className="flex justify-center">
             <Link
-              href="/dashboard"
+              href={dashboardUrl}
               className="w-full md:w-auto px-12 py-5 bg-rose-500 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-rose-600 transition-all duration-500 shadow-xl shadow-rose-900/10 flex items-center justify-center gap-3"
             >
               Mulai Isi Data

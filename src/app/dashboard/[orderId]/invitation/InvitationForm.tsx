@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { mockTemplates } from "@/lib/mock-data";
-import { FieldSchema } from "@/lib/types";
+import { useState, useEffect, useRef } from "react";
+import { useParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { FieldSchema } from "@/lib/types";
 
 const Icons = {
   Couple: () => (
@@ -38,23 +38,40 @@ const Icons = {
       <line x1="12" y1="16" x2="12.01" y2="16"></line>
     </svg>
   ),
+  Upload: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+      <polyline points="17 8 12 3 7 8"></polyline>
+      <line x1="12" y1="3" x2="12" y2="15"></line>
+    </svg>
+  ),
+  Trash: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6"></polyline>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    </svg>
+  ),
 };
 
 export default function InvitationForm() {
+  const params = useParams();
+  const orderId = params.orderId as string;
   const supabase = createClient();
   const [data, setData] = useState<any>(null);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
   const [activeTab, setActiveTab] = useState("mempelai");
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadData() {
-      const { data: invData, error } = await supabase
+      if (!orderId) return;
+
+      const { data: invData } = await supabase
         .from('invitations')
         .select('*, orders(*, templates(*))')
-        .order('created_at', { ascending: false })
-        .limit(1)
+        .eq('order_id', orderId)
         .single();
       
       if (invData) {
@@ -64,7 +81,7 @@ export default function InvitationForm() {
       setLoading(false);
     }
     loadData();
-  }, [supabase]);
+  }, [supabase, orderId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,36 +89,146 @@ export default function InvitationForm() {
 
     setSaveStatus("saving");
     
-    const { error } = await supabase
-      .from('invitations')
-      .update({ content: formData })
-      .eq('id', data.id);
+    try {
+      const response = await fetch(`/api/invitations/${data.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: formData }),
+      });
 
-    if (error) {
-      console.error(error);
-      setSaveStatus("error");
-    } else {
+      if (!response.ok) throw new Error("Failed to save");
+
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 3000);
+    } catch (error) {
+      console.error(error);
+      setSaveStatus("error");
+    }
+  };
+
+  const handleFileUpload = async (key: string, file: File, isMulti = false) => {
+    if (!data?.id) return;
+    
+    setUploadingField(key);
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${data.id}/${key}-${Date.now()}.${fileExt}`;
+    const filePath = `uploads/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('invitations')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error(uploadError);
+      setUploadingField(null);
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('invitations')
+      .getPublicUrl(filePath);
+
+    if (isMulti) {
+      const currentFiles = formData[key] || [];
+      handleInputChange(key, [...currentFiles, publicUrl]);
+    } else {
+      handleInputChange(key, publicUrl);
+    }
+    
+    setUploadingField(null);
+  };
+
+  const removeFile = (key: string, index?: number) => {
+    if (index !== undefined) {
+      const currentFiles = [...(formData[key] || [])];
+      currentFiles.splice(index, 1);
+      handleInputChange(key, currentFiles);
+    } else {
+      handleInputChange(key, null);
     }
   };
 
   const template = data?.orders?.templates;
   const fieldSchema = template?.field_schema || [];
 
-  const groomBrideFields = fieldSchema.filter((f: any) => f.key.startsWith('groom') || f.key.startsWith('bride'));
-  const eventFields = fieldSchema.filter((f: any) => f.key.startsWith('akad') || f.key.startsWith('reception') || f.key.includes('maps') || f.key.includes('date'));
-  const otherFields = fieldSchema.filter((f: any) => !groomBrideFields.includes(f) && !eventFields.includes(f));
+  const mediaFields = fieldSchema.filter((f: any) => f.type === 'file' || f.type === 'multi_file');
+  const groomBrideFields = fieldSchema.filter((f: any) => (f.key.startsWith('groom') || f.key.startsWith('bride')) && !mediaFields.includes(f));
+  const eventFields = fieldSchema.filter((f: any) => (f.key.startsWith('akad') || f.key.startsWith('reception') || f.key.includes('maps') || f.key.includes('date')) && !mediaFields.includes(f));
+  const otherFields = fieldSchema.filter((f: any) => !groomBrideFields.includes(f) && !eventFields.includes(f) && !mediaFields.includes(f));
 
-  const handleInputChange = (key: string, value: string) => {
+  const handleInputChange = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
   const renderField = (field: FieldSchema) => {
     const commonClasses = "w-full px-6 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all bg-slate-50/50 font-bold text-charcoal-800 placeholder:text-slate-300 placeholder:font-medium text-sm";
     
+    if (field.type === "file" || field.type === "multi_file") {
+      const isMulti = field.type === "multi_file";
+      const value = formData[field.key];
+      
+      return (
+        <div key={field.key} className="space-y-4 col-span-full">
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+            {field.label} {field.required && <span className="text-rose-500">*</span>}
+          </label>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {isMulti ? (
+              (value || []).map((url: string, idx: number) => (
+                <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden group border border-slate-100">
+                  <img src={url} alt="" className="w-full h-full object-cover" />
+                  <button 
+                    type="button"
+                    onClick={() => removeFile(field.key, idx)}
+                    className="absolute top-2 right-2 p-2 bg-white/90 text-rose-500 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                  >
+                    <Icons.Trash />
+                  </button>
+                </div>
+              ))
+            ) : (
+              value && (
+                <div className="relative aspect-square rounded-2xl overflow-hidden group border border-slate-100">
+                  <img src={value} alt="" className="w-full h-full object-cover" />
+                  <button 
+                    type="button"
+                    onClick={() => removeFile(field.key)}
+                    className="absolute top-2 right-2 p-2 bg-white/90 text-rose-500 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                  >
+                    <Icons.Trash />
+                  </button>
+                </div>
+              )
+            )}
+            
+            <label className={`aspect-square rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/50 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 transition-all ${uploadingField === field.key ? 'opacity-50 pointer-events-none' : ''}`}>
+              <input 
+                type="file" 
+                className="hidden" 
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(field.key, file, isMulti);
+                }}
+              />
+              {uploadingField === field.key ? (
+                <div className="w-6 h-6 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  <div className="text-slate-300 mb-2"><Icons.Upload /></div>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Upload</span>
+                </>
+              )}
+            </label>
+          </div>
+          {field.hint && <p className="text-[9px] text-slate-300 font-bold uppercase tracking-wider">{field.hint}</p>}
+        </div>
+      );
+    }
+
     return (
-      <div key={field.key} className="space-y-2.5">
+      <div key={field.key} className={`space-y-2.5 ${field.type === 'textarea' ? 'col-span-full' : ''}`}>
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
           {field.label} 
           {field.required && <span className="text-rose-500">*</span>}
@@ -137,7 +264,7 @@ export default function InvitationForm() {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row bg-white rounded-[40px] shadow-xl shadow-charcoal-900/[0.02] border border-slate-100 overflow-hidden">
+    <div className="flex flex-col lg:flex-row bg-white rounded-[40px] shadow-xl shadow-charcoal-900/[0.02] border border-slate-100 overflow-hidden min-h-[600px]">
       {/* Sidebar Tabs */}
       <div className="lg:w-72 bg-slate-50/50 border-r border-slate-100 flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar p-3">
         {[
@@ -181,7 +308,7 @@ export default function InvitationForm() {
                 <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Profil Mempelai</h2>
                 <p className="text-xs text-slate-400 font-medium">Lengkapi detail profil untuk calon pengantin pria dan wanita.</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                 {groomBrideFields.map(renderField)}
               </div>
             </div>
@@ -193,7 +320,7 @@ export default function InvitationForm() {
                 <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Waktu & Lokasi Acara</h2>
                 <p className="text-xs text-slate-400 font-medium">Pastikan detail waktu dan alamat sudah benar agar tamu tidak tersesat.</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                 {eventFields.map(renderField)}
               </div>
             </div>
@@ -205,7 +332,7 @@ export default function InvitationForm() {
                 <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Cerita & Pesan Tambahan</h2>
                 <p className="text-xs text-slate-400 font-medium">Tambahkan sentuhan personal untuk menyapa para tamu undangan.</p>
               </div>
-              <div className="space-y-8">
+              <div className="grid grid-cols-1 gap-10">
                 {otherFields.map(renderField)}
               </div>
             </div>
@@ -218,17 +345,20 @@ export default function InvitationForm() {
                 <p className="text-xs text-slate-400 font-medium">Unggah foto-foto terbaik kamu untuk menghiasi undangan digital.</p>
               </div>
               
-              <div className="text-center py-16 bg-slate-50/50 rounded-[32px] border-2 border-dashed border-slate-100 border-spacing-4">
-                 <div className="w-16 h-16 bg-white text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-slate-100">
-                  <Icons.Camera />
-                </div>
-                <h3 className="font-bold text-charcoal-900 text-lg">Pilih Foto Galeri</h3>
-                <p className="text-slate-400 text-xs mt-2 font-medium max-w-xs mx-auto mb-8">
-                  Format JPG, PNG, atau WEBP. Maksimum 5MB per file.
-                </p>
-                <button type="button" className="px-10 py-4 bg-white border border-slate-100 text-charcoal-900 font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-slate-50 transition-all shadow-sm">
-                  Pilih File
-                </button>
+              <div className="grid grid-cols-1 gap-12">
+                {mediaFields.length > 0 ? (
+                  mediaFields.map(renderField)
+                ) : (
+                  <div className="text-center py-20 bg-slate-50/50 rounded-[32px] border-2 border-dashed border-slate-100">
+                    <div className="w-16 h-16 bg-white text-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-slate-100">
+                      <Icons.Camera />
+                    </div>
+                    <h3 className="font-bold text-charcoal-900 text-lg">Belum Ada Field Media</h3>
+                    <p className="text-slate-400 text-xs mt-2 font-medium max-w-xs mx-auto">
+                      Template yang kamu pilih mungkin tidak membutuhkan unggahan media tambahan.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -256,4 +386,3 @@ export default function InvitationForm() {
     </div>
   );
 }
-
