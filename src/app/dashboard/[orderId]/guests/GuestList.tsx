@@ -67,7 +67,11 @@ export default function GuestList() {
   };
 
   const copyInvitationLink = (guest: any) => {
-    navigator.clipboard.writeText(guest.full_url);
+    if (!invitation) return;
+    const baseUrl = `${window.location.origin}/invitation/${invitation.slug}`;
+    const personalUrl = `${baseUrl}?to=${guest.url_param}`;
+    
+    navigator.clipboard.writeText(personalUrl);
     alert(`Link untuk ${guest.name} berhasil disalin!`);
   };
 

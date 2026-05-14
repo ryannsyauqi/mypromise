@@ -38,7 +38,11 @@ interface MinimalistTemplateProps {
 }
 
 function formatEventDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("id-ID", {
+  if (!dateStr) return "Tanggal Belum Diatur";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "Tanggal Tidak Valid";
+  
+  return date.toLocaleDateString("id-ID", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -47,17 +51,23 @@ function formatEventDate(dateStr: string) {
 }
 
 function getGoogleCalendarUrl(title: string, date: string, time: string, venue: string, address: string) {
-  const start = `${date.replace(/-/g, "")}T${time.replace(":", "")}00`;
-  const endHour = String(Number(time.split(":")[0]) + 2).padStart(2, "0");
-  const end = `${date.replace(/-/g, "")}T${endHour}${time.split(":")[1]}00`;
-  const params = new URLSearchParams({
-    action: "TEMPLATE",
-    text: title,
-    dates: `${start}/${end}`,
-    location: `${venue}, ${address}`,
-    details: `Undangan Pernikahan — ${title}`,
-  });
-  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  if (!date || !time) return "#";
+  try {
+    const start = `${date.replace(/-/g, "")}T${time.replace(":", "")}00`;
+    const hourPart = time.split(":")[0];
+    const endHour = String(Number(hourPart) + 2).padStart(2, "0");
+    const end = `${date.replace(/-/g, "")}T${endHour}${time.split(":")[1]}00`;
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: title,
+      dates: `${start}/${end}`,
+      location: `${venue || ""}, ${address || ""}`,
+      details: `Undangan Pernikahan — ${title}`,
+    });
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  } catch (e) {
+    return "#";
+  }
 }
 
 const Icons = {
@@ -99,16 +109,22 @@ const Icons = {
   ),
 };
 
+const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop";
+
 export default function MinimalistTemplate({ data, guestName, isDemo }: MinimalistTemplateProps) {
   const [isOpened, setIsOpened] = useState(false);
   const displayName = guestName || "Tamu Undangan";
+
+  const heroImage = data.photo_hero || PLACEHOLDER_IMAGE;
+  const groomImage = data.photo_groom || PLACEHOLDER_IMAGE;
+  const brideImage = data.photo_bride || PLACEHOLDER_IMAGE;
 
   return (
     <div className="relative min-h-screen bg-cream-50 overflow-hidden">
       {/* ===== COVER / OPENING ===== */}
       {!isOpened && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-charcoal-900">
-          <Image src={data.photo_hero} alt="Cover" fill className="object-cover opacity-40" />
+          <Image src={heroImage} alt="Cover" fill className="object-cover opacity-40" />
           <div className="relative z-10 text-center px-6 animate-fade-in">
             <p className="text-cream-200/60 text-sm uppercase tracking-[0.3em] mb-4">The Wedding of</p>
             <h1
@@ -167,7 +183,7 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
 
         {/* — Hero — */}
         <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
-          <Image src={data.photo_hero} alt={`${data.groom_name} & ${data.bride_name}`} fill className="object-cover" priority />
+          <Image src={heroImage} alt={`${data.groom_name} & ${data.bride_name}`} fill className="object-cover" priority />
           <div className="absolute inset-0 bg-gradient-to-b from-charcoal-900/30 via-transparent to-charcoal-900/60" />
           <div className="relative z-10 text-center mt-auto pb-20 px-6">
             <p className="text-cream-200/70 text-sm uppercase tracking-[0.25em] mb-3">The Wedding of</p>
@@ -193,7 +209,7 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
               {/* Groom */}
               <div className="text-center">
                 <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-cream-200 shadow-lg">
-                  <Image src={data.photo_groom} alt={data.groom_full_name} fill className="object-cover" />
+                  <Image src={groomImage} alt={data.groom_full_name} fill className="object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-charcoal-800 mb-1" style={{ fontFamily: "var(--font-playfair)" }}>
                   {data.groom_full_name}
@@ -203,7 +219,7 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
               {/* Bride */}
               <div className="text-center">
                 <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-cream-200 shadow-lg">
-                  <Image src={data.photo_bride} alt={data.bride_full_name} fill className="object-cover" />
+                  <Image src={brideImage} alt={data.bride_full_name} fill className="object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-charcoal-800 mb-1" style={{ fontFamily: "var(--font-playfair)" }}>
                   {data.bride_full_name}
@@ -390,7 +406,7 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
 
         {/* — Closing — */}
         <section className="relative py-24 overflow-hidden">
-          <Image src={data.photo_hero} alt="Closing" fill className="object-cover" />
+          <Image src={heroImage} alt="Closing" fill className="object-cover" />
           <div className="absolute inset-0 bg-charcoal-900/60" />
           <div className="relative z-10 text-center px-6 max-w-lg mx-auto">
             <p className="text-cream-200/70 text-sm uppercase tracking-widest mb-4">Terima Kasih</p>

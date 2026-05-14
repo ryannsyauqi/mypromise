@@ -9,14 +9,15 @@ export default async function DashboardPage(props: { params: Promise<{ orderId: 
   // Fetch data using Admin Client to bypass RLS for public access via UUID
   const supabase = createAdminClient();
   
-  // Get invitation and related order/template
-  const { data: invitationData } = await supabase
-    .from('invitations')
-    .select('*, orders(*, templates(*))')
-    .eq('order_id', orderId)
+  // 1. Get order first to ensure it exists
+  const { data: orderData, error: orderError } = await supabase
+    .from('orders')
+    .select('*, templates(*)')
+    .eq('id', orderId)
     .single();
 
-  if (!invitationData) {
+  if (orderError || !orderData) {
+    console.error("Dashboard: Order not found:", orderId, orderError);
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center space-y-4">
         <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 text-3xl mb-4">
@@ -29,7 +30,40 @@ export default async function DashboardPage(props: { params: Promise<{ orderId: 
     );
   }
 
-  // Get guests stats
+  // 2. Get invitation
+  let { data: invitationData, error: invError } = await supabase
+    .from('invitations')
+    .select('*')
+    .eq('order_id', orderId)
+    .single();
+
+  // 3. Create invitation if it doesn't exist
+  if (!invitationData) {
+    console.warn("Dashboard: Invitation missing, creating on the fly for order:", orderId);
+    
+    // Generate a better default slug from names
+    const names = orderData.buyer_name?.split(' & ') || [orderData.buyer_name || "undangan"];
+    const nameSlug = names.map((n: string) => n.trim().split(' ')[0].toLowerCase()).join('-');
+    const invitationSlug = orderData.inv_slug || `${nameSlug}-${orderId.substring(0, 4)}`;
+    
+    const { data: newInv, error: createError } = await supabase.from('invitations').insert({
+      order_id: orderId,
+      slug: invitationSlug,
+      template_id: orderData.template_id,
+      content: {
+        groom_name: names[0] || orderData.buyer_name,
+        bride_name: names[1] || "",
+      }
+    }).select().single();
+
+    if (createError) {
+      console.error("Dashboard: Failed to create missing invitation:", createError);
+    } else {
+      invitationData = newInv;
+    }
+  }
+
+  // 4. Get guests stats
   const { data: guestData } = await supabase
     .from('guests')
     .select('status')
@@ -37,6 +71,7 @@ export default async function DashboardPage(props: { params: Promise<{ orderId: 
 
   const initialData = {
     ...invitationData,
+    orders: orderData,
     guests: guestData || []
   };
 

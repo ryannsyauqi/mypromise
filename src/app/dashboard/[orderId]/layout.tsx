@@ -31,10 +31,9 @@ const Icons = {
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
     </svg>
   ),
-  User: () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-      <circle cx="12" cy="7" r="4"></circle>
+  Settings: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
     </svg>
   ),
 };
@@ -73,6 +72,7 @@ export default function DashboardLayout({
   const navItems = [
     { name: "Beranda", href: `/dashboard/${orderId}`, icon: Icons.Home },
     { name: "Edit Undangan", href: `/dashboard/${orderId}/invitation`, icon: Icons.Edit },
+    { name: "Pengaturan Link", href: `/dashboard/${orderId}/settings`, icon: Icons.Settings },
     { name: "Daftar Tamu", href: `/dashboard/${orderId}/guests`, icon: Icons.Guests },
     { name: "Pembayaran", href: `/dashboard/${orderId}/billing`, icon: Icons.Billing },
   ];
@@ -90,17 +90,7 @@ export default function DashboardLayout({
         </div>
 
         <div className="p-6">
-          <div className="bg-slate-50/50 rounded-3xl p-5 border border-slate-100 flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-rose-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
-              <Icons.User />
-            </div>
-            <div className="flex-grow overflow-hidden">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Selamat Datang</p>
-              <p className="text-sm font-bold text-charcoal-900 truncate">{nickname}</p>
-            </div>
-          </div>
-
-          <nav className="space-y-2">
+          <nav className="space-y-2 mt-4">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;

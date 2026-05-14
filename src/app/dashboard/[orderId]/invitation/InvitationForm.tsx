@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { FieldSchema } from "@/lib/types";
 
@@ -53,18 +54,35 @@ const Icons = {
   ),
 };
 
-export default function InvitationForm() {
+function InvitationFormContent({ initialData }: { initialData?: any }) {
   const params = useParams();
+  const searchParams = useSearchParams();
   const orderId = params.orderId as string;
+  const initialTab = searchParams.get("tab") || "mempelai";
+  
   const supabase = createClient();
-  const [data, setData] = useState<any>(null);
-  const [formData, setFormData] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<any>(initialData || null);
+  const [formData, setFormData] = useState<Record<string, any>>(initialData?.content || {});
+  const [loading, setLoading] = useState(!initialData);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
-  const [activeTab, setActiveTab] = useState("mempelai");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initialTab && initialTab !== "pengaturan") {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
+  useEffect(() => {
+    if (initialData) {
+      setData(initialData);
+      setFormData(initialData.content || {});
+      setLoading(false);
+      return;
+    }
+
     async function loadData() {
       if (!orderId) return;
 
@@ -81,13 +99,14 @@ export default function InvitationForm() {
       setLoading(false);
     }
     loadData();
-  }, [supabase, orderId]);
+  }, [supabase, orderId, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!data?.id) return;
 
     setSaveStatus("saving");
+    setErrorMessage("");
     
     try {
       const response = await fetch(`/api/invitations/${data.id}`, {
@@ -96,12 +115,17 @@ export default function InvitationForm() {
         body: JSON.stringify({ content: formData }),
       });
 
-      if (!response.ok) throw new Error("Failed to save");
+      const resData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(resData.message || "Failed to save");
+      }
 
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      setErrorMessage(error.message);
       setSaveStatus("error");
     }
   };
@@ -148,7 +172,8 @@ export default function InvitationForm() {
     }
   };
 
-  const template = data?.orders?.templates;
+  const order = data?.orders;
+  const template = Array.isArray(order?.templates) ? order.templates[0] : order?.templates;
   const fieldSchema = template?.field_schema || [];
 
   const mediaFields = fieldSchema.filter((f: any) => f.type === 'file' || f.type === 'multi_file');
@@ -298,7 +323,7 @@ export default function InvitationForm() {
           
           {saveStatus === "error" && (
             <div className="flex items-center gap-3 p-5 bg-rose-50 text-rose-600 rounded-2xl border border-rose-100/50 text-[10px] font-black uppercase tracking-widest animate-fade-in">
-              <Icons.Error /> Gagal Menyimpan. Silakan Coba Lagi.
+              <Icons.Error /> {errorMessage || "Gagal Menyimpan. Silakan Coba Lagi."}
             </div>
           )}
 
@@ -384,5 +409,13 @@ export default function InvitationForm() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function InvitationForm({ initialData }: { initialData?: any }) {
+  return (
+    <Suspense fallback={<div className="p-20 text-center">Loading...</div>}>
+      <InvitationFormContent initialData={initialData} />
+    </Suspense>
   );
 }

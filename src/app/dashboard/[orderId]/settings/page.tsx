@@ -1,8 +1,8 @@
-import InvitationForm from "./InvitationForm";
+import InvitationSettingsForm from "./InvitationSettingsForm";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { notFound } from "next/navigation";
 
-export default async function EditInvitationPage(props: { params: Promise<{ orderId: string }> }) {
+export default async function SettingsPage(props: { params: Promise<{ orderId: string }> }) {
   const params = await props.params;
   const orderId = params.orderId;
 
@@ -21,13 +21,13 @@ export default async function EditInvitationPage(props: { params: Promise<{ orde
     <div className="animate-fade-in space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-charcoal-800" style={{ fontFamily: "var(--font-playfair)" }}>
-          Edit Konten Undangan
+          Pengaturan URL Undangan
         </h1>
-        <p className="text-charcoal-400 mt-2">Isi detail pernikahan Anda di bawah ini. Perubahan akan langsung terlihat di preview.</p>
+        <p className="text-charcoal-400 mt-2">Ubah alamat link undangan kamu agar lebih personal dan mudah diingat.</p>
       </div>
 
       <div className="bg-white rounded-[40px] border border-cream-200 shadow-sm overflow-hidden">
-        <InvitationForm initialData={invitationData} />
+        <InvitationSettingsForm initialData={invitationData} />
       </div>
     </div>
   );
