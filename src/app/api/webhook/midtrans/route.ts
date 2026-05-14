@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import { sendWhatsAppNotification, sendEmailNotification } from "@/lib/notifications";
+import { sendEmailNotification } from "@/lib/notifications";
 import crypto from "crypto";
 
 export async function POST(request: Request) {
@@ -45,10 +45,6 @@ export async function POST(request: Request) {
       } else if (order) {
         // --- TRIGGER NOTIFICATIONS ---
         const dashboardLink = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/${order.id}`;
-        const waMessage = `Halo ${order.buyer_name}! 🎉\n\nPembayaran kamu telah berhasil diverifikasi. Sekarang kamu bisa mulai mengatur undanganmu di dashboard MyPromise melalui link berikut:\n\n${dashboardLink}\n\nSelamat berkarya!`;
-        
-        // Kirim WhatsApp (Async - biarkan berjalan di background)
-        sendWhatsAppNotification(order.buyer_phone, waMessage);
         
         // Kirim Email (Async)
         const emailHtml = `
