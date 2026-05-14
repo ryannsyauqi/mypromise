@@ -44,7 +44,7 @@ export async function POST(request: Request) {
         console.error("❌ Error updating order to paid:", updateError);
       } else if (order) {
         // --- TRIGGER NOTIFICATIONS ---
-        const dashboardLink = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/${order.order_number}`;
+        const dashboardLink = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/${order.id}`;
         const waMessage = `Halo ${order.buyer_name}! 🎉\n\nPembayaran kamu telah berhasil diverifikasi. Sekarang kamu bisa mulai mengatur undanganmu di dashboard MyPromise melalui link berikut:\n\n${dashboardLink}\n\nSelamat berkarya!`;
         
         // Kirim WhatsApp (Async - biarkan berjalan di background)
