@@ -329,9 +329,23 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
 
           {activeTab === "mempelai" && (
             <div className="space-y-10 animate-fade-in">
-              <div>
-                <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Profil Mempelai</h2>
-                <p className="text-xs text-slate-400 font-medium">Lengkapi detail profil untuk calon pengantin pria dan wanita.</p>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Profil Mempelai</h2>
+                  <p className="text-xs text-slate-400 font-medium">Lengkapi detail profil untuk calon pengantin pria dan wanita.</p>
+                </div>
+                {data?.slug && (
+                  <Link 
+                    href={`/${data.slug}`}
+                    target="_blank"
+                    className="flex items-center gap-2 px-6 py-3 bg-rose-50 text-rose-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100/50 hover:bg-rose-100 transition-all shrink-0 w-fit"
+                  >
+                    Lihat Undangan
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </Link>
+                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                 {groomBrideFields.map(renderField)}
@@ -341,9 +355,23 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
 
           {activeTab === "acara" && (
             <div className="space-y-10 animate-fade-in">
-              <div>
-                <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Waktu & Lokasi Acara</h2>
-                <p className="text-xs text-slate-400 font-medium">Pastikan detail waktu dan alamat sudah benar agar tamu tidak tersesat.</p>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Waktu & Lokasi Acara</h2>
+                  <p className="text-xs text-slate-400 font-medium">Pastikan detail waktu dan alamat sudah benar agar tamu tidak tersesat.</p>
+                </div>
+                {data?.slug && (
+                  <Link 
+                    href={`/${data.slug}`}
+                    target="_blank"
+                    className="flex items-center gap-2 px-6 py-3 bg-rose-50 text-rose-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100/50 hover:bg-rose-100 transition-all shrink-0 w-fit"
+                  >
+                    Lihat Undangan
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </Link>
+                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                 {eventFields.map(renderField)}
@@ -353,9 +381,23 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
 
           {activeTab === "lainnya" && (
             <div className="space-y-10 animate-fade-in">
-              <div>
-                <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Cerita & Pesan Tambahan</h2>
-                <p className="text-xs text-slate-400 font-medium">Tambahkan sentuhan personal untuk menyapa para tamu undangan.</p>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Cerita & Pesan Tambahan</h2>
+                  <p className="text-xs text-slate-400 font-medium">Tambahkan sentuhan personal untuk menyapa para tamu undangan.</p>
+                </div>
+                {data?.slug && (
+                  <Link 
+                    href={`/${data.slug}`}
+                    target="_blank"
+                    className="flex items-center gap-2 px-6 py-3 bg-rose-50 text-rose-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100/50 hover:bg-rose-100 transition-all shrink-0 w-fit"
+                  >
+                    Lihat Undangan
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </Link>
+                )}
               </div>
               <div className="grid grid-cols-1 gap-10">
                 {otherFields.map(renderField)}
@@ -365,9 +407,23 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
 
           {activeTab === "media" && (
             <div className="space-y-10 animate-fade-in">
-              <div>
-                <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Media & Galeri Foto</h2>
-                <p className="text-xs text-slate-400 font-medium">Unggah foto-foto terbaik kamu untuk menghiasi undangan digital.</p>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Media & Galeri Foto</h2>
+                  <p className="text-xs text-slate-400 font-medium">Unggah foto-foto terbaik kamu untuk menghiasi undangan digital.</p>
+                </div>
+                {data?.slug && (
+                  <Link 
+                    href={`/${data.slug}`}
+                    target="_blank"
+                    className="flex items-center gap-2 px-6 py-3 bg-rose-50 text-rose-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100/50 hover:bg-rose-100 transition-all shrink-0 w-fit"
+                  >
+                    Lihat Undangan
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </Link>
+                )}
               </div>
               
               <div className="grid grid-cols-1 gap-12">

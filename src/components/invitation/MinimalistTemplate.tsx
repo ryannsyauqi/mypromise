@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import CountdownTimer from "@/components/invitation/CountdownTimer";
 import RSVPForm from "@/components/invitation/RSVPForm";
@@ -32,6 +32,7 @@ interface InvitationData {
 }
 
 interface MinimalistTemplateProps {
+  invitationId: string;
   data: InvitationData;
   guestName?: string;
   isDemo?: boolean;
@@ -111,13 +112,34 @@ const Icons = {
 
 const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop";
 
-export default function MinimalistTemplate({ data, guestName, isDemo }: MinimalistTemplateProps) {
+export default function MinimalistTemplate({ invitationId, data, guestName, isDemo }: MinimalistTemplateProps) {
   const [isOpened, setIsOpened] = useState(false);
+  const [wishes, setWishes] = useState<any[]>([]);
   const displayName = guestName || "Tamu Undangan";
 
   const heroImage = data.photo_hero || PLACEHOLDER_IMAGE;
   const groomImage = data.photo_groom || PLACEHOLDER_IMAGE;
   const brideImage = data.photo_bride || PLACEHOLDER_IMAGE;
+
+  // Fetch real wishes
+  useEffect(() => {
+    async function loadWishes() {
+      if (isDemo) {
+        setWishes(demoWishes);
+        return;
+      }
+      try {
+        const response = await fetch(`/api/invitations/${invitationId}/wishes`);
+        if (response.ok) {
+          const wishData = await response.json();
+          setWishes(wishData);
+        }
+      } catch (error) {
+        console.error("Failed to load wishes:", error);
+      }
+    }
+    loadWishes();
+  }, [invitationId, isDemo]);
 
   return (
     <div className="relative min-h-screen bg-cream-50 overflow-hidden">
@@ -338,7 +360,17 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
               <p className="text-charcoal-400 text-sm mt-2">Merupakan kehormatan bagi kami atas kehadiran Anda</p>
             </div>
             <div className="bg-cream-50 rounded-2xl p-8 border border-cream-200">
-              <RSVPForm guestName={guestName} isDemo={isDemo} />
+              <RSVPForm 
+                invitationId={invitationId} 
+                guestName={guestName} 
+                isDemo={isDemo} 
+                onSuccess={() => {
+                  // Refresh wishes after successful RSVP
+                  fetch(`/api/invitations/${invitationId}/wishes`)
+                    .then(res => res.json())
+                    .then(data => setWishes(data));
+                }}
+              />
             </div>
 
             {/* Wishes Wall */}
@@ -349,23 +381,29 @@ export default function MinimalistTemplate({ data, guestName, isDemo }: Minimali
                 </h3>
               </div>
               <div className="space-y-4 max-h-96 overflow-y-auto pr-2 no-scrollbar">
-                {demoWishes.map((wish, i) => (
-                  <div key={i} className="bg-cream-50 rounded-xl p-5 border border-cream-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-charcoal-700 text-sm">{wish.name}</span>
-                      <span className="text-charcoal-300 text-xs">{wish.time}</span>
+                {wishes.length === 0 ? (
+                  <p className="text-center text-charcoal-300 text-sm italic">Belum ada ucapan. Jadilah yang pertama memberikan doa!</p>
+                ) : (
+                  wishes.map((wish, i) => (
+                    <div key={i} className="bg-cream-50 rounded-xl p-5 border border-cream-200 animate-fade-in">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-charcoal-700 text-sm">{wish.name}</span>
+                        <span className="text-charcoal-300 text-[10px]">
+                          {new Date(wish.created_at).toLocaleDateString("id-ID", { day: 'numeric', month: 'short' })}
+                        </span>
+                      </div>
+                      <p className="text-charcoal-500 text-sm leading-relaxed">{wish.message}</p>
+                      <span className={`inline-flex items-center gap-1.5 mt-2 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${
+                        wish.attendance === "hadir" ? "bg-emerald-50 text-emerald-600" :
+                        wish.attendance === "tidak_hadir" ? "bg-rose-50 text-rose-500" :
+                        "bg-amber-50 text-amber-600"
+                      }`}>
+                        {wish.attendance === "hadir" && <Icons.Check />}
+                        {wish.attendance === "hadir" ? "Hadir" : wish.attendance === "tidak_hadir" ? "Tidak Hadir" : "Belum Pasti"}
+                      </span>
                     </div>
-                    <p className="text-charcoal-500 text-sm leading-relaxed">{wish.message}</p>
-                    <span className={`inline-flex items-center gap-1.5 mt-2 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${
-                      wish.attendance === "hadir" ? "bg-emerald-50 text-emerald-600" :
-                      wish.attendance === "tidak_hadir" ? "bg-rose-50 text-rose-500" :
-                      "bg-amber-50 text-amber-600"
-                    }`}>
-                      {wish.attendance === "hadir" && <Icons.Check />}
-                      {wish.attendance === "hadir" ? "Hadir" : wish.attendance === "tidak_hadir" ? "Tidak Hadir" : "Belum Pasti"}
-                    </span>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </div>

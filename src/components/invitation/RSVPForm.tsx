@@ -3,8 +3,10 @@
 import { useState } from "react";
 
 interface RSVPFormProps {
+  invitationId: string;
   guestName?: string;
   isDemo?: boolean;
+  onSuccess?: () => void;
 }
 
 const Icons = {
@@ -35,20 +37,46 @@ const Icons = {
   ),
 };
 
-export default function RSVPForm({ guestName, isDemo }: RSVPFormProps) {
+export default function RSVPForm({ invitationId, guestName, isDemo, onSuccess }: RSVPFormProps) {
   const [name, setName] = useState(guestName || "");
   const [attendance, setAttendance] = useState("");
   const [guestCount, setGuestCount] = useState(1);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isDemo) {
       setSubmitted(true);
+      if (onSuccess) onSuccess();
       return;
     }
-    setSubmitted(true);
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          invitationId,
+          name,
+          attendance,
+          guestCount,
+          message
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save RSVP");
+      
+      setSubmitted(true);
+      if (onSuccess) onSuccess();
+    } catch (error) {
+      console.error(error);
+      alert("Gagal mengirim konfirmasi. Silakan coba lagi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {

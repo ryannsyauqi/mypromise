@@ -57,56 +57,71 @@ export default async function SuccessPage({
             </svg>
           </div>
           
-          <div className="mb-8">
+          <div className="mb-6">
             <span className="text-[9px] font-black uppercase tracking-[0.4em] text-rose-500 mb-2 block">Order Confirmed</span>
             <h1 className="text-3xl md:text-5xl font-bold text-charcoal-900 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>
               Terima Kasih!
             </h1>
             <p className="text-slate-500 text-sm md:text-base mt-4 leading-relaxed max-w-md mx-auto font-medium">
-              Pembayaran berhasil! Silakan lengkapi data undangan kamu di bawah ini. Tautan akses juga telah kami kirimkan ke Email kamu sebagai cadangan.
+              Pembayaran berhasil! Silakan lengkapi data undangan kamu.
             </p>
           </div>
-          
-          <div className="bg-white rounded-[32px] p-8 md:p-10 shadow-xl shadow-charcoal-900/[0.02] border border-slate-100 mb-10 text-left">
-            <h3 className="font-black text-charcoal-900 mb-8 uppercase tracking-[0.2em] text-[10px] flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-              Langkah Selanjutnya
-            </h3>
-            <div className="space-y-6">
-              <div className="flex gap-5 group">
-                <span className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 text-xs font-black flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-500">1</span>
-                <div>
-                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Isi Data Undangan</h4>
-                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Masukkan info mempelai, detail acara, lokasi Google Maps, dan galeri foto.</p>
-                </div>
-              </div>
-              <div className="flex gap-5 group">
-                <span className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 text-xs font-black flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-500">2</span>
-                <div>
-                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Siapkan Daftar Tamu</h4>
-                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Buat daftar nama tamu untuk mendapatkan link undangan personal tiap orang.</p>
-                </div>
-              </div>
-              <div className="flex gap-5 group">
-                <span className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 text-xs font-black flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-500">3</span>
-                <div>
-                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Kirim Undangan</h4>
-                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Selesai! Bagikan link undangan resmi kamu ke teman dan keluarga.</p>
-                </div>
-              </div>
-            </div>
+
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-8 text-left max-w-lg mx-auto flex gap-4 animate-fade-in shadow-sm">
+             <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+             </div>
+             <div>
+                <h4 className="text-sm font-bold text-amber-900 uppercase tracking-wider mb-1">Cek Email Kamu</h4>
+                <p className="text-[11px] md:text-xs text-amber-800 leading-relaxed font-medium">
+                  Tautan akses dashboard ini bersifat rahasia dan sudah kami kirimkan juga ke email kamu. <strong>Jangan sampai hilang ya!</strong> Buka email tersebut jika kamu ingin kembali mengedit undangan di lain waktu.
+                </p>
+             </div>
           </div>
           
-          <div className="flex justify-center">
+          <div className="flex justify-center mb-10">
             <Link
               href={dashboardUrl}
-              className="w-full md:w-auto px-12 py-5 bg-rose-500 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-rose-600 transition-all duration-500 shadow-xl shadow-rose-900/10 flex items-center justify-center gap-3"
+              className="w-full md:w-auto px-12 py-5 bg-rose-500 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-rose-600 transition-all duration-500 shadow-xl shadow-rose-900/10 flex items-center justify-center gap-3 animate-pulse-soft"
             >
-              Mulai Isi Data
+              Mulai Isi Data Undangan
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </Link>
+          </div>
+
+          <div className="max-w-3xl mx-auto border-t border-slate-100 pt-10 text-center">
+            <h3 className="font-black text-charcoal-300 mb-8 uppercase tracking-[0.2em] text-[10px]">
+              Langkah Selanjutnya
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="flex flex-col items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-slate-50 text-slate-400 text-[10px] font-black flex items-center justify-center">1</span>
+                <div>
+                  <h4 className="text-sm font-bold text-charcoal-900 mb-1">Isi Data Undangan</h4>
+                  <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-[200px] mx-auto">Lengkapi profil mempelai, detail acara, dan galeri.</p>
+                </div>
+              </div>
+              
+              <div className="flex flex-col items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-slate-50 text-slate-400 text-[10px] font-black flex items-center justify-center">2</span>
+                <div>
+                  <h4 className="text-sm font-bold text-charcoal-900 mb-1">Daftar Tamu</h4>
+                  <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-[200px] mx-auto">Buat link personal untuk setiap tamu undangan.</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-slate-50 text-slate-400 text-[10px] font-black flex items-center justify-center">3</span>
+                <div>
+                  <h4 className="text-sm font-bold text-charcoal-900 mb-1">Kirim Undangan</h4>
+                  <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-[200px] mx-auto">Selesai! Bagikan link tersebut ke teman & keluarga.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>

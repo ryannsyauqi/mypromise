@@ -143,7 +143,7 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
           <div className="relative z-10">
             {data?.slug ? (
               <Link
-                href={`/invitation/${data.slug}`}
+                href={`/${data.slug}`}
                 target="_blank"
                 className="inline-flex items-center gap-3 bg-white px-8 py-4 rounded-2xl text-rose-500 font-black uppercase tracking-[0.2em] text-[10px] hover:scale-105 transition-all duration-500 shadow-2xl shadow-rose-900/20"
               >

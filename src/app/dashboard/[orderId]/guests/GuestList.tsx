@@ -52,7 +52,7 @@ export default function GuestList() {
           order_id: orderId,
           name: newGuestName,
           url_param: urlParam,
-          full_url: `${window.location.origin}/invitation/${invitation.slug}?to=${urlParam}`
+          full_url: `${window.location.origin}/${invitation.slug}?to=${urlParam}`
         }),
       });
 
@@ -68,8 +68,7 @@ export default function GuestList() {
 
   const copyInvitationLink = (guest: any) => {
     if (!invitation) return;
-    const baseUrl = `${window.location.origin}/invitation/${invitation.slug}`;
-    const personalUrl = `${baseUrl}?to=${guest.url_param}`;
+    const personalUrl = `${window.location.origin}/${invitation.slug}?to=${guest.url_param}`;
     
     navigator.clipboard.writeText(personalUrl);
     alert(`Link untuk ${guest.name} berhasil disalin!`);

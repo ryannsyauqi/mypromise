@@ -74,7 +74,7 @@ export default function InvitationSettingsForm({ initialData }: { initialData: a
             <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-4 block">Alamat Undangan (URL Slug)</label>
             <div className="flex flex-col md:flex-row items-center gap-4">
               <div className="flex-grow flex items-center gap-2 px-6 py-4 bg-white rounded-2xl border border-slate-200 w-full overflow-hidden">
-                <span className="text-slate-300 text-xs font-medium shrink-0">mypromise.id/invitation/</span>
+                <span className="text-slate-300 text-xs font-medium shrink-0">mypromise.id/</span>
                 <input 
                   type="text"
                   value={slug}
@@ -84,7 +84,7 @@ export default function InvitationSettingsForm({ initialData }: { initialData: a
                 />
               </div>
               <Link 
-                href={`/invitation/${slug}`}
+                href={`/${slug}`}
                 target="_blank"
                 className="shrink-0 px-6 py-4 bg-white text-rose-500 border border-rose-100 font-black uppercase tracking-widest text-[9px] rounded-2xl hover:bg-rose-50 transition-all flex items-center gap-2"
               >
