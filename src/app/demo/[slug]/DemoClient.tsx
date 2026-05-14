@@ -50,7 +50,7 @@ export default function DemoClient({ guestName, data, templateName }: DemoClient
         </p>
       </div>
       <div className="pt-8">
-        <MinimalistTemplate data={data} guestName={guestName} isDemo />
+        <MinimalistTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />
       </div>
     </>
   );
