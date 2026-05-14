@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { snap } from "@/lib/midtrans";
 
 export async function POST(request: Request) {
   try {
@@ -10,52 +11,59 @@ export async function POST(request: Request) {
     const orderId = `MP-${nanoid(10)}`;
     const invitationSlug = `${templateSlug}-${nanoid(5)}`.toLowerCase();
 
-    // Using Admin Client to bypass RLS and ensure data is saved
-    try {
-      const supabase = createAdminClient();
-      
-      const { data: orderData, error: orderError } = await supabase.from('orders').insert({
-        order_number: orderId,
-        buyer_name: customerDetails.name,
-        buyer_email: customerDetails.email,
-        buyer_phone: customerDetails.phone,
-        template_id: templateId,
-        amount: amount,
-        payment_status: 'paid',
-        order_status: 'awaiting_content',
-        inv_slug: invitationSlug,
-      }).select().single();
+    // 1. Create Transaction in Midtrans Snap
+    const parameter = {
+      transaction_details: {
+        order_id: orderId,
+        gross_amount: amount,
+      },
+      customer_details: {
+        first_name: customerDetails.name,
+        email: customerDetails.email,
+        phone: customerDetails.phone,
+      },
+    };
 
-      if (orderError) {
-        console.error("❌ Database Insert Error:", orderError);
-        throw orderError;
-      }
+    const transaction = await snap.createTransaction(parameter);
+    const snapToken = transaction.token;
 
-      // Create initial invitation content
-      const { error: invError } = await supabase.from('invitations').insert({
-        order_id: orderData.id,
-        slug: invitationSlug,
-        template_id: templateId,
-        content: {
-          groom_name: customerDetails.name.split(' & ')[0] || customerDetails.name,
-          bride_name: customerDetails.name.split(' & ')[1] || "",
-        }
-      });
+    // 2. Save to Database with 'pending' status
+    const supabase = createAdminClient();
+    
+    const { data: orderData, error: orderError } = await supabase.from('orders').insert({
+      order_number: orderId,
+      buyer_name: customerDetails.name,
+      buyer_email: customerDetails.email,
+      buyer_phone: customerDetails.phone,
+      template_id: templateId,
+      amount: amount,
+      payment_status: 'pending', // Awalnya pending
+      order_status: 'awaiting_content',
+      inv_slug: invitationSlug,
+    }).select().single();
 
-      if (invError) {
-        console.error("❌ Invitation Insert Error:", invError);
-      }
-
-      console.log("✅ Order & Invitation saved successfully:", orderId);
-    } catch (dbError) {
-      console.error("❌ Database save failed:", dbError);
+    if (orderError) {
+      console.error("❌ Database Insert Error:", orderError);
+      throw orderError;
     }
 
+    // Create initial invitation content
+    await supabase.from('invitations').insert({
+      order_id: orderData.id,
+      slug: invitationSlug,
+      template_id: templateId,
+      content: {
+        groom_name: customerDetails.name.split(' & ')[0] || customerDetails.name,
+        bride_name: customerDetails.name.split(' & ')[1] || "",
+      }
+    });
+
+    console.log("✅ Order saved & Midtrans token generated:", orderId);
+
     return NextResponse.json({
-      isSimulator: true,
+      token: snapToken,
       orderId: orderId,
       invitationSlug: invitationSlug,
-      message: "Order processed successfully."
     });
     
   } catch (error: any) {
