@@ -63,7 +63,7 @@ export default async function SuccessPage({
               Terima Kasih!
             </h1>
             <p className="text-slate-500 text-sm md:text-base mt-4 leading-relaxed max-w-md mx-auto font-medium">
-              Pesanan kamu telah berhasil diterima. Tautan pengisian konten sudah dikirim ke Email kamu.
+              Pembayaran berhasil! Silakan lengkapi data undangan kamu di bawah ini. Tautan akses juga telah kami kirimkan ke Email kamu sebagai cadangan.
             </p>
           </div>
           
@@ -76,22 +76,22 @@ export default async function SuccessPage({
               <div className="flex gap-5 group">
                 <span className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 text-xs font-black flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-500">1</span>
                 <div>
-                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Cek Email Kamu</h4>
-                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Buka pesan masuk untuk melihat tautan dashboard kamu.</p>
+                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Isi Data Undangan</h4>
+                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Masukkan info mempelai, detail acara, lokasi Google Maps, dan galeri foto.</p>
                 </div>
               </div>
               <div className="flex gap-5 group">
                 <span className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 text-xs font-black flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-500">2</span>
                 <div>
-                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Lengkapi Data Pernikahan</h4>
-                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Isi detail acara dan unggah momen-momen terbaik kamu.</p>
+                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Siapkan Daftar Tamu</h4>
+                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Buat daftar nama tamu untuk mendapatkan link undangan personal tiap orang.</p>
                 </div>
               </div>
               <div className="flex gap-5 group">
                 <span className="w-9 h-9 rounded-xl bg-slate-50 text-slate-400 text-xs font-black flex items-center justify-center shrink-0 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white group-hover:border-rose-500 transition-all duration-500">3</span>
                 <div>
-                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Undangan Ready Untuk Disebar</h4>
-                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Selesaikan konten dan bagikan kebahagiaan kamu sekarang!</p>
+                  <h4 className="text-sm md:text-base font-bold text-charcoal-900 mb-1">Kirim Undangan</h4>
+                  <p className="text-xs md:text-sm text-slate-400 leading-relaxed font-medium">Selesai! Bagikan link undangan resmi kamu ke teman dan keluarga.</p>
                 </div>
               </div>
             </div>
