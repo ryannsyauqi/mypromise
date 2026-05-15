@@ -36,12 +36,17 @@ const Icons = {
   ),
 };
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const navItems = [
     { name: "Dashboard", href: "/admin", icon: Icons.Dashboard },
@@ -49,6 +54,21 @@ export default function AdminLayout({
     { name: "Katalog Template", href: "/admin/templates", icon: Icons.Templates },
     { name: "Pengaturan", href: "/admin/settings", icon: Icons.Settings },
   ];
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+      router.push("/admin/login");
+      router.refresh();
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
+  // Jika ini halaman login, jangan tampilkan sidebar dan header admin
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans">
@@ -83,33 +103,26 @@ export default function AdminLayout({
           })}
         </nav>
 
-        <div className="p-6 border-t border-slate-800">
-          <Link href="/" className="w-full px-4 py-3 text-left text-slate-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest flex items-center gap-3">
-            <Icons.ArrowLeft /> Back to Web
+        <div className="p-6 border-t border-slate-800 space-y-2">
+          <button 
+            onClick={handleLogout}
+            className="w-full px-4 py-3 text-left text-rose-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest flex items-center gap-3"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Logout HQ
+          </button>
+          <Link href="/" className="w-full px-4 py-3 text-left text-slate-500 hover:text-slate-300 transition-colors text-[9px] font-bold uppercase tracking-widest flex items-center gap-3">
+            <Icons.ArrowLeft /> View Website
           </Link>
         </div>
       </aside>
 
       {/* Admin Content Area */}
       <div className="flex-grow flex flex-col">
-        <header className="bg-white border-b border-slate-200 h-20 flex items-center justify-between px-10 sticky top-0 z-20">
-          <div className="flex items-center gap-4">
-            <span className="text-slate-400">/</span>
-            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-widest">
-              {navItems.find(item => item.href === pathname)?.name || "Administrator Overview"}
-            </h2>
-          </div>
-          <div className="flex items-center gap-6">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-slate-800">Operator One</p>
-              <p className="text-[10px] text-slate-400 uppercase tracking-widest">Main Controller</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
-              <Icons.User />
-            </div>
-          </div>
-        </header>
-
         <main className="p-10 max-w-7xl w-full mx-auto">
           {children}
         </main>
