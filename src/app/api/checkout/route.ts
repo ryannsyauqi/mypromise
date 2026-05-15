@@ -25,15 +25,36 @@ export async function POST(request: Request) {
 
     const supabase = createAdminClient();
 
-    // Check for existing slug and add suffix if needed
-    const { data: existingInvs } = await supabase
-      .from('invitations')
-      .select('slug')
-      .ilike('slug', `${baseSlug}%`);
+    // Check for existing slug in both tables
+    let isUnique = false;
+    let suffix = 0;
+    
+    while (!isUnique) {
+      const currentCheck = suffix === 0 ? baseSlug : `${baseSlug}-${suffix.toString().padStart(3, '0')}`;
+      
+      // Check invitations table
+      const { data: invCheck } = await supabase
+        .from('invitations')
+        .select('slug')
+        .eq('slug', currentCheck)
+        .maybeSingle();
 
-    if (existingInvs && existingInvs.length > 0) {
-      const count = existingInvs.length;
-      invitationSlug = `${baseSlug}-${(count + 1).toString().padStart(3, '0')}`;
+      // Check orders table (the one causing the constraint error)
+      const { data: orderCheck } = await supabase
+        .from('orders')
+        .select('inv_slug')
+        .eq('inv_slug', currentCheck)
+        .maybeSingle();
+
+      if (!invCheck && !orderCheck) {
+        invitationSlug = currentCheck;
+        isUnique = true;
+      } else {
+        suffix++;
+      }
+      
+      // Safety break to prevent infinite loop
+      if (suffix > 999) break;
     }
     const parameter = {
       transaction_details: {
