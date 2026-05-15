@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { snap } from "@/lib/midtrans";
+import { sendEmailNotification } from "@/lib/notifications";
+import { getPendingPaymentEmail } from "@/lib/email-templates";
 
 export async function POST(request: Request) {
   try {
@@ -60,8 +62,22 @@ export async function POST(request: Request) {
 
     console.log("✅ Order saved & Midtrans token generated:", orderId);
 
+    // 3. Send Pending Payment Email (Async)
+    const pendingEmailHtml = getPendingPaymentEmail(
+      customerDetails.name,
+      amount.toLocaleString("id-ID"),
+      transaction.redirect_url
+    );
+    
+    sendEmailNotification(
+      customerDetails.email,
+      "Hampir Selesai! Pesanan Undangan MyPromise Kamu",
+      pendingEmailHtml
+    );
+
     return NextResponse.json({
       token: snapToken,
+      redirectUrl: transaction.redirect_url,
       orderId: orderId,
       invitationSlug: invitationSlug,
     });

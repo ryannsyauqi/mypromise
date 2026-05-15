@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { sendEmailNotification } from "@/lib/notifications";
+import { getSuccessPaymentEmail } from "@/lib/email-templates";
 import crypto from "crypto";
 
 export async function POST(request: Request) {
@@ -44,25 +45,16 @@ export async function POST(request: Request) {
         console.error("❌ Error updating order to paid:", updateError);
       } else if (order) {
         // --- TRIGGER NOTIFICATIONS ---
-        const dashboardLink = `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/${order.id}`;
+        const dashboardLink = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://mypromise.id'}/dashboard/${order.id}`;
         
-        // Kirim Email (Async)
-        const emailHtml = `
-          <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
-            <h2 style="color: #333;">Pembayaran Berhasil! 🎉</h2>
-            <p>Halo <strong>${order.buyer_name}</strong>,</p>
-            <p>Terima kasih telah mempercayakan undangan pernikahan kamu kepada MyPromise.</p>
-            <p>Kamu sekarang bisa mulai mengisi detail undangan dan memilih musik melalui dashboard pribadi kamu:</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${dashboardLink}" style="background-color: #000; color: #fff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Buka Dashboard Saya</a>
-            </div>
-            <p style="font-size: 0.9em; color: #666;">Jika tombol di atas tidak bekerja, kamu bisa copy-paste link berikut ke browser kamu:<br>${dashboardLink}</p>
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-            <p style="font-size: 0.8em; color: #999;">Ini adalah email otomatis, mohon tidak membalas email ini.</p>
-          </div>
-        `;
+        // Kirim Email (Async) menggunakan template premium baru
+        const successEmailHtml = getSuccessPaymentEmail(order.buyer_name, dashboardLink);
         
-        sendEmailNotification(order.buyer_email, "Pembayaran Berhasil - Dashboard MyPromise", emailHtml);
+        sendEmailNotification(
+          order.buyer_email, 
+          "Pembayaran Berhasil 🎉 - Dashboard MyPromise", 
+          successEmailHtml
+        );
         
         console.log(`✅ Success notifications triggered for ${order.buyer_name}`);
       }
