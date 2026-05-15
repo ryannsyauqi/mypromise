@@ -70,14 +70,16 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
           <p className="text-slate-500 font-medium text-sm">Lengkapi data untuk mengaktifkan website undanganmu.</p>
         </div>
 
-        <div className="lg:col-span-5 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[9px] font-black text-charcoal-900 uppercase tracking-[0.2em] opacity-50">Progres Persiapan</span>
-            <span className="text-base font-black text-rose-500">{overallProgress}%</span>
+        <div className="lg:col-span-5 space-y-4">
+          <div className="flex items-end justify-between">
+            <div className="space-y-1">
+              <span className="text-[10px] font-black text-charcoal-900 uppercase tracking-[0.2em] opacity-40">Progres Persiapan</span>
+            </div>
+            <span className="text-3xl font-black text-rose-500 tracking-tighter leading-none">{overallProgress}%</span>
           </div>
-          <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner">
-            <div
-              className="h-full bg-rose-500 rounded-full transition-all duration-700 ease-out shadow-lg shadow-rose-500/20"
+          <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden shadow-inner p-0.5">
+            <div 
+              className="h-full bg-gradient-to-r from-rose-400 to-rose-500 rounded-full transition-all duration-700 ease-out shadow-lg shadow-rose-500/20"
               style={{ width: `${overallProgress}%` }}
             ></div>
           </div>
@@ -161,14 +163,13 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
             <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 blur-[100px] rounded-full -mr-32 -mt-32 transition-transform duration-1000 group-hover:scale-110"></div>
 
             <div className="relative z-10">
-              <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-white mb-8 border border-white/10 backdrop-blur-md">
-                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10.172 13.828a4 4 0 015.656 0l4 4a4 4 0 11-5.656 5.656l-1.102-1.101" />
+              <div className="w-16 h-16 bg-white/20 rounded-[24px] flex items-center justify-center text-white mb-8 border border-white/10 backdrop-blur-md shadow-inner overflow-visible">
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </div>
               <h2 className="text-white text-4xl font-bold leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>
-                Cek Hasil Undangan
+                Cek Undangan Website
               </h2>
             </div>
 
@@ -193,7 +194,7 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
                     </svg>
                   </div>
                   <p className="text-[10px] text-center text-white/50 font-bold uppercase tracking-widest leading-relaxed">
-                    Selesaikan semua langkah untuk melihat preview undangan
+                    Selesaikan pengisian data untuk melihat preview undangan
                   </p>
                 </div>
               )}
