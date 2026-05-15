@@ -34,6 +34,7 @@ interface InvitationData {
 interface MinimalistTemplateProps {
   invitationId: string;
   data: InvitationData;
+  designConfig?: any;
   guestName?: string;
   isDemo?: boolean;
 }
@@ -112,7 +113,7 @@ const Icons = {
 
 const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop";
 
-export default function MinimalistTemplate({ invitationId, data, guestName, isDemo }: MinimalistTemplateProps) {
+export default function MinimalistTemplate({ invitationId, data, designConfig, guestName, isDemo }: MinimalistTemplateProps) {
   const [isOpened, setIsOpened] = useState(false);
   const [wishes, setWishes] = useState<any[]>([]);
   const displayName = guestName || "Tamu Undangan";
