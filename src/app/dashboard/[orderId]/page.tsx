@@ -42,17 +42,35 @@ export default async function DashboardPage(props: { params: Promise<{ orderId: 
     console.warn("Dashboard: Invitation missing, creating on the fly for order:", orderId);
     
     // Generate a better default slug from names
-    const names = orderData.buyer_name?.split(' & ') || [orderData.buyer_name || "undangan"];
-    const nameSlug = names.map((n: string) => n.trim().split(' ')[0].toLowerCase()).join('-');
-    const invitationSlug = orderData.inv_slug || `${nameSlug}-${orderId.substring(0, 4)}`;
+    const slugify = (text: string) => text.toString().toLowerCase().trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+
+    const baseSlug = slugify(orderData.buyer_name || "undangan");
+    let invitationSlug = orderData.inv_slug || baseSlug;
+
+    // Check for existing slug and add suffix if needed if using baseSlug
+    if (!orderData.inv_slug) {
+      const { data: existingInvs } = await supabase
+        .from('invitations')
+        .select('slug')
+        .ilike('slug', `${baseSlug}%`);
+
+      if (existingInvs && existingInvs.length > 0) {
+        invitationSlug = `${baseSlug}-${(existingInvs.length + 1).toString().padStart(3, '0')}`;
+      }
+    }
     
     const { data: newInv, error: createError } = await supabase.from('invitations').insert({
       order_id: orderId,
       slug: invitationSlug,
       template_id: orderData.template_id,
       content: {
-        groom_name: names[0] || orderData.buyer_name,
-        bride_name: names[1] || "",
+        groom_name: "",
+        bride_name: "",
       }
     }).select().single();
 

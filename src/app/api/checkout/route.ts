@@ -11,9 +11,30 @@ export async function POST(request: Request) {
     const { templateId, templateSlug, amount, customerDetails } = body;
     
     const orderId = `MP-${nanoid(10)}`;
-    const invitationSlug = `${templateSlug}-${nanoid(5)}`.toLowerCase();
+    
+    // Generate slug from buyer name
+    const slugify = (text: string) => text.toString().toLowerCase().trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w\-]+/g, '')
+      .replace(/\-\-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
 
-    // 1. Create Transaction in Midtrans Snap
+    let baseSlug = slugify(customerDetails.name);
+    let invitationSlug = baseSlug;
+
+    const supabase = createAdminClient();
+
+    // Check for existing slug and add suffix if needed
+    const { data: existingInvs } = await supabase
+      .from('invitations')
+      .select('slug')
+      .ilike('slug', `${baseSlug}%`);
+
+    if (existingInvs && existingInvs.length > 0) {
+      const count = existingInvs.length;
+      invitationSlug = `${baseSlug}-${(count + 1).toString().padStart(3, '0')}`;
+    }
     const parameter = {
       transaction_details: {
         order_id: orderId,
@@ -30,8 +51,6 @@ export async function POST(request: Request) {
     const snapToken = transaction.token;
 
     // 2. Save to Database with 'pending' status
-    const supabase = createAdminClient();
-    
     const { data: orderData, error: orderError } = await supabase.from('orders').insert({
       order_number: orderId,
       buyer_name: customerDetails.name,
@@ -55,21 +74,21 @@ export async function POST(request: Request) {
       slug: invitationSlug,
       template_id: templateId,
       content: {
-        groom_name: customerDetails.name.split(' & ')[0] || customerDetails.name,
-        bride_name: customerDetails.name.split(' & ')[1] || "",
+        groom_name: "",
+        bride_name: "",
       }
     });
 
     console.log("✅ Order saved & Midtrans token generated:", orderId);
 
-    // 3. Send Pending Payment Email (Async)
+    // 3. Send Pending Payment Email (Wait for it to ensure delivery)
     const pendingEmailHtml = getPendingPaymentEmail(
       customerDetails.name,
       amount.toLocaleString("id-ID"),
       transaction.redirect_url
     );
     
-    sendEmailNotification(
+    await sendEmailNotification(
       customerDetails.email,
       "Hampir Selesai! Pesanan Undangan MyPromise Kamu",
       pendingEmailHtml

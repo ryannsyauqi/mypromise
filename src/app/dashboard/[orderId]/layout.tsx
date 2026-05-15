@@ -76,10 +76,9 @@ export default function DashboardLayout({
 
   const navItems = [
     { name: "Beranda", href: `/dashboard/${orderId}`, icon: Icons.Home },
-    { name: "Edit Undangan", href: `/dashboard/${orderId}/invitation`, icon: Icons.Edit },
+    { name: "Data Mempelai", href: `/dashboard/${orderId}/invitation`, icon: Icons.Edit },
     { name: "Pengaturan Link", href: `/dashboard/${orderId}/settings`, icon: Icons.Settings },
     { name: "Daftar Tamu", href: `/dashboard/${orderId}/guests`, icon: Icons.Guests },
-    { name: "Pembayaran", href: `/dashboard/${orderId}/billing`, icon: Icons.Billing },
   ];
 
   return (

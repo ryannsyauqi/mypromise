@@ -19,7 +19,17 @@ export async function PATCH(
     // Build update object
     const updateData: any = {};
     if (content) updateData.content = content;
-    if (slug) updateData.slug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    if (slug) {
+      updateData.slug = slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      
+      // If we're updating the slug, we mark it as customized in the content JSON
+      const { data: current } = await supabase.from('invitations').select('content').eq('id', id).single();
+      updateData.content = { 
+        ...(current?.content || {}), 
+        ...(content || {}),
+        is_slug_customized: true 
+      };
+    }
 
     const { data, error } = await supabase
       .from('invitations')

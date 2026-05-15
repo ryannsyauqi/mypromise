@@ -9,22 +9,22 @@ import { FieldSchema } from "@/lib/types";
 const Icons = {
   Couple: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 12c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm10 2h-6c-1.1 0-2 .9-2 2v5h2v-5h2v5h2v-5h2v-5c0-1.1-.9-2-2-2z"/>
+      <path d="M12 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm7 6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 12c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm10 2h-6c-1.1 0-2 .9-2 2v5h2v-5h2v5h2v-5h2v-5c0-1.1-.9-2-2-2z" />
     </svg>
   ),
   Event: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z"/>
+      <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2zm-7 5h5v5h-5z" />
     </svg>
   ),
   Sparkles: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2l2.45 7.55L22 12l-7.55 2.45L12 22l-2.45-7.55L2 12l7.55-2.45L12 2z"/>
+      <path d="M12 2l2.45 7.55L22 12l-7.55 2.45L12 22l-2.45-7.55L2 12l7.55-2.45L12 2z" />
     </svg>
   ),
   Camera: () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 12c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zm9-8h-3.17L16 2H8L6.17 4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+      <path d="M12 12c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zm9-8h-3.17L16 2H8L6.17 4H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z" />
     </svg>
   ),
   Check: () => (
@@ -59,7 +59,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
   const searchParams = useSearchParams();
   const orderId = params.orderId as string;
   const initialTab = searchParams.get("tab") || "mempelai";
-  
+
   const supabase = createClient();
   const [data, setData] = useState<any>(initialData || null);
   const [formData, setFormData] = useState<Record<string, any>>(initialData?.content || {});
@@ -91,7 +91,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
         .select('*, orders(*, templates(*))')
         .eq('order_id', orderId)
         .single();
-      
+
       if (invData) {
         setData(invData);
         setFormData(invData.content || {});
@@ -107,7 +107,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
 
     setSaveStatus("saving");
     setErrorMessage("");
-    
+
     try {
       const response = await fetch(`/api/invitations/${data.id}`, {
         method: "PATCH",
@@ -132,7 +132,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
 
   const handleFileUpload = async (key: string, file: File, isMulti = false) => {
     if (!data?.id) return;
-    
+
     setUploadingField(key);
     const fileExt = file.name.split('.').pop();
     const fileName = `${data.id}/${key}-${Date.now()}.${fileExt}`;
@@ -158,7 +158,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
     } else {
       handleInputChange(key, publicUrl);
     }
-    
+
     setUploadingField(null);
   };
 
@@ -187,23 +187,23 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
 
   const renderField = (field: FieldSchema) => {
     const commonClasses = "w-full px-6 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all bg-slate-50/50 font-bold text-charcoal-800 placeholder:text-slate-300 placeholder:font-medium text-sm";
-    
+
     if (field.type === "file" || field.type === "multi_file") {
       const isMulti = field.type === "multi_file";
       const value = formData[field.key];
-      
+
       return (
         <div key={field.key} className="space-y-4 col-span-full">
           <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
             {field.label} {field.required && <span className="text-rose-500">*</span>}
           </label>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {isMulti ? (
               (value || []).map((url: string, idx: number) => (
                 <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden group border border-slate-100">
                   <img src={url} alt="" className="w-full h-full object-cover" />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => removeFile(field.key, idx)}
                     className="absolute top-2 right-2 p-2 bg-white/90 text-rose-500 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"
@@ -216,7 +216,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
               value && (
                 <div className="relative aspect-square rounded-2xl overflow-hidden group border border-slate-100">
                   <img src={value} alt="" className="w-full h-full object-cover" />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => removeFile(field.key)}
                     className="absolute top-2 right-2 p-2 bg-white/90 text-rose-500 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"
@@ -226,11 +226,11 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
                 </div>
               )
             )}
-            
+
             <label className={`aspect-square rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/50 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 transition-all ${uploadingField === field.key ? 'opacity-50 pointer-events-none' : ''}`}>
-              <input 
-                type="file" 
-                className="hidden" 
+              <input
+                type="file"
+                className="hidden"
                 accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -255,12 +255,12 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
     return (
       <div key={field.key} className={`space-y-2.5 ${field.type === 'textarea' ? 'col-span-full' : ''}`}>
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-          {field.label} 
+          {field.label}
           {field.required && <span className="text-rose-500">*</span>}
         </label>
-        
+
         {field.type === "textarea" ? (
-          <textarea 
+          <textarea
             className={`${commonClasses} min-h-[120px] resize-none`}
             required={field.required}
             value={formData[field.key] || ""}
@@ -268,8 +268,8 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
             placeholder={field.placeholder || "Tuliskan di sini..."}
           />
         ) : (
-          <input 
-            type={field.type} 
+          <input
+            type={field.type}
             className={commonClasses}
             required={field.required}
             placeholder={field.placeholder || field.hint}
@@ -295,17 +295,16 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
         {[
           { id: "mempelai", label: "Profil Mempelai", icon: <Icons.Couple /> },
           { id: "acara", label: "Detail Acara", icon: <Icons.Event /> },
-          { id: "lainnya", label: "Konten Tambahan", icon: <Icons.Sparkles /> },
+          { id: "lainnya", label: "Lainnya", icon: <Icons.Sparkles /> },
           { id: "media", label: "Media & Galeri", icon: <Icons.Camera /> },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 lg:flex-none flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-2xl mb-1 ${
-              activeTab === tab.id
-                ? "bg-white text-rose-500 shadow-sm border border-slate-100"
-                : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
-            }`}
+            className={`flex-1 lg:flex-none flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-2xl mb-1 ${activeTab === tab.id
+              ? "bg-white text-rose-500 shadow-sm border border-slate-100"
+              : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
+              }`}
           >
             <span>{tab.icon}</span>
             <span className="hidden sm:inline whitespace-nowrap">{tab.label}</span>
@@ -320,7 +319,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
               <Icons.Check /> Perubahan Berhasil Disimpan
             </div>
           )}
-          
+
           {saveStatus === "error" && (
             <div className="flex items-center gap-3 p-5 bg-rose-50 text-rose-600 rounded-2xl border border-rose-100/50 text-[10px] font-black uppercase tracking-widest animate-fade-in">
               <Icons.Error /> {errorMessage || "Gagal Menyimpan. Silakan Coba Lagi."}
@@ -334,18 +333,6 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
                   <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Profil Mempelai</h2>
                   <p className="text-xs text-slate-400 font-medium">Lengkapi detail profil untuk calon pengantin pria dan wanita.</p>
                 </div>
-                {data?.slug && (
-                  <Link 
-                    href={`/${data.slug}`}
-                    target="_blank"
-                    className="flex items-center gap-2 px-6 py-3 bg-rose-50 text-rose-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100/50 hover:bg-rose-100 transition-all shrink-0 w-fit"
-                  >
-                    Lihat Undangan
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </Link>
-                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                 {groomBrideFields.map(renderField)}
@@ -360,18 +347,6 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
                   <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Waktu & Lokasi Acara</h2>
                   <p className="text-xs text-slate-400 font-medium">Pastikan detail waktu dan alamat sudah benar agar tamu tidak tersesat.</p>
                 </div>
-                {data?.slug && (
-                  <Link 
-                    href={`/${data.slug}`}
-                    target="_blank"
-                    className="flex items-center gap-2 px-6 py-3 bg-rose-50 text-rose-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100/50 hover:bg-rose-100 transition-all shrink-0 w-fit"
-                  >
-                    Lihat Undangan
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </Link>
-                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
                 {eventFields.map(renderField)}
@@ -383,21 +358,9 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
             <div className="space-y-10 animate-fade-in">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Cerita & Pesan Tambahan</h2>
+                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Lainnya</h2>
                   <p className="text-xs text-slate-400 font-medium">Tambahkan sentuhan personal untuk menyapa para tamu undangan.</p>
                 </div>
-                {data?.slug && (
-                  <Link 
-                    href={`/${data.slug}`}
-                    target="_blank"
-                    className="flex items-center gap-2 px-6 py-3 bg-rose-50 text-rose-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100/50 hover:bg-rose-100 transition-all shrink-0 w-fit"
-                  >
-                    Lihat Undangan
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </Link>
-                )}
               </div>
               <div className="grid grid-cols-1 gap-10">
                 {otherFields.map(renderField)}
@@ -412,20 +375,8 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
                   <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Media & Galeri Foto</h2>
                   <p className="text-xs text-slate-400 font-medium">Unggah foto-foto terbaik kamu untuk menghiasi undangan digital.</p>
                 </div>
-                {data?.slug && (
-                  <Link 
-                    href={`/${data.slug}`}
-                    target="_blank"
-                    className="flex items-center gap-2 px-6 py-3 bg-rose-50 text-rose-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100/50 hover:bg-rose-100 transition-all shrink-0 w-fit"
-                  >
-                    Lihat Undangan
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </Link>
-                )}
               </div>
-              
+
               <div className="grid grid-cols-1 gap-12">
                 {mediaFields.length > 0 ? (
                   mediaFields.map(renderField)
@@ -444,11 +395,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
             </div>
           )}
 
-          <div className="pt-10 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-2 text-emerald-500">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-[10px] font-black uppercase tracking-widest">Sistem Ready</span>
-            </div>
+          <div className="pt-10 border-t border-slate-100 flex flex-col md:flex-row justify-end items-center gap-6">
             <button
               type="submit"
               disabled={saveStatus === "saving" || !data?.id}
