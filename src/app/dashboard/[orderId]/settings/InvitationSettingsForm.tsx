@@ -39,6 +39,17 @@ const Icons = {
 };
 
 export default function InvitationSettingsForm({ initialData }: { initialData: any }) {
+  const order = initialData?.orders;
+  const isLifetime = order?.notes?.includes('Selamanya') || order?.expires_at?.startsWith('2099') || false;
+
+  let remainingText = "365 Hari";
+  if (!isLifetime && order) {
+    const expiryDate = order.expires_at ? new Date(order.expires_at) : new Date(new Date(order.created_at).setFullYear(new Date(order.created_at).getFullYear() + 1));
+    const diffTime = expiryDate.getTime() - new Date().getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    remainingText = diffDays > 0 ? `${diffDays} Hari` : "Expired";
+  }
+
   const [slug, setSlug] = useState(initialData.slug || "");
   const [isEditing, setIsEditing] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
@@ -77,117 +88,90 @@ export default function InvitationSettingsForm({ initialData }: { initialData: a
   };
 
   return (
-    <div className="animate-fade-in space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold text-charcoal-800" style={{ fontFamily: "var(--font-playfair)" }}>
-          Pengaturan Link Undangan
-        </h1>
-        <p className="text-charcoal-400 mt-2">Kustomisasi alamat website undangan agar lebih personal dan mudah diingat.</p>
-      </div>
-
-      <div className="bg-white rounded-[48px] border border-slate-100 shadow-xl shadow-charcoal-900/[0.02] overflow-hidden">
-        <form onSubmit={handleSubmit} className="p-10 space-y-8">
-          
-          <div className="space-y-6">
-            <div className={`p-10 rounded-[40px] transition-all duration-500 relative overflow-hidden ${
-              isEditing ? 'bg-white border-2 border-rose-500 shadow-2xl shadow-rose-500/10' : 'bg-slate-50/50 border border-slate-100'
-            }`}>
-              {/* Decorative Background Elements */}
+    <div className="animate-fade-in">
+      <form onSubmit={handleSubmit} className="p-8 md:p-12">
+        <div className="w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
+            <div className="space-y-1.5">
+               <label className="text-base md:text-lg font-bold text-charcoal-900 block" style={{ fontFamily: "var(--font-playfair)" }}>Alamat Website Undangan</label>
+               <p className="text-xs md:text-sm text-slate-400">Pastikan URL mudah diingat oleh tamu undangan.</p>
+            </div>
+            
+            <div className="flex items-center gap-4">
               {isEditing && (
-                <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 blur-[50px] rounded-full -mr-16 -mt-16 animate-pulse"></div>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setIsEditing(false);
+                    setSlug(initialData.slug || "");
+                  }}
+                  className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-charcoal-900 transition-colors"
+                >
+                  Batal
+                </button>
               )}
+              <button 
+                type="button"
+                onClick={() => isEditing ? handleSubmit() : setIsEditing(true)}
+                disabled={saveStatus === "saving"}
+                className={`group flex items-center gap-2 px-6 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 ${
+                  isEditing 
+                    ? 'bg-rose-500 text-white hover:bg-rose-600 shadow-lg shadow-rose-500/20' 
+                    : 'bg-charcoal-900 text-white hover:bg-charcoal-800 shadow-lg shadow-charcoal-900/10'
+                }`}
+              >
+                {saveStatus === "saving" ? (
+                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                ) : isEditing ? (
+                  <><Icons.Check /> Simpan</>
+                ) : (
+                  <><Icons.Edit /> Edit Link</>
+                )}
+              </button>
+            </div>
+          </div>
 
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                    isEditing ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'bg-white text-slate-300 border border-slate-100'
-                  }`}>
-                    <Icons.Globe />
-                  </div>
-                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 block">Alamat Undangan (URL SLUG)</label>
+          <div className="space-y-4">
+            <div className="flex flex-col md:flex-row items-stretch gap-4 transition-all duration-300">
+              <div className={`flex-grow flex items-center gap-0 px-2 py-2 rounded-[20px] border transition-all duration-300 w-full overflow-hidden ${
+                isEditing ? 'bg-white border-rose-500 ring-4 ring-rose-500/10' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className="pl-5 pr-2 py-3 flex items-center justify-center shrink-0">
+                   <span className={`text-sm font-bold ${isEditing ? 'text-charcoal-400' : 'text-slate-400'}`}>mypromise.id/</span>
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  {isEditing && (
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        setIsEditing(false);
-                        setSlug(initialData.slug || "");
-                      }}
-                      className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
-                    >
-                      Batal
-                    </button>
-                  )}
-                  <button 
-                    type="button"
-                    onClick={() => isEditing ? handleSubmit() : setIsEditing(true)}
-                    disabled={saveStatus === "saving"}
-                    className={`group flex items-center gap-2 px-6 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-sm active:scale-95 ${
-                      isEditing 
-                        ? 'bg-rose-500 text-white hover:bg-rose-600' 
-                        : 'bg-white text-charcoal-900 border border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    {saveStatus === "saving" ? (
-                      <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    ) : isEditing ? (
-                      <><Icons.Check /> Simpan</>
-                    ) : (
-                      <><Icons.Edit /> Edit Link</>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className={`flex flex-col md:flex-row items-stretch gap-4 transition-all ${isEditing ? 'scale-[1.01]' : ''}`}>
-                  <div className={`flex-grow flex items-center gap-0 px-1 py-1 rounded-[24px] border transition-all duration-300 w-full overflow-hidden ${
-                    isEditing ? 'bg-white border-rose-500 ring-8 ring-rose-500/5 shadow-inner' : 'bg-white border-slate-200'
-                  }`}>
-                    <div className="bg-slate-50 px-6 py-4 rounded-l-[20px] border-r border-slate-100 flex items-center justify-center shrink-0">
-                       <span className="text-slate-400 text-sm font-bold tracking-tight">mypromise.id/</span>
-                    </div>
-                    <input 
-                      type="text"
-                      value={slug}
-                      disabled={!isEditing}
-                      onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-                      className="flex-grow bg-transparent border-none focus:outline-none px-6 py-4 font-black text-charcoal-900 text-lg lowercase disabled:text-slate-300 placeholder:text-slate-200"
-                      placeholder="nama-pengantin"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 text-xs font-medium min-h-[32px]">
-                  {saveStatus === "success" && (
-                    <div className="flex items-center gap-2 text-emerald-600 animate-scale-in">
-                       <Icons.Check /> <span>Berhasil Diperbarui</span>
-                    </div>
-                  )}
-                  {saveStatus === "error" && (
-                    <div className="flex items-center gap-2 text-rose-600 animate-scale-in">
-                       <Icons.Error /> <span>{errorMessage}</span>
-                    </div>
-                  )}
-                  {!saveStatus || saveStatus === "idle" ? (
-                    isEditing ? (
-                      <div className="flex items-center gap-2 text-rose-500/70 bg-rose-50 px-4 py-2 rounded-lg animate-fade-in">
-                         <div className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></div>
-                         <span>Huruf kecil & tanda hubung. Contoh: <strong className="text-rose-600">ryan-nurul</strong></span>
-                      </div>
-                    ) : (
-                      <span className="text-slate-400 px-2 italic">Klik edit untuk mengubah alamat website undangan.</span>
-                    )
-                  ) : null}
-                </div>
+                <input 
+                  type="text"
+                  value={slug}
+                  disabled={!isEditing}
+                  onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                  className="flex-grow bg-transparent border-none focus:outline-none pr-5 py-3 font-black text-charcoal-900 text-base md:text-xl lowercase disabled:text-charcoal-600 placeholder:text-slate-300 w-full"
+                  placeholder="nama-pengantin"
+                />
               </div>
             </div>
 
+            <div className="flex items-center gap-3 text-xs font-medium min-h-[24px]">
+              {saveStatus === "success" && (
+                <div className="flex items-center gap-2 text-emerald-600 animate-scale-in">
+                   <Icons.Check /> <span>Berhasil Diperbarui</span>
+                </div>
+              )}
+              {saveStatus === "error" && (
+                <div className="flex items-center gap-2 text-rose-600 animate-scale-in">
+                   <Icons.Error /> <span>{errorMessage}</span>
+                </div>
+              )}
+              {!saveStatus || saveStatus === "idle" ? (
+                <div className="flex items-center gap-2 text-slate-500 animate-fade-in text-xs">
+                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0"></span>
+                   <span>Gunakan huruf kecil & tanda hubung. Contoh: <strong className="text-charcoal-900 font-bold">niafahmiforever</strong> atau <strong className="text-charcoal-900 font-bold">nia-dan-fahmi</strong></span>
+                </div>
+              ) : null}
+            </div>
+
             {/* Status Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               <div className="p-8 bg-slate-50/50 rounded-[32px] border border-slate-100 flex items-center justify-between group cursor-default">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 mt-8 border-t border-slate-100">
+               <div className="p-8 bg-slate-50/70 rounded-[32px] border border-slate-100 flex items-center justify-between group cursor-default">
                   <div className="space-y-1">
                     <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Link</h4>
                     <p className="text-xl font-bold text-charcoal-900">Aktif & Siap</p>
@@ -197,21 +181,26 @@ export default function InvitationSettingsForm({ initialData }: { initialData: a
                   </div>
                </div>
 
-               <div className="p-8 bg-slate-50/50 rounded-[32px] border border-slate-100 flex items-center justify-between group cursor-default">
+               <div className="p-8 bg-slate-50/70 rounded-[32px] border border-slate-100 flex items-center justify-between group cursor-default">
                   <div className="space-y-1">
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu Aktif</h4>
-                    <p className="text-xl font-bold text-charcoal-900">365 Hari</p>
+                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Masa Aktif</h4>
+                    <div className="flex items-center gap-2">
+                      <p className={`text-xl font-bold ${isLifetime ? 'text-rose-600' : (remainingText === 'Expired' ? 'text-rose-500' : 'text-charcoal-900')}`}>
+                        {isLifetime ? 'Selamanya' : remainingText}
+                      </p>
+                      {isLifetime && (
+                        <span className="px-2 py-0.5 bg-rose-100/80 text-rose-600 rounded-md text-[9px] font-black uppercase tracking-widest">VIP</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-300 shadow-sm">
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                  <div className={`w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm ${isLifetime ? 'text-rose-500 bg-rose-50/80 border-rose-200' : 'text-slate-400'}`}>
+                    <Icons.Globe />
                   </div>
                </div>
             </div>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 }

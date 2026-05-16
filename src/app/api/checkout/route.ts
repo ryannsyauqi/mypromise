@@ -8,7 +8,7 @@ import { getPendingPaymentEmail } from "@/lib/email-templates";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { templateId, templateSlug, amount, customerDetails } = body;
+    const { templateId, templateSlug, amount, customerDetails, isLifetime } = body;
     
     const orderId = `MP-${nanoid(10)}`;
     
@@ -82,6 +82,8 @@ export async function POST(request: Request) {
       payment_status: 'pending', // Awalnya pending
       order_status: 'awaiting_content',
       inv_slug: invitationSlug,
+      notes: isLifetime ? 'Masa Aktif Selamanya' : null,
+      expires_at: isLifetime ? '2099-12-31T23:59:59Z' : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
     }).select().single();
 
     if (orderError) {

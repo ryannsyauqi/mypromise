@@ -157,9 +157,14 @@ export default function AdminOrdersPage() {
                       <span className="font-mono text-[10px] font-black text-slate-400 uppercase tracking-tighter">#{order.order_number}</span>
                     </td>
                     <td className="px-6 py-6">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 text-sm whitespace-nowrap">{order.buyer_name}</span>
-                        <span className="text-[9px] text-slate-400 mt-0.5 uppercase font-medium">
+                      <div className="flex flex-col items-start gap-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-900 text-sm whitespace-nowrap">{order.buyer_name}</span>
+                          {(order.notes?.includes('Selamanya') || order.expires_at?.startsWith('2099')) && (
+                            <span className="px-1.5 py-0.5 bg-rose-50 border border-rose-200 text-rose-600 rounded text-[8px] font-black uppercase tracking-widest">Lifetime</span>
+                          )}
+                        </div>
+                        <span className="text-[9px] text-slate-400 uppercase font-medium">
                           {new Date(order.created_at).toLocaleDateString("id-ID", { day: 'numeric', month: 'short' })}
                         </span>
                       </div>

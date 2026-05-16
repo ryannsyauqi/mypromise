@@ -78,10 +78,9 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
 
   // Calculate Active Period
   const getRemainingDays = () => {
+    if (order?.notes?.includes('Selamanya') || order?.expires_at?.startsWith('2099')) return "Selamanya";
     if (!order?.created_at) return "365 Hari";
-    const createdDate = new Date(order.created_at);
-    const expiryDate = new Date(createdDate);
-    expiryDate.setFullYear(expiryDate.getFullYear() + 1); // 1 year validity
+    const expiryDate = order.expires_at ? new Date(order.expires_at) : new Date(new Date(order.created_at).setFullYear(new Date(order.created_at).getFullYear() + 1));
 
     const today = new Date();
     const diffTime = expiryDate.getTime() - today.getTime();

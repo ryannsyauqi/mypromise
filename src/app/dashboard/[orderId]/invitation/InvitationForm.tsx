@@ -231,48 +231,55 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
   };
 
   const renderField = (field: FieldSchema) => {
-    const commonClasses = "w-full px-6 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all bg-slate-50/50 font-bold text-charcoal-800 placeholder:text-slate-300 placeholder:font-medium text-sm";
+    const commonClasses = "w-full px-4 py-3 md:py-3.5 rounded-xl border border-slate-200 focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/10 bg-white font-bold text-charcoal-900 placeholder:text-slate-300 text-sm transition-all shadow-xs";
 
     if (field.type === "file" || field.type === "multi_file" || field.type === "image" || field.type === "gallery") {
       const isMulti = field.type === "multi_file" || field.type === "gallery";
       const value = formData[field.key];
 
       return (
-        <div key={field.key} className="space-y-4 col-span-full">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
-            {field.label} {field.required && <span className="text-rose-500">*</span>}
-          </label>
+        <div key={field.key} className="p-6 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4 col-span-full">
+          <div className="flex justify-between items-center">
+            <label className="text-xs font-bold text-charcoal-900 flex items-center gap-2">
+              {field.label} {field.required && <span className="text-rose-500">*</span>}
+            </label>
+            <span className="text-[10px] font-black text-slate-400 bg-white px-2 py-0.5 rounded-md border border-slate-200 uppercase tracking-wider">{isMulti ? "Multi Foto" : "1 Foto"}</span>
+          </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
             {isMulti ? (
               (value || []).map((url: string, idx: number) => (
-                <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden group border border-slate-100">
+                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden group/img border border-slate-200 shadow-sm bg-white">
                   <img src={url} alt="" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeFile(field.key, idx)}
-                    className="absolute top-2 right-2 p-2 bg-white/90 text-rose-500 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"
-                  >
-                    <Icons.Trash />
-                  </button>
+                  <div className="absolute inset-0 bg-charcoal-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => removeFile(field.key, idx)}
+                      className="p-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-all shadow-md transform active:scale-95"
+                    >
+                      <Icons.Trash />
+                    </button>
+                  </div>
                 </div>
               ))
             ) : (
               value && (
-                <div className="relative aspect-square rounded-2xl overflow-hidden group border border-slate-100">
+                <div className="relative aspect-square rounded-xl overflow-hidden group/img border border-slate-200 shadow-sm bg-white">
                   <img src={value} alt="" className="w-full h-full object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => removeFile(field.key)}
-                    className="absolute top-2 right-2 p-2 bg-white/90 text-rose-500 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-sm"
-                  >
-                    <Icons.Trash />
-                  </button>
+                  <div className="absolute inset-0 bg-charcoal-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={() => removeFile(field.key)}
+                      className="p-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition-all shadow-md transform active:scale-95"
+                    >
+                      <Icons.Trash />
+                    </button>
+                  </div>
                 </div>
               )
             )}
 
-            <label className={`aspect-square rounded-2xl border-2 border-dashed border-slate-100 bg-slate-50/50 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 transition-all ${uploadingField === field.key ? 'opacity-50 pointer-events-none' : ''}`}>
+            <label className={`aspect-square rounded-xl border-2 border-dashed border-rose-200 bg-rose-50/50 hover:bg-rose-100/50 flex flex-col items-center justify-center cursor-pointer transition-all group/upload shadow-inner ${uploadingField === field.key ? 'opacity-50 pointer-events-none' : ''}`}>
               <input
                 type="file"
                 className="hidden"
@@ -283,30 +290,30 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
                 }}
               />
               {uploadingField === field.key ? (
-                <div className="w-6 h-6 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-rose-500/20 border-t-rose-500 rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <div className="text-slate-300 mb-2"><Icons.Upload /></div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Upload</span>
+                  <div className="text-rose-500 mb-1 transform group-hover/upload:-translate-y-0.5 transition-transform"><Icons.Upload /></div>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-rose-500">Pilih File</span>
                 </>
               )}
             </label>
           </div>
-          {field.hint && <p className="text-[9px] text-slate-300 font-bold uppercase tracking-wider">{field.hint}</p>}
+          {field.hint && <p className="text-[10px] text-slate-500 font-medium leading-relaxed flex items-center gap-1.5"><Icons.Sparkles /> {field.hint}</p>}
         </div>
       );
     }
 
     return (
-      <div key={field.key} className={`space-y-2.5 ${field.type === 'textarea' ? 'col-span-full' : ''}`}>
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-2">
+      <div key={field.key} className={`space-y-1.5 ${field.type === 'textarea' ? 'col-span-full' : ''}`}>
+        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
           {field.label}
           {field.required && <span className="text-rose-500">*</span>}
         </label>
 
         {field.type === "textarea" ? (
           <textarea
-            className={`${commonClasses} min-h-[120px] resize-none`}
+            className={`${commonClasses} min-h-[100px] resize-y`}
             required={field.required}
             value={formData[field.key] || ""}
             onChange={(e) => handleInputChange(field.key, e.target.value)}
@@ -322,7 +329,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
             onChange={(e) => handleInputChange(field.key, e.target.value)}
           />
         )}
-        {field.hint && <p className="text-[9px] text-slate-300 font-bold uppercase tracking-wider">{field.hint}</p>}
+        {field.hint && <p className="text-[10px] text-slate-400 font-medium">{field.hint}</p>}
       </div>
     );
   };
@@ -334,105 +341,119 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
   );
 
   return (
-    <div className="flex flex-col lg:flex-row bg-white rounded-[40px] shadow-xl shadow-charcoal-900/[0.02] border border-slate-100 overflow-hidden min-h-[600px]">
+    <div className="flex flex-col lg:flex-row bg-white rounded-[40px] shadow-2xl shadow-charcoal-900/[0.04] border border-slate-100/80 overflow-hidden min-h-[700px] my-4">
       {/* Sidebar Tabs */}
-      <div className="lg:w-72 bg-slate-50/50 border-r border-slate-100 flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar p-3">
+      <div className="lg:w-80 bg-slate-50/60 border-b lg:border-b-0 lg:border-r border-slate-100 flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar p-6 gap-3">
+        <div className="hidden lg:flex items-center gap-3.5 px-4 pb-6 mb-4 border-b border-slate-200/60 shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-rose-500/25 shrink-0">
+            <Icons.Couple />
+          </div>
+          <div>
+            <h3 className="font-bold text-charcoal-900 text-base leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>Data Pengantin</h3>
+            <p className="text-[10px] font-black uppercase tracking-widest text-rose-500 mt-0.5">Live Template Sync</p>
+          </div>
+        </div>
+
         {[
-          { id: "mempelai", label: "Profil Mempelai", icon: <Icons.Couple /> },
-          { id: "acara", label: "Detail Acara", icon: <Icons.Event /> },
-          { id: "lainnya", label: "Lainnya", icon: <Icons.Sparkles /> },
-          { id: "media", label: "Media & Galeri", icon: <Icons.Camera /> },
+          { id: "mempelai", label: "Profil Mempelai", desc: "Nama & Orang Tua", icon: <Icons.Couple /> },
+          { id: "acara", label: "Waktu & Lokasi", desc: "Akad & Resepsi", icon: <Icons.Event /> },
+          { id: "lainnya", label: "Informasi Ekstra", desc: "Cerita & Hadiah", icon: <Icons.Sparkles /> },
+          { id: "media", label: "Galeri Foto", desc: "Prewedding & Musik", icon: <Icons.Camera /> },
         ].map((tab) => (
           <button
             key={tab.id}
+            type="button"
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 lg:flex-none flex items-center gap-4 px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all rounded-2xl mb-1 ${activeTab === tab.id
-              ? "bg-white text-rose-500 shadow-sm border border-slate-100"
-              : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
+            className={`group relative flex items-center gap-4 px-6 py-4 transition-all duration-300 rounded-[24px] text-left shrink-0 lg:shrink ${activeTab === tab.id
+              ? "bg-rose-500 text-white shadow-xl shadow-rose-500/25 font-bold"
+              : "bg-white/60 hover:bg-white text-slate-400 hover:text-charcoal-900 border border-slate-100 shadow-xs"
               }`}
           >
-            <span>{tab.icon}</span>
-            <span className="hidden sm:inline whitespace-nowrap">{tab.label}</span>
+            <div className={`p-2.5 rounded-xl transition-all duration-300 shrink-0 ${activeTab === tab.id ? "bg-white/20 text-white" : "bg-slate-50 text-slate-400 group-hover:text-rose-500"}`}>
+              {tab.icon}
+            </div>
+            <div>
+              <div className="text-xs md:text-sm font-black uppercase tracking-wider">{tab.label}</div>
+              <div className={`text-[10px] font-semibold mt-0.5 ${activeTab === tab.id ? "text-rose-100" : "text-slate-400"}`}>{tab.desc}</div>
+            </div>
           </button>
         ))}
       </div>
 
-      <div className="flex-grow p-8 md:p-12">
-        <form onSubmit={handleSubmit} className="space-y-10 max-w-2xl">
+      <div className="flex-grow p-6 sm:p-10 lg:p-16">
+        <form onSubmit={handleSubmit} className="space-y-10 max-w-4xl mx-auto">
           {saveStatus === "success" && (
-            <div className="flex items-center gap-3 p-5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-100/50 text-[10px] font-black uppercase tracking-widest animate-fade-in">
-              <Icons.Check /> Perubahan Berhasil Disimpan
+            <div className="flex items-center gap-3 p-6 bg-emerald-50 text-emerald-700 rounded-[28px] border border-emerald-200/80 text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-500/10 animate-fade-in">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm"><Icons.Check /></div>
+              <span>Perubahan Berhasil Disimpan & Tersinkronisasi ke Undangan Live</span>
             </div>
           )}
 
           {saveStatus === "error" && (
-            <div className="flex items-center gap-3 p-5 bg-rose-50 text-rose-600 rounded-2xl border border-rose-100/50 text-[10px] font-black uppercase tracking-widest animate-fade-in">
-              <Icons.Error /> {errorMessage || "Gagal Menyimpan. Silakan Coba Lagi."}
+            <div className="flex items-center gap-3 p-6 bg-rose-50 text-rose-700 rounded-[28px] border border-rose-200/80 text-xs font-black uppercase tracking-widest shadow-lg shadow-rose-500/10 animate-fade-in">
+              <div className="w-8 h-8 rounded-xl bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-sm"><Icons.Error /></div>
+              <span>{errorMessage || "Gagal Menyimpan. Silakan Periksa Jaringan & Coba Lagi."}</span>
             </div>
           )}
 
           {activeTab === "mempelai" && (
-            <div className="space-y-10 animate-fade-in">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Profil Mempelai</h2>
-                  <p className="text-xs text-slate-400 font-medium">Lengkapi detail profil untuk calon pengantin pria dan wanita.</p>
-                </div>
+            <div className="space-y-8 animate-fade-in">
+              <div className="pb-6 border-b border-slate-100">
+                <span className="px-3 py-1 bg-rose-50 text-rose-600 font-black uppercase tracking-widest text-[10px] rounded-full">Kategori 1 / 4</span>
+                <h2 className="text-3xl md:text-4xl font-black text-charcoal-900 mt-3 mb-2 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>Profil Mempelai</h2>
+                <p className="text-sm text-slate-400 font-medium">Lengkapi nama lengkap, nama panggilan, serta detail orang tua dari masing-masing mempelai.</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {groomBrideFields.map(renderField)}
               </div>
             </div>
           )}
 
           {activeTab === "acara" && (
-            <div className="space-y-10 animate-fade-in">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Waktu & Lokasi Acara</h2>
-                  <p className="text-xs text-slate-400 font-medium">Pastikan detail waktu dan alamat sudah benar agar tamu tidak tersesat.</p>
-                </div>
+            <div className="space-y-8 animate-fade-in">
+              <div className="pb-6 border-b border-slate-100">
+                <span className="px-3 py-1 bg-rose-50 text-rose-600 font-black uppercase tracking-widest text-[10px] rounded-full">Kategori 2 / 4</span>
+                <h2 className="text-3xl md:text-4xl font-black text-charcoal-900 mt-3 mb-2 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>Waktu & Lokasi Acara</h2>
+                <p className="text-sm text-slate-400 font-medium">Tentukan jadwal pelaksanaan akad nikah dan resepsi, serta tautan peta Google Maps lokasi acara.</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {eventFields.map(renderField)}
               </div>
             </div>
           )}
 
           {activeTab === "lainnya" && (
-            <div className="space-y-10 animate-fade-in">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Lainnya</h2>
-                  <p className="text-xs text-slate-400 font-medium">Tambahkan sentuhan personal untuk menyapa para tamu undangan.</p>
-                </div>
+            <div className="space-y-8 animate-fade-in">
+              <div className="pb-6 border-b border-slate-100">
+                <span className="px-3 py-1 bg-rose-50 text-rose-600 font-black uppercase tracking-widest text-[10px] rounded-full">Kategori 3 / 4</span>
+                <h2 className="text-3xl md:text-4xl font-black text-charcoal-900 mt-3 mb-2 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>Informasi Tambahan</h2>
+                <p className="text-sm text-slate-400 font-medium">Sematkan kata sambutan, kutipan ayat cinta, atau informasi rekening/kado digital untuk tamu undangan.</p>
               </div>
-              <div className="grid grid-cols-1 gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {otherFields.map(renderField)}
               </div>
             </div>
           )}
 
           {activeTab === "media" && (
-            <div className="space-y-10 animate-fade-in">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>Media & Galeri Foto</h2>
-                  <p className="text-xs text-slate-400 font-medium">Unggah foto-foto terbaik kamu untuk menghiasi undangan digital.</p>
-                </div>
+            <div className="space-y-8 animate-fade-in">
+              <div className="pb-6 border-b border-slate-100">
+                <span className="px-3 py-1 bg-rose-50 text-rose-600 font-black uppercase tracking-widest text-[10px] rounded-full">Kategori 4 / 4</span>
+                <h2 className="text-3xl md:text-4xl font-black text-charcoal-900 mt-3 mb-2 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>Galeri & Media Foto</h2>
+                <p className="text-sm text-slate-400 font-medium">Unggah koleksi foto prewedding terbaik Anda untuk mempercantik galeri undangan digital.</p>
               </div>
 
-              <div className="grid grid-cols-1 gap-12">
+              <div className="grid grid-cols-1 gap-6">
                 {mediaFields.length > 0 ? (
                   mediaFields.map(renderField)
                 ) : (
-                  <div className="text-center py-20 bg-slate-50/50 rounded-[32px] border-2 border-dashed border-slate-100">
-                    <div className="w-16 h-16 bg-white text-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm border border-slate-100">
+                  <div className="text-center py-20 bg-slate-50/70 rounded-[36px] border-2 border-dashed border-slate-200 shadow-inner">
+                    <div className="w-20 h-20 bg-white text-slate-300 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-md border border-slate-100">
                       <Icons.Camera />
                     </div>
-                    <h3 className="font-bold text-charcoal-900 text-lg">Belum Ada Field Media</h3>
-                    <p className="text-slate-400 text-xs mt-2 font-medium max-w-xs mx-auto">
-                      Template yang kamu pilih mungkin tidak membutuhkan unggahan media tambahan.
+                    <h3 className="font-black text-charcoal-900 text-xl md:text-2xl" style={{ fontFamily: "var(--font-playfair)" }}>Galeri Tidak Diperlukan</h3>
+                    <p className="text-slate-400 text-sm mt-3 font-medium max-w-md mx-auto leading-relaxed">
+                      Desain template undangan yang Anda pilih bernuansa minimalis elegan dan tidak menggunakan galeri foto eksternal.
                     </p>
                   </div>
                 )}
@@ -440,18 +461,25 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
             </div>
           )}
 
-          <div className="pt-10 border-t border-slate-100 flex flex-col md:flex-row justify-end items-center gap-6">
+          <div className="pt-12 border-t border-slate-100 flex flex-col sm:flex-row justify-end items-center gap-6">
             <button
               type="submit"
               disabled={saveStatus === "saving" || !data?.id}
-              className="w-full md:w-auto px-12 py-5 bg-charcoal-900 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-rose-500 transition-all duration-500 shadow-xl shadow-charcoal-900/10 disabled:opacity-50 flex items-center justify-center gap-3"
+              className="group relative w-full sm:w-auto px-14 py-5 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-black uppercase tracking-[0.25em] text-xs rounded-2xl hover:from-rose-600 hover:to-rose-700 transition-all duration-500 shadow-2xl shadow-rose-500/25 disabled:opacity-50 flex items-center justify-center gap-3 transform active:scale-95 cursor-pointer"
             >
               {saveStatus === "saving" ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Menyimpan...
+                  <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span>Menyimpan Sistem...</span>
                 </>
-              ) : "Simpan Perubahan"}
+              ) : (
+                <>
+                  <span>Simpan Perubahan</span>
+                  <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center transition-transform duration-300 group-hover:translate-x-1 shrink-0">
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                  </div>
+                </>
+              )}
             </button>
           </div>
         </form>

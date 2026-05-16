@@ -27,6 +27,41 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
     return notFound();
   }
 
+  const order = invitation.orders;
+  if (order) {
+    const isLifetime = order.notes?.includes('Selamanya') || order.expires_at?.startsWith('2099');
+    if (!isLifetime) {
+      const expiryDate = order.expires_at ? new Date(order.expires_at) : new Date(new Date(order.created_at).setFullYear(new Date(order.created_at).getFullYear() + 1));
+      if (new Date() > expiryDate) {
+        return (
+          <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 text-center">
+            <div className="max-w-md w-full bg-slate-800/80 backdrop-blur-md p-8 md:p-12 rounded-[32px] border border-slate-700 shadow-2xl space-y-6 animate-fade-in">
+              <div className="w-16 h-16 bg-rose-500/10 border border-rose-500/30 text-rose-500 rounded-2xl flex items-center justify-center mx-auto mb-2 shadow-lg shadow-rose-500/10">
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>
+                Link Undangan Telah Berakhir
+              </h1>
+              <p className="text-slate-300 text-sm md:text-base leading-relaxed">
+                Masa aktif undangan ini telah habis (365 hari sejak pemesanan). Terima kasih telah mempercayakan momen berharga Anda kepada MyPromise.
+              </p>
+              <div className="pt-4 border-t border-slate-700/80">
+                <a 
+                  href="/" 
+                  className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-rose-500/20"
+                >
+                  Buat Undangan Baru
+                </a>
+              </div>
+            </div>
+          </div>
+        );
+      }
+    }
+  }
+
   const templateData = invitation.orders?.templates;
   const content = invitation.content || {};
 
