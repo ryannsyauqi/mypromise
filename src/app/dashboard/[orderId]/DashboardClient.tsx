@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function DashboardClient({ initialData, orderId }: { initialData: any, orderId: string }) {
   const [data, setData] = useState<any>(initialData);
@@ -10,6 +11,55 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
     totalGuests: initialData?.guests?.length || 0,
     rsvpCount: initialData?.guests?.filter((g: any) => g.status === 'hadir').length || 0
   });
+
+  useEffect(() => {
+    // Sync with initialData if it changes via router.refresh()
+    setData(initialData);
+    setStats({
+      totalGuests: initialData?.guests?.length || 0,
+      rsvpCount: initialData?.guests?.filter((g: any) => g.status === 'hadir').length || 0
+    });
+  }, [initialData]);
+
+  useEffect(() => {
+    const fetchFreshData = async () => {
+      // Fetch fresh guests via API to bypass RLS
+      try {
+        const res = await fetch(`/api/guests?order_id=${orderId}`);
+        if (res.ok) {
+          const guests = await res.json();
+          setStats({
+            totalGuests: guests.length,
+            rsvpCount: guests.filter((g: any) => g.status === 'hadir').length
+          });
+        }
+      } catch (error) {
+        console.error("Failed to fetch fresh guests", error);
+      }
+      
+      // Fetch fresh invitation content
+      try {
+        const supabase = createClient();
+        const { data: inv } = await supabase
+          .from('invitations')
+          .select('content, slug')
+          .eq('order_id', orderId)
+          .single();
+          
+        if (inv) {
+          setData((prev: any) => ({
+            ...prev,
+            content: inv.content,
+            slug: inv.slug
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch fresh invitation data", error);
+      }
+    };
+    
+    fetchFreshData();
+  }, [orderId]);
 
   const order = data?.orders;
   const template = order?.templates;
@@ -50,13 +100,14 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
   const isStep4Done = isStep1Done && isStep2Done && isStep3Done;
 
   // New Granular Global Progress calculation (3 steps)
-  // Step 1 contributes based on its actual percentage (0-100%)
-  // Step 2 and 3 are binary (0 or 100%)
-  const step1Weight = progressPercent / 100;
-  const step2Weight = isStep2Done ? 1 : 0;
-  const step3Weight = isStep3Done ? 1 : 0;
+  // Step 1: 80% weight based on actual percentage
+  // Step 2: 10% weight
+  // Step 3: 10% weight
+  const step1Score = (progressPercent / 100) * 80;
+  const step2Score = isStep2Done ? 10 : 0;
+  const step3Score = isStep3Done ? 10 : 0;
 
-  const overallProgress = Math.round(((step1Weight + step2Weight + step3Weight) / 3) * 100);
+  const overallProgress = Math.round(step1Score + step2Score + step3Score);
   const activeStep = !isStep1Done ? 1 : !isStep2Done ? 2 : !isStep3Done ? 3 : 4;
 
   return (
@@ -174,7 +225,7 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
             </div>
 
             <div className="relative z-10 space-y-4">
-              {data?.slug && overallProgress === 100 ? (
+              {data?.slug && isStep1Done ? (
                 <Link
                   href={`/${data.slug}`}
                   target="_blank"

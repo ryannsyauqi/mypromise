@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import CountdownTimer from "@/components/invitation/CountdownTimer";
 import RSVPForm from "@/components/invitation/RSVPForm";
 import { demoWishes } from "@/lib/demo-data";
@@ -147,7 +146,7 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
       {/* ===== COVER / OPENING ===== */}
       {!isOpened && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-charcoal-900">
-          <Image src={heroImage} alt="Cover" fill className="object-cover opacity-40" />
+          <img src={heroImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover opacity-40" />
           <div className="relative z-10 text-center px-6 animate-fade-in">
             <p className="text-cream-200/60 text-sm uppercase tracking-[0.3em] mb-4">The Wedding of</p>
             <h1
@@ -206,7 +205,7 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
 
         {/* — Hero — */}
         <section className="relative h-screen flex flex-col items-center justify-center overflow-hidden">
-          <Image src={heroImage} alt={`${data.groom_name} & ${data.bride_name}`} fill className="object-cover" priority />
+          <img src={heroImage} alt={`${data.groom_name} & ${data.bride_name}`} className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-charcoal-900/30 via-transparent to-charcoal-900/60" />
           <div className="relative z-10 text-center mt-auto pb-20 px-6">
             <p className="text-cream-200/70 text-sm uppercase tracking-[0.25em] mb-3">The Wedding of</p>
@@ -232,7 +231,7 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
               {/* Groom */}
               <div className="text-center">
                 <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-cream-200 shadow-lg">
-                  <Image src={groomImage} alt={data.groom_full_name} fill className="object-cover" />
+                  <img src={groomImage} alt={data.groom_full_name} className="absolute inset-0 w-full h-full object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-charcoal-800 mb-1" style={{ fontFamily: "var(--font-playfair)" }}>
                   {data.groom_full_name}
@@ -242,7 +241,7 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
               {/* Bride */}
               <div className="text-center">
                 <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-cream-200 shadow-lg">
-                  <Image src={brideImage} alt={data.bride_full_name} fill className="object-cover" />
+                  <img src={brideImage} alt={data.bride_full_name} className="absolute inset-0 w-full h-full object-cover" />
                 </div>
                 <h3 className="text-2xl font-bold text-charcoal-800 mb-1" style={{ fontFamily: "var(--font-playfair)" }}>
                   {data.bride_full_name}
@@ -445,7 +444,7 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
 
         {/* — Closing — */}
         <section className="relative py-24 overflow-hidden">
-          <Image src={heroImage} alt="Closing" fill className="object-cover" />
+          <img src={heroImage} alt="Closing" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-charcoal-900/60" />
           <div className="relative z-10 text-center px-6 max-w-lg mx-auto">
             <p className="text-cream-200/70 text-sm uppercase tracking-widest mb-4">Terima Kasih</p>

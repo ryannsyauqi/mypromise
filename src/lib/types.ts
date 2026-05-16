@@ -6,7 +6,7 @@
 export interface FieldSchema {
   key: string;
   label: string;
-  type: "text" | "textarea" | "date" | "time" | "url" | "file" | "multi_file" | "select" | "repeater";
+  type: "text" | "textarea" | "date" | "time" | "url" | "file" | "multi_file" | "image" | "gallery" | "select" | "repeater";
   required?: boolean;
   hint?: string;
   placeholder?: string;

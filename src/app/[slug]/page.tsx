@@ -8,9 +8,11 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
   const params = await props.params;
   const searchParams = await props.searchParams;
   const slug = params.slug;
-  const guestName = searchParams.to;
+  const urlParam = searchParams.to;
 
   const supabase = createAdminClient();
+
+  let guestName = urlParam;
 
   // Fetch invitation by slug
   // design_config is added here as a future-proof column
@@ -27,6 +29,23 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
 
   const templateData = invitation.orders?.templates;
   const content = invitation.content || {};
+
+  // Fetch real guest name if urlParam exists
+  if (urlParam) {
+    const { data: guestData } = await supabase
+      .from('guests')
+      .select('name')
+      .eq('order_id', invitation.order_id)
+      .eq('url_param', urlParam)
+      .single();
+
+    if (guestData) {
+      guestName = guestData.name;
+    } else {
+      // Fallback: capitalize each word and replace hyphens
+      guestName = urlParam.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+  }
   
   // designConfig will hold template-specific tweaks (backgrounds, fonts, etc.)
   const designConfig = invitation.design_config || {};

@@ -130,36 +130,81 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
     }
   };
 
-  const handleFileUpload = async (key: string, file: File, isMulti = false) => {
+  const handleFileUpload = async (key: string, originalFile: File, isMulti = false) => {
     if (!data?.id) return;
 
     setUploadingField(key);
-    const fileExt = file.name.split('.').pop();
+
+    // Auto convert image to AVIF/WEBP to save space
+    let file = originalFile;
+    if (originalFile.type.startsWith("image/")) {
+      file = await new Promise<File>((resolve) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(originalFile);
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 1920;
+          const MAX_HEIGHT = 1920;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+          } else {
+            if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+          }
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return resolve(originalFile);
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          canvas.toBlob((blob) => {
+            if (blob && blob.type === "image/avif") {
+              resolve(new File([blob], originalFile.name.replace(/\.[^/.]+$/, "") + ".avif", { type: "image/avif" }));
+            } else {
+              canvas.toBlob((webpBlob) => {
+                if (webpBlob) {
+                  resolve(new File([webpBlob], originalFile.name.replace(/\.[^/.]+$/, "") + ".webp", { type: "image/webp" }));
+                } else resolve(originalFile);
+              }, "image/webp", 0.8);
+            }
+          }, "image/avif", 0.8);
+        };
+        img.onerror = () => resolve(originalFile);
+      });
+    }
+
+    const fileExt = file.name.split('.').pop() || 'jpg';
     const fileName = `${data.id}/${key}-${Date.now()}.${fileExt}`;
     const filePath = `uploads/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from('invitations')
-      .upload(filePath, file);
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append("file", file);
+      uploadFormData.append("path", filePath);
 
-    if (uploadError) {
-      console.error(uploadError);
+      const response = await fetch("/api/invitations/upload", {
+        method: "POST",
+        body: uploadFormData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal mengunggah foto.");
+      }
+
+      const { publicUrl } = await response.json();
+
+      if (isMulti) {
+        const currentFiles = formData[key] || [];
+        handleInputChange(key, [...currentFiles, publicUrl]);
+      } else {
+        handleInputChange(key, publicUrl);
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+    } finally {
       setUploadingField(null);
-      return;
     }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('invitations')
-      .getPublicUrl(filePath);
-
-    if (isMulti) {
-      const currentFiles = formData[key] || [];
-      handleInputChange(key, [...currentFiles, publicUrl]);
-    } else {
-      handleInputChange(key, publicUrl);
-    }
-
-    setUploadingField(null);
   };
 
   const removeFile = (key: string, index?: number) => {
@@ -176,7 +221,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
   const template = Array.isArray(order?.templates) ? order.templates[0] : order?.templates;
   const fieldSchema = template?.field_schema || [];
 
-  const mediaFields = fieldSchema.filter((f: any) => f.type === 'file' || f.type === 'multi_file');
+  const mediaFields = fieldSchema.filter((f: any) => f.type === 'file' || f.type === 'multi_file' || f.type === 'image' || f.type === 'gallery');
   const groomBrideFields = fieldSchema.filter((f: any) => (f.key.startsWith('groom') || f.key.startsWith('bride')) && !mediaFields.includes(f));
   const eventFields = fieldSchema.filter((f: any) => (f.key.startsWith('akad') || f.key.startsWith('reception') || f.key.includes('maps') || f.key.includes('date')) && !mediaFields.includes(f));
   const otherFields = fieldSchema.filter((f: any) => !groomBrideFields.includes(f) && !eventFields.includes(f) && !mediaFields.includes(f));
@@ -188,8 +233,8 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
   const renderField = (field: FieldSchema) => {
     const commonClasses = "w-full px-6 py-4 rounded-2xl border border-slate-100 focus:outline-none focus:ring-4 focus:ring-rose-500/5 focus:border-rose-500 transition-all bg-slate-50/50 font-bold text-charcoal-800 placeholder:text-slate-300 placeholder:font-medium text-sm";
 
-    if (field.type === "file" || field.type === "multi_file") {
-      const isMulti = field.type === "multi_file";
+    if (field.type === "file" || field.type === "multi_file" || field.type === "image" || field.type === "gallery") {
+      const isMulti = field.type === "multi_file" || field.type === "gallery";
       const value = formData[field.key];
 
       return (
@@ -231,7 +276,7 @@ function InvitationFormContent({ initialData }: { initialData?: any }) {
               <input
                 type="file"
                 className="hidden"
-                accept="image/*"
+                accept="image/jpeg, image/png, image/webp, image/avif, image/heic"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) handleFileUpload(field.key, file, isMulti);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface RSVPFormProps {
   invitationId: string;
@@ -44,6 +44,13 @@ export default function RSVPForm({ invitationId, guestName, isDemo, onSuccess }:
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  // Sync internal state if the guestName prop changes
+  useEffect(() => {
+    if (guestName) {
+      setName(guestName);
+    }
+  }, [guestName]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
