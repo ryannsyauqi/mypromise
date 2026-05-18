@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         const dashboardLink = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://mypromise.id'}/dashboard/${order.id}`;
         
         // Kirim Email menggunakan template premium baru (Wait for it)
-        const successEmailHtml = getSuccessPaymentEmail(order.buyer_name, dashboardLink);
+        const successEmailHtml = getSuccessPaymentEmail(order.buyer_name, dashboardLink, order.order_number);
         
         await sendEmailNotification(
           order.buyer_email, 

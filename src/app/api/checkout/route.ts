@@ -108,7 +108,8 @@ export async function POST(request: Request) {
     const pendingEmailHtml = getPendingPaymentEmail(
       customerDetails.name,
       amount.toLocaleString("id-ID"),
-      transaction.redirect_url
+      transaction.redirect_url,
+      orderId
     );
     
     await sendEmailNotification(

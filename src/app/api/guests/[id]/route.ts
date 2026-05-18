@@ -12,6 +12,14 @@ export async function PATCH(request: Request, props: { params: Promise<{ id: str
     }
 
     const supabase = createAdminClient();
+
+    // Fetch original guest details before update to sync wishes
+    const { data: oldGuest } = await supabase
+      .from('guests')
+      .select('name, order_id')
+      .eq('id', guestId)
+      .single();
+
     const { data, error } = await supabase
       .from('guests')
       .update({
@@ -24,6 +32,24 @@ export async function PATCH(request: Request, props: { params: Promise<{ id: str
       .single();
 
     if (error) throw error;
+
+    // Sync wish name if updated
+    if (oldGuest && body.name && oldGuest.name !== body.name) {
+      const { data: invitation } = await supabase
+        .from('invitations')
+        .select('id')
+        .eq('order_id', oldGuest.order_id)
+        .single();
+
+      if (invitation) {
+        await supabase
+          .from('wishes')
+          .update({ name: body.name })
+          .eq('invitation_id', invitation.id)
+          .ilike('name', oldGuest.name);
+      }
+    }
+
     return NextResponse.json(data);
   } catch (error: any) {
     console.error("Error updating guest:", error);
@@ -41,12 +67,38 @@ export async function DELETE(request: Request, props: { params: Promise<{ id: st
     }
 
     const supabase = createAdminClient();
+
+    // Fetch guest details before deleting to clean up wishes
+    const { data: guest } = await supabase
+      .from('guests')
+      .select('name, order_id')
+      .eq('id', guestId)
+      .single();
+
     const { error } = await supabase
       .from('guests')
       .delete()
       .eq('id', guestId);
 
     if (error) throw error;
+
+    // Clean up matching wishes
+    if (guest) {
+      const { data: invitation } = await supabase
+        .from('invitations')
+        .select('id')
+        .eq('order_id', guest.order_id)
+        .single();
+
+      if (invitation) {
+        await supabase
+          .from('wishes')
+          .delete()
+          .eq('invitation_id', invitation.id)
+          .ilike('name', guest.name);
+      }
+    }
+
     return NextResponse.json({ message: "Guest deleted successfully" });
   } catch (error: any) {
     console.error("Error deleting guest:", error);

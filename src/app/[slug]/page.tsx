@@ -12,7 +12,8 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
 
   const supabase = createAdminClient();
 
-  let guestName = urlParam;
+  let guestName: string | undefined = undefined;
+  let guestSlug: string | undefined = undefined;
 
   // Fetch invitation by slug
   // design_config is added here as a future-proof column
@@ -66,20 +67,18 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
   const templateData = invitation.orders?.templates;
   const content = invitation.content || {};
 
-  // Fetch real guest name if urlParam exists
+  // Fetch real guest name and slug if urlParam exists in database
   if (urlParam) {
     const { data: guestData } = await supabase
       .from('guests')
-      .select('name')
+      .select('name, url_param')
       .eq('order_id', invitation.order_id)
       .eq('url_param', urlParam)
       .single();
 
     if (guestData) {
       guestName = guestData.name;
-    } else {
-      // Fallback: capitalize each word and replace hyphens
-      guestName = urlParam.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      guestSlug = guestData.url_param;
     }
   }
   
@@ -101,6 +100,7 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
         data={content} 
         designConfig={designConfig}
         guestName={guestName} 
+        guestSlug={guestSlug}
         isDemo={false} 
       />
     );

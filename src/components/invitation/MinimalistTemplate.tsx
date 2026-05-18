@@ -40,6 +40,7 @@ interface MinimalistTemplateProps {
   data: InvitationData;
   designConfig?: any;
   guestName?: string;
+  guestSlug?: string;
   isDemo?: boolean;
 }
 
@@ -139,7 +140,7 @@ const Icons = {
 
 const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop";
 
-export default function MinimalistTemplate({ invitationId, data, designConfig, guestName, isDemo }: MinimalistTemplateProps) {
+export default function MinimalistTemplate({ invitationId, data, designConfig, guestName, guestSlug, isDemo }: MinimalistTemplateProps) {
   const [isOpened, setIsOpened] = useState(false);
   const [wishes, setWishes] = useState<any[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -216,6 +217,15 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
       audioRef.current.play()
         .then(() => setIsPlaying(true))
         .catch((err) => console.log("Autoplay prevented by browser:", err));
+    }
+
+    // Update is_opened status in database
+    if (guestSlug && !isDemo) {
+      fetch("/api/guests/open", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invitationId, guestSlug }),
+      }).catch((err) => console.error("Failed to update opened status:", err));
     }
   };
 
@@ -566,6 +576,7 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
               <RSVPForm 
                 invitationId={invitationId} 
                 guestName={guestName} 
+                guestSlug={guestSlug}
                 isDemo={isDemo} 
                 onSuccess={() => {
                   // Refresh wishes after successful RSVP

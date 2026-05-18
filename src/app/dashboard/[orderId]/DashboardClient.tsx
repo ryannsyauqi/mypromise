@@ -123,10 +123,17 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
     <div className="max-w-6xl mx-auto space-y-8 animate-fade-in pb-20">
       {/* Minimalist Header Area */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center px-4 md:px-2">
-        <div className="lg:col-span-7 space-y-1">
-          <h1 className="text-4xl font-bold text-charcoal-900 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>
-            Halo, {nickname}
-          </h1>
+        <div className="lg:col-span-7 space-y-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-4xl font-bold text-charcoal-900 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>
+              Halo, {nickname}
+            </h1>
+            {order?.order_number && (
+              <span className="inline-flex items-center px-3 py-1 bg-slate-100 text-charcoal-600 text-[10px] font-black uppercase tracking-wider rounded-lg border border-slate-200/50 select-none">
+                No. Order: {order.order_number}
+              </span>
+            )}
+          </div>
           <p className="text-slate-500 font-medium text-sm">Lengkapi data untuk mengaktifkan website undanganmu.</p>
         </div>
 

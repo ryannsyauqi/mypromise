@@ -40,7 +40,7 @@ const baseLayout = (content: string) => `
   </div>
 `;
 
-export const getPendingPaymentEmail = (name: string, amount: string, checkoutUrl: string) => baseLayout(`
+export const getPendingPaymentEmail = (name: string, amount: string, checkoutUrl: string, orderNumber?: string) => baseLayout(`
   <div style="text-align: center; margin-bottom: 30px;">
     <div style="display: inline-block; padding: 12px; background-color: #fff1f2; border-radius: 16px; margin-bottom: 20px;">
       <img src="https://cdn-icons-png.flaticon.com/512/10705/10705886.png" width="40" height="40" alt="Pending" />
@@ -51,6 +51,21 @@ export const getPendingPaymentEmail = (name: string, amount: string, checkoutUrl
   <p style="font-size: 15px; line-height: 1.6; color: #44403c;">Halo <strong>${name}</strong>,</p>
   <p style="font-size: 15px; line-height: 1.6; color: #44403c;">Terima kasih sudah memilih MyPromise. Undangan impianmu tinggal selangkah lagi. Selesaikan pembayaran sebesar <strong>Rp ${amount}</strong> untuk mulai mengisi data undanganmu.</p>
   
+  ${orderNumber ? `
+  <div style="background-color: #fafaf9; border: 1px solid #e7e5e4; border-radius: 20px; padding: 20px; margin: 35px 0 10px 0; text-align: left;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <tr>
+        <td style="color: #78716c; padding: 6px 0; font-family: sans-serif;">No. Pesanan:</td>
+        <td style="text-align: right; font-weight: 700; color: #1c1917; font-family: sans-serif;">${orderNumber}</td>
+      </tr>
+      <tr>
+        <td style="color: #78716c; padding: 6px 0; font-family: sans-serif;">Total Tagihan:</td>
+        <td style="text-align: right; font-weight: 700; color: #f43f5e; font-family: sans-serif;">Rp ${amount}</td>
+      </tr>
+    </table>
+  </div>
+  ` : ''}
+
   <div style="text-align: center; margin: 40px 0;">
     <a href="${checkoutUrl}" style="background-color: ${APP_COLOR}; color: #ffffff; padding: 18px 35px; border-radius: 20px; text-decoration: none; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; display: inline-block; box-shadow: 0 10px 15px -3px rgba(244, 63, 94, 0.3);">Lanjutkan Pembayaran</a>
   </div>
@@ -60,7 +75,7 @@ export const getPendingPaymentEmail = (name: string, amount: string, checkoutUrl
   </div>
 `);
 
-export const getSuccessPaymentEmail = (name: string, dashboardUrl: string) => baseLayout(`
+export const getSuccessPaymentEmail = (name: string, dashboardUrl: string, orderNumber?: string) => baseLayout(`
   <div style="text-align: center; margin-bottom: 30px;">
     <div style="display: inline-block; padding: 12px; background-color: #f0fdf4; border-radius: 16px; margin-bottom: 20px;">
       <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" width="40" height="40" alt="Success" />
@@ -71,6 +86,21 @@ export const getSuccessPaymentEmail = (name: string, dashboardUrl: string) => ba
   <p style="font-size: 15px; line-height: 1.6; color: #44403c;">Halo <strong>${name}</strong>,</p>
   <p style="font-size: 15px; line-height: 1.6; color: #44403c;">Pembayaran kamu sudah kami terima. Sekarang saatnya merangkai undangan pernikahanmu! Dashboard pribadi kamu sudah siap diakses.</p>
   
+  ${orderNumber ? `
+  <div style="background-color: #fafaf9; border: 1px solid #e7e5e4; border-radius: 20px; padding: 20px; margin: 35px 0 10px 0; text-align: left;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <tr>
+        <td style="color: #78716c; padding: 6px 0; font-family: sans-serif;">No. Pesanan:</td>
+        <td style="text-align: right; font-weight: 700; color: #1c1917; font-family: sans-serif;">${orderNumber}</td>
+      </tr>
+      <tr>
+        <td style="color: #78716c; padding: 6px 0; font-family: sans-serif;">Status Pembayaran:</td>
+        <td style="text-align: right; font-weight: 700; color: #10b981; font-family: sans-serif;">LUNAS / BERHASIL</td>
+      </tr>
+    </table>
+  </div>
+  ` : ''}
+
   <div style="text-align: center; margin: 40px 0;">
     <a href="${dashboardUrl}" style="background-color: ${TEXT_COLOR}; color: #ffffff; padding: 18px 35px; border-radius: 20px; text-decoration: none; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; display: inline-block; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);">Masuk ke Dashboard</a>
   </div>

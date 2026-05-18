@@ -59,13 +59,14 @@ export default function DashboardLayout({
       // For public dashboard, we fetch the order details instead of auth user
       const { data: order } = await supabase
         .from('orders')
-        .select('buyer_name')
+        .select('buyer_name, order_number')
         .eq('id', orderId)
         .single();
       
       if (order) {
         setUser({
-          display_name: order.buyer_name || "User"
+          display_name: order.buyer_name || "User",
+          order_number: order.order_number
         });
       }
     }
@@ -85,12 +86,17 @@ export default function DashboardLayout({
     <div className="min-h-screen bg-charcoal-50 flex">
       {/* Sidebar */}
       <aside className="w-72 bg-white border-r border-cream-200 hidden lg:flex flex-col sticky top-0 h-screen shadow-sm">
-        <div className="p-8 border-b border-cream-100 flex items-center justify-between">
+        <div className="p-8 border-b border-cream-100 flex flex-col gap-1.5 justify-center">
           <Link href="/" className="inline-block">
             <span className="text-xl font-bold tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>
               <span className="gradient-text">My</span>Promise
             </span>
           </Link>
+          {user?.order_number && (
+            <span className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400 select-none">
+              No. Order: {user.order_number}
+            </span>
+          )}
         </div>
 
         <div className="p-6">
@@ -142,7 +148,14 @@ export default function DashboardLayout({
       <div className="flex-grow flex flex-col">
         {/* Topbar Mobile */}
         <header className="lg:hidden bg-white border-b border-cream-200 p-4 flex justify-between items-center sticky top-0 z-50">
-          <span className="font-bold text-lg" style={{ fontFamily: "var(--font-playfair)" }}>MyPromise</span>
+          <div className="flex flex-col">
+            <span className="font-bold text-lg leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>MyPromise</span>
+            {user?.order_number && (
+              <span className="text-[8px] font-black uppercase tracking-wider text-slate-400 select-none">
+                No. Order: {user.order_number}
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-4">
              <div className="w-8 h-8 rounded-xl bg-rose-500 flex items-center justify-center text-white text-xs font-bold">
               {nickname[0]}

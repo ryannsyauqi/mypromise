@@ -4,7 +4,7 @@ import { createAdminClient } from "@/utils/supabase/admin";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { invitationId, name, attendance, guestCount, message } = body;
+    const { invitationId, name, guestSlug, attendance, guestCount, message } = body;
 
     if (!invitationId || !name || !attendance) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
@@ -24,12 +24,18 @@ export async function POST(request: Request) {
     }
 
     // 2. Update Guest Status and Message in 'guests' table
-    // We try to match by name (case insensitive) and order_id
-    const { error: guestError } = await supabase
+    // Match by unique guestSlug (url_param) if present, otherwise fallback to matching by name (case-insensitive)
+    let guestQuery = supabase
       .from('guests')
-      .update({ status: attendance, message: message })
-      .ilike('name', name)
-      .eq('order_id', invitation.order_id);
+      .update({ status: attendance, message: message });
+
+    if (guestSlug) {
+      guestQuery = guestQuery.eq('url_param', guestSlug);
+    } else {
+      guestQuery = guestQuery.ilike('name', name);
+    }
+
+    const { error: guestError } = await guestQuery.eq('order_id', invitation.order_id);
 
     if (guestError) {
       console.warn("Guest status not updated (might not exist in guest list):", guestError.message);

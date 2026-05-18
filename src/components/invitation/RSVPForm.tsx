@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 interface RSVPFormProps {
   invitationId: string;
   guestName?: string;
+  guestSlug?: string;
   isDemo?: boolean;
   onSuccess?: () => void;
 }
@@ -37,7 +38,7 @@ const Icons = {
   ),
 };
 
-export default function RSVPForm({ invitationId, guestName, isDemo, onSuccess }: RSVPFormProps) {
+export default function RSVPForm({ invitationId, guestName, guestSlug, isDemo, onSuccess }: RSVPFormProps) {
   const [name, setName] = useState(guestName || "");
   const [attendance, setAttendance] = useState("");
   const [guestCount, setGuestCount] = useState(1);
@@ -68,6 +69,7 @@ export default function RSVPForm({ invitationId, guestName, isDemo, onSuccess }:
         body: JSON.stringify({
           invitationId,
           name,
+          guestSlug,
           attendance,
           guestCount,
           message
