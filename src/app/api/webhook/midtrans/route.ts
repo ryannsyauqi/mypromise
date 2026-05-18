@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
-import { sendEmailNotification } from "@/lib/notifications";
-import { getSuccessPaymentEmail } from "@/lib/email-templates";
+import { sendEmailNotification, sendAdminInternalNotification } from "@/lib/notifications";
+import { getSuccessPaymentEmail, getAdminInternalEmail } from "@/lib/email-templates";
 import crypto from "crypto";
 
 export async function POST(request: Request) {
@@ -38,7 +38,10 @@ export async function POST(request: Request) {
         .from("orders")
         .update({ payment_status: "paid" })
         .eq("order_number", orderId)
-        .select()
+        .select(`
+          *,
+          templates:template_id (name)
+        `)
         .single();
       
       if (updateError) {
@@ -47,14 +50,31 @@ export async function POST(request: Request) {
         // --- TRIGGER NOTIFICATIONS ---
         const dashboardLink = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://mypromise.id'}/dashboard/${order.id}`;
         
-        // Kirim Email menggunakan template premium baru (Wait for it)
+        // 1. Kirim Email ke Customer
         const successEmailHtml = getSuccessPaymentEmail(order.buyer_name, dashboardLink, order.order_number);
-        
         await sendEmailNotification(
           order.buyer_email, 
           "Pembayaran Berhasil 🎉 - Dashboard MyPromise", 
-          successEmailHtml,
-          true
+          successEmailHtml
+        );
+
+        // 2. Kirim Email Notifikasi Internal ke Admin HQ
+        const adminHqUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://mypromise.id'}/admin/orders`;
+        const templateName = order.templates?.name || "Template Undangan";
+        const adminHtml = getAdminInternalEmail(
+          order.order_number,
+          order.buyer_name,
+          order.buyer_email,
+          order.buyer_phone,
+          templateName,
+          order.amount,
+          "paid",
+          adminHqUrl
+        );
+
+        await sendAdminInternalNotification(
+          `[MyPromise] Pembayaran Berhasil #${order.order_number} - Rp ${order.amount.toLocaleString("id-ID")}`,
+          adminHtml
         );
         
         console.log(`✅ Success notifications triggered for ${order.buyer_name}`);

@@ -124,3 +124,72 @@ export const getSuccessPaymentEmail = (name: string, dashboardUrl: string, order
     <p style="margin: 0; font-size: 13px; color: #b45309; line-height: 1.5;">Simpan email ini baik-baik. Link di atas adalah akses utama kamu untuk mengedit data, melihat RSVP tamu, dan memantau ucapan kapan saja.</p>
   </div>
 `);
+
+export const getAdminInternalEmail = (
+  orderNumber: string,
+  buyerName: string,
+  buyerEmail: string,
+  buyerPhone: string,
+  templateName: string,
+  amount: number,
+  status: string,
+  adminHqUrl: string
+) => baseLayout(`
+  <div style="text-align: center; margin-bottom: 30px;">
+    <div style="display: inline-block; padding: 12px; background-color: #f3f4f6; border-radius: 16px; margin-bottom: 20px;">
+      <span style="font-size: 28px;">🔔</span>
+    </div>
+    <h2 style="margin: 0; font-size: 22px; font-weight: 800; line-height: 1.3; color: #111827;">
+      [MyPromise] Transaksi ${status.toUpperCase()}
+    </h2>
+    <p style="margin: 5px 0 0 0; font-size: 14px; color: #6b7280;">Pesanan baru dari ${buyerName}</p>
+  </div>
+  
+  <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 24px; padding: 28px; margin-bottom: 30px;">
+    <h3 style="margin: 0 0 20px 0; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #475569;">
+      Rincian Transaksi
+    </h3>
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <tr style="border-bottom: 1px solid #edf2f7;">
+        <td style="padding: 12px 0; color: #64748b;">No. Pesanan:</td>
+        <td style="text-align: right; font-weight: 700; color: #0f172a;">${orderNumber}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #edf2f7;">
+        <td style="padding: 12px 0; color: #64748b;">Nama Customer:</td>
+        <td style="text-align: right; font-weight: 700; color: #0f172a;">${buyerName}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #edf2f7;">
+        <td style="padding: 12px 0; color: #64748b;">WhatsApp:</td>
+        <td style="text-align: right; font-weight: 700; color: #0284c7;">
+          <a href="https://wa.me/${buyerPhone.replace(/\D/g, '')}" style="color: #0284c7; text-decoration: none;">+62 ${buyerPhone}</a>
+        </td>
+      </tr>
+      <tr style="border-bottom: 1px solid #edf2f7;">
+        <td style="padding: 12px 0; color: #64748b;">Email Customer:</td>
+        <td style="text-align: right; font-weight: 700; color: #0f172a;">${buyerEmail}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #edf2f7;">
+        <td style="padding: 12px 0; color: #64748b;">Pilihan Template:</td>
+        <td style="text-align: right; font-weight: 700; color: #e11d48;">${templateName}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #edf2f7;">
+        <td style="padding: 12px 0; color: #64748b;">Status Pembayaran:</td>
+        <td style="text-align: right; font-weight: 800; color: ${status === 'paid' ? '#10b981' : '#f59e0b'};">
+          ${status === 'paid' ? 'LUNAS (PAID)' : 'MENUNGGU (PENDING)'}
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 12px 0; color: #64748b;">Total Bayar:</td>
+        <td style="text-align: right; font-weight: 800; color: #f43f5e; font-size: 16px;">
+          Rp ${amount.toLocaleString('id-ID')}
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div style="text-align: center; margin: 30px 0;">
+    <a href="${adminHqUrl}" style="background-color: #0f172a; color: #ffffff; padding: 16px 32px; border-radius: 16px; text-decoration: none; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; display: inline-block;">
+      Buka Dashboard Operator HQ
+    </a>
+  </div>
+`);

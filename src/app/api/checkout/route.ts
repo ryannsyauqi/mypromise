@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { snap } from "@/lib/midtrans";
-import { sendEmailNotification } from "@/lib/notifications";
-import { getPendingPaymentEmail } from "@/lib/email-templates";
+import { sendEmailNotification, sendAdminInternalNotification } from "@/lib/notifications";
+import { getPendingPaymentEmail, getAdminInternalEmail } from "@/lib/email-templates";
 
 export async function POST(request: Request) {
   try {
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
 
     console.log("✅ Order saved & Midtrans token generated:", orderId);
 
-    // 3. Send Pending Payment Email (Wait for it to ensure delivery)
+    // 3. Send Pending Payment Email to Customer
     const pendingEmailHtml = getPendingPaymentEmail(
       customerDetails.name,
       amount.toLocaleString("id-ID"),
@@ -115,8 +115,25 @@ export async function POST(request: Request) {
     await sendEmailNotification(
       customerDetails.email,
       "Hampir Selesai! Pesanan Undangan MyPromise Kamu",
-      pendingEmailHtml,
-      true
+      pendingEmailHtml
+    );
+
+    // 4. Send Internal Admin HQ Notification
+    const adminHqUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://mypromise.id'}/admin/orders`;
+    const adminHtml = getAdminInternalEmail(
+      orderId,
+      customerDetails.name,
+      customerDetails.email,
+      customerDetails.phone,
+      templateSlug || "Template Undangan",
+      amount,
+      "pending",
+      adminHqUrl
+    );
+
+    await sendAdminInternalNotification(
+      `[MyPromise] Pesanan Baru Masuk #${orderId} - Rp ${amount.toLocaleString("id-ID")}`,
+      adminHtml
     );
 
     return NextResponse.json({

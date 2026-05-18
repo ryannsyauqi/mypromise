@@ -37,7 +37,7 @@ export async function sendWhatsAppNotification(to: string, message: string) {
   }
 }
 
-export async function sendEmailNotification(to: string, subject: string, html: string, isCustomerTransaction = false) {
+export async function sendEmailNotification(to: string, subject: string, html: string) {
   if (!process.env.RESEND_API_KEY) {
     console.warn("⚠️ RESEND_API_KEY tidak ditemukan. Email tidak terkirim.");
     return { success: false, message: "Key missing" };
@@ -45,13 +45,9 @@ export async function sendEmailNotification(to: string, subject: string, html: s
 
   try {
     const settings = getSystemSettings();
-    // Jika ini adalah transaksi pelanggan, kirim BCC ke email notifikasi admin
-    const bccList = isCustomerTransaction && settings.notificationEmail ? [settings.notificationEmail] : [];
-
     const { data, error } = await resend.emails.send({
       from: `${settings.websiteName} <halo@mypromise.id>`,
       to: [to],
-      bcc: bccList,
       subject: subject,
       html: html,
     });
@@ -61,10 +57,39 @@ export async function sendEmailNotification(to: string, subject: string, html: s
       return { success: false, error };
     }
 
-    console.log("📧 Email Sent:", data?.id);
+    console.log("📧 Email Sent to customer:", data?.id);
     return { success: true, data };
   } catch (error) {
     console.error("❌ Email Fatal Error:", error);
+    return { success: false, error };
+  }
+}
+
+export async function sendAdminInternalNotification(subject: string, html: string) {
+  if (!process.env.RESEND_API_KEY) {
+    return { success: false, message: "Key missing" };
+  }
+
+  try {
+    const settings = getSystemSettings();
+    const adminEmail = settings.notificationEmail || "syauqiryan1@gmail.com";
+
+    const { data, error } = await resend.emails.send({
+      from: `${settings.websiteName} HQ <halo@mypromise.id>`,
+      to: [adminEmail],
+      subject: subject,
+      html: html,
+    });
+
+    if (error) {
+      console.error("❌ Admin Resend Error:", error);
+      return { success: false, error };
+    }
+
+    console.log("📧 Admin HQ Notif Sent to " + adminEmail + ":", data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error("❌ Admin Email Fatal Error:", error);
     return { success: false, error };
   }
 }
