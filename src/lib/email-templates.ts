@@ -66,8 +66,15 @@ export const getPendingPaymentEmail = (name: string, amount: string, checkoutUrl
   </div>
   ` : ''}
 
-  <div style="text-align: center; margin: 40px 0;">
+  <div style="text-align: center; margin: 40px 0 10px 0;">
     <a href="${checkoutUrl}" style="background-color: ${APP_COLOR}; color: #ffffff; padding: 18px 35px; border-radius: 20px; text-decoration: none; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; display: inline-block; box-shadow: 0 10px 15px -3px rgba(244, 63, 94, 0.3);">Lanjutkan Pembayaran</a>
+  </div>
+
+  <div style="text-align: center; margin: 0 0 40px 0;">
+    <p style="margin: 0 0 8px 0; font-size: 12px; color: #78716c; font-family: sans-serif;">Atau buka link pembayaran langsung di browser:</p>
+    <div style="display: inline-block; background-color: #fafaf9; border: 1px solid #e7e5e4; border-radius: 12px; padding: 10px 20px; font-family: monospace; font-size: 12px; color: #44403c; word-break: break-all; max-width: 90%;">
+      <a href="${checkoutUrl}" style="color: #e11d48; text-decoration: underline; font-weight: 700;">${checkoutUrl}</a>
+    </div>
   </div>
 
   <div style="background-color: #fafaf9; border: 1px dashed #e7e5e4; border-radius: 20px; padding: 20px; text-align: center;">
@@ -101,8 +108,15 @@ export const getSuccessPaymentEmail = (name: string, dashboardUrl: string, order
   </div>
   ` : ''}
 
-  <div style="text-align: center; margin: 40px 0;">
+  <div style="text-align: center; margin: 40px 0 10px 0;">
     <a href="${dashboardUrl}" style="background-color: ${TEXT_COLOR}; color: #ffffff; padding: 18px 35px; border-radius: 20px; text-decoration: none; font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: 0.1em; display: inline-block; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);">Masuk ke Dashboard</a>
+  </div>
+
+  <div style="text-align: center; margin: 0 0 40px 0;">
+    <p style="margin: 0 0 8px 0; font-size: 12px; color: #78716c; font-family: sans-serif;">Atau salin link akses langsung di bawah ini:</p>
+    <div style="display: inline-block; background-color: #fafaf9; border: 1px solid #e7e5e4; border-radius: 12px; padding: 10px 20px; font-family: monospace; font-size: 12px; color: #44403c; word-break: break-all; max-width: 90%;">
+      <a href="${dashboardUrl}" style="color: #0f172a; text-decoration: underline; font-weight: 700;">${dashboardUrl}</a>
+    </div>
   </div>
 
   <div style="background-color: #fffbeb; border: 1px solid #fde68a; border-radius: 20px; padding: 25px;">

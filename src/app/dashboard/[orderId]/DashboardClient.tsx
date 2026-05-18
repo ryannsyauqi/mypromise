@@ -64,7 +64,27 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
   const order = data?.orders;
   const template = order?.templates;
   const content = data?.content || {};
-  const baseFieldSchema = template?.field_schema || [];
+  const baseFieldSchema = template?.field_schema && template?.field_schema.length > 0 
+    ? template.field_schema 
+    : [
+        { key: "groom_name", label: "Nama Panggilan Mempelai Pria", type: "text", required: true },
+        { key: "bride_name", label: "Nama Panggilan Mempelai Wanita", type: "text", required: true },
+        { key: "groom_full_name", label: "Nama Lengkap Mempelai Pria", type: "text", required: true },
+        { key: "bride_full_name", label: "Nama Lengkap Mempelai Wanita", type: "text", required: true },
+        { key: "groom_parents", label: "Nama Orang Tua Mempelai Pria", type: "text", required: true },
+        { key: "bride_parents", label: "Nama Orang Tua Mempelai Wanita", type: "text", required: true },
+        { key: "akad_date", label: "Tanggal Akad", type: "date", required: true },
+        { key: "akad_time", label: "Waktu Akad", type: "time", required: true },
+        { key: "akad_venue", label: "Nama Tempat Akad", type: "text", required: true },
+        { key: "akad_address", label: "Alamat Lengkap Akad", type: "textarea", required: true },
+        { key: "reception_date", label: "Tanggal Resepsi", type: "date", required: true },
+        { key: "reception_time", label: "Waktu Resepsi", type: "time", required: true },
+        { key: "reception_venue", label: "Nama Tempat Resepsi", type: "text", required: true },
+        { key: "reception_address", label: "Alamat Lengkap Resepsi", type: "textarea", required: true },
+        { key: "photo_hero", label: "Foto Utama", type: "file", required: true },
+        { key: "photo_groom", label: "Foto Mempelai Pria", type: "file", required: true },
+        { key: "photo_bride", label: "Foto Mempelai Wanita", type: "file", required: true },
+      ];
   const fieldSchema = [...baseFieldSchema];
   if (!fieldSchema.some((f: any) => f.key === "music_url")) {
     fieldSchema.push({
@@ -76,15 +96,44 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
     });
   }
 
-  // Calculate progress based on schema
+  // Calculate progress based on 5 tabs (20% each)
   const requiredFields = fieldSchema.filter((f: any) => f.required);
-  const totalRequired = requiredFields.length || 1;
-  const filledRequired = requiredFields.filter((f: any) => {
-    const val = f.key === "music_url" ? (content.music_url || content.music) : content[f.key];
-    return val && val.toString().trim() !== "";
-  }).length;
 
-  const progressPercent = Math.min(Math.round((filledRequired / totalRequired) * 100), 100);
+  // Tab 1: Profil Mempelai (key starts with groom or bride, type is not file)
+  const tab1Fields = requiredFields.filter((f: any) => (f.key.startsWith('groom') || f.key.startsWith('bride')) && f.type !== 'file');
+  const tab1Total = tab1Fields.length || 1;
+  const tab1Filled = tab1Fields.filter((f: any) => content[f.key] && content[f.key].toString().trim() !== "").length;
+  const tab1Percent = Math.round((tab1Filled / tab1Total) * 100);
+
+  // Tab 2: Waktu & Lokasi (key starts with akad or reception or includes date)
+  const tab2Fields = requiredFields.filter((f: any) => f.key.startsWith('akad') || f.key.startsWith('reception') || f.key.includes('date'));
+  const tab2Total = tab2Fields.length || 1;
+  const tab2Filled = tab2Fields.filter((f: any) => content[f.key] && content[f.key].toString().trim() !== "").length;
+  const tab2Percent = Math.round((tab2Filled / tab2Total) * 100);
+
+  // Tab 3: Info Lainnya (Optional fields like quote, banks. Since standard schema has no required otherFields, it is 100% complete)
+  const tab3Fields = requiredFields.filter((f: any) => 
+    !tab1Fields.some((x: any) => x.key === f.key) && 
+    !tab2Fields.some((x: any) => x.key === f.key) && 
+    f.type !== 'file' && f.key !== 'music_url' && f.key !== 'music'
+  );
+  const tab3Total = tab3Fields.length;
+  const tab3Percent = tab3Total === 0 ? 100 : Math.round((tab3Fields.filter((f: any) => content[f.key] && content[f.key].toString().trim() !== "").length / tab3Total) * 100);
+
+  // Tab 4: Foto & Galeri (Required image file fields)
+  const tab4Fields = requiredFields.filter((f: any) => (f.type === 'file' || f.type === 'image') && f.key !== 'music_url' && f.key !== 'music');
+  const tab4Total = tab4Fields.length || 1;
+  const tab4Filled = tab4Fields.filter((f: any) => content[f.key] && content[f.key].toString().trim() !== "").length;
+  const tab4Percent = Math.round((tab4Filled / tab4Total) * 100);
+
+  // Tab 5: Latar Musik (Required music fields)
+  const tab5Fields = requiredFields.filter((f: any) => f.key === 'music_url' || f.key === 'music');
+  const tab5Total = tab5Fields.length || 1;
+  const tab5Filled = tab5Fields.filter((f: any) => (content.music_url || content.music) && (content.music_url || content.music).toString().trim() !== "").length;
+  const tab5Percent = Math.round((tab5Filled / tab5Total) * 100);
+
+  // Average of the 5 tabs
+  const progressPercent = Math.min(Math.round((tab1Percent + tab2Percent + tab3Percent + tab4Percent + tab5Percent) / 5), 100);
 
   // Calculate Active Period
   const getRemainingDays = () => {
