@@ -111,14 +111,14 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
   const tab2Filled = tab2Fields.filter((f: any) => content[f.key] && content[f.key].toString().trim() !== "").length;
   const tab2Percent = Math.round((tab2Filled / tab2Total) * 100);
 
-  // Tab 3: Info Lainnya (Optional fields like quote, banks. Since standard schema has no required otherFields, it is 100% complete)
-  const tab3Fields = requiredFields.filter((f: any) => 
-    !tab1Fields.some((x: any) => x.key === f.key) && 
-    !tab2Fields.some((x: any) => x.key === f.key) && 
-    f.type !== 'file' && f.key !== 'music_url' && f.key !== 'music'
-  );
-  const tab3Total = tab3Fields.length;
-  const tab3Percent = tab3Total === 0 ? 100 : Math.round((tab3Fields.filter((f: any) => content[f.key] && content[f.key].toString().trim() !== "").length / tab3Total) * 100);
+  const hasLoveQuote = content.love_quote && content.love_quote.toString().trim() !== "";
+  const hasGiftAddress = content.gift_address && content.gift_address.toString().trim() !== "";
+  const hasLoveStory = Array.isArray(content.love_story) && content.love_story.length > 0 && content.love_story.some((story: any) => (story.title || story.description || "").toString().trim() !== "");
+  const hasGiftAccounts = (content.bank_account_1 && content.bank_account_1.toString().trim() !== "") || 
+                          (content.bank_account_2 && content.bank_account_2.toString().trim() !== "") ||
+                          (Array.isArray(content.bank_accounts) && content.bank_accounts.length > 0 && content.bank_accounts.some((acc: any) => (acc.number || acc.name || "").toString().trim() !== ""));
+
+  const tab3Percent = (hasLoveQuote || hasGiftAddress || hasLoveStory || hasGiftAccounts) ? 100 : 0;
 
   // Tab 4: Foto & Galeri (Required image file fields)
   const tab4Fields = requiredFields.filter((f: any) => (f.type === 'file' || f.type === 'image') && f.key !== 'music_url' && f.key !== 'music');

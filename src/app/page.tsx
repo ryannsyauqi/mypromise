@@ -12,6 +12,7 @@ import { Template } from "@/lib/types";
 export default function HomePage() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
+  const [waNumber, setWaNumber] = useState("6281234567890");
 
   useEffect(() => {
     async function fetchTemplates() {
@@ -34,6 +35,17 @@ export default function HomePage() {
     }
 
     fetchTemplates();
+
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data?.whatsappNumber) {
+          let cleaned = data.whatsappNumber.replace(/\D/g, "");
+          if (cleaned.startsWith("0")) cleaned = "62" + cleaned.slice(1);
+          setWaNumber(cleaned);
+        }
+      })
+      .catch(err => console.error("Error loading settings:", err));
   }, []);
 
   return (
@@ -82,7 +94,7 @@ export default function HomePage() {
                 Lihat Katalog
               </a>
               <a
-                href="https://wa.me/6281234567890"
+                href={`https://wa.me/${waNumber}?text=Halo%20Admin%20MyPromise%2C%20saya%20tertarik%20membuat%20undangan%20digital.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-10 py-4 bg-white/5 backdrop-blur-md text-white font-bold rounded-xl border border-white/20 hover:bg-white/10 transition-all duration-300 uppercase tracking-widest text-[10px] text-center flex items-center justify-center gap-3"
@@ -308,7 +320,7 @@ export default function HomePage() {
               Pilih Desain
             </a>
             <a
-              href="https://wa.me/6281234567890"
+              href={`https://wa.me/${waNumber}?text=Halo%20Admin%20MyPromise%2C%20saya%20tertarik%20membuat%20undangan%20digital.`}
               target="_blank"
               rel="noopener noreferrer"
               className="px-12 py-4 bg-white/5 backdrop-blur-md border border-white/10 text-white font-black uppercase tracking-widest text-[10px] rounded-xl hover:bg-white/10 transition-all flex items-center justify-center gap-3"

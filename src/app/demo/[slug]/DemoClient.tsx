@@ -1,6 +1,8 @@
 "use client";
 
 import MinimalistTemplate from "@/components/invitation/MinimalistTemplate";
+import ModernLuxeTemplate from "@/components/invitation/ModernLuxeTemplate";
+import GardenRomanceTemplate from "@/components/invitation/GardenRomanceTemplate";
 
 interface DemoClientProps {
   slug: string;
@@ -32,9 +34,19 @@ interface DemoClientProps {
   templateName: string;
 }
 
-export default function DemoClient({ guestName, data, templateName }: DemoClientProps) {
-  // For now, all templates render the Minimalist Template
-  // In the future, different slugs will render different template components
+export default function DemoClient({ slug, guestName, data, templateName }: DemoClientProps) {
+  const renderTemplate = () => {
+    switch (slug) {
+      case "modern-luxe":
+        return <ModernLuxeTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "garden-romance":
+        return <GardenRomanceTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "minimalist-elegance":
+      default:
+        return <MinimalistTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+    }
+  };
+
   return (
     <>
       {/* Demo banner */}
@@ -50,7 +62,7 @@ export default function DemoClient({ guestName, data, templateName }: DemoClient
         </p>
       </div>
       <div className="pt-8">
-        <MinimalistTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />
+        {renderTemplate()}
       </div>
     </>
   );

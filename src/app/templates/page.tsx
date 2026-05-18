@@ -7,12 +7,13 @@ import TemplateCard from "@/components/TemplateCard";
 import { createClient } from "@/utils/supabase/client";
 import { Template } from "@/lib/types";
 
-const categories = ["Semua", "Minimalist", "Traditional", "Romantic"];
+const categories = ["Semua", "Minimalist", "Romantic"];
 
 export default function TemplatesPage() {
   const [activeCategory, setActiveCategory] = useState("Semua");
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
+  const [waNumber, setWaNumber] = useState("6281234567890");
 
   useEffect(() => {
     async function fetchTemplates() {
@@ -34,6 +35,17 @@ export default function TemplatesPage() {
     }
 
     fetchTemplates();
+
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data?.whatsappNumber) {
+          let cleaned = data.whatsappNumber.replace(/\D/g, "");
+          if (cleaned.startsWith("0")) cleaned = "62" + cleaned.slice(1);
+          setWaNumber(cleaned);
+        }
+      })
+      .catch(err => console.error("Error loading settings:", err));
   }, []);
 
   const filtered =
@@ -43,53 +55,48 @@ export default function TemplatesPage() {
 
   return (
     <>
-      <Navbar variant="light-bg" />
+      <Navbar />
 
-      {/* Header */}
-      <section className="pt-32 pb-12 bg-cream-50">
-        <div className="container-default px-6 text-center">
-          <p className="text-rose-500 text-sm font-semibold uppercase tracking-wider mb-3">
-            Koleksi Template
-          </p>
+      {/* Hero Header */}
+      <section className="bg-charcoal-900 text-white pt-36 pb-24 text-center">
+        <div className="container-tight px-6 space-y-4">
           <h1
-            className="text-3xl md:text-5xl font-bold text-charcoal-800 mb-4"
+            className="text-4xl md:text-6xl font-bold tracking-tight"
             style={{ fontFamily: "var(--font-playfair)" }}
           >
-            Pilih Template Undangan
+            Koleksi Desain <span className="text-rose-500 italic">Eksklusif</span>
           </h1>
-          <p className="text-charcoal-400 max-w-lg mx-auto">
-            Semua template dengan harga yang sama. Pilih desain yang paling
-            sesuai dengan gaya pernikahan Anda.
+          <p className="text-white/60 max-w-lg mx-auto text-sm md:text-base">
+            Temukan template undangan pernikahan yang sesuai dengan tema dan kepribadian perayaan Anda.
           </p>
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="sticky top-0 z-40 bg-cream-50/90 backdrop-blur-md border-b border-cream-200">
-        <div className="container-default px-6 py-4 flex gap-3 overflow-x-auto no-scrollbar">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-                activeCategory === cat
-                  ? "bg-rose-500 text-white shadow-md shadow-rose-500/25"
-                  : "bg-white text-charcoal-500 hover:bg-cream-100 border border-cream-200"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Grid */}
-      <section className="section-padding bg-cream-50 min-h-[40vh]">
+      {/* Catalog & Filter Section */}
+      <section className="py-16 bg-cream-50/30 min-h-[50vh]">
         <div className="container-default px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Category Tabs */}
+          <div className="flex justify-center gap-2 mb-12 overflow-x-auto py-2">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 whitespace-nowrap ${
+                  activeCategory === cat
+                    ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20"
+                    : "bg-white text-charcoal-600 hover:bg-white/80 border border-cream-200"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
             {loading ? (
               [...Array(6)].map((_, i) => (
-                <div key={i} className="aspect-[4/5] bg-white animate-pulse rounded-3xl border border-cream-200" />
+                <div key={i} className="aspect-[4/5] bg-slate-100 animate-pulse rounded-3xl" />
               ))
             ) : (
               filtered.map((t, i) => (
@@ -97,6 +104,7 @@ export default function TemplatesPage() {
               ))
             )}
           </div>
+
           {!loading && filtered.length === 0 && (
             <p className="text-center text-charcoal-400 py-20">
               Belum ada template untuk kategori ini.
@@ -119,7 +127,7 @@ export default function TemplatesPage() {
             via WhatsApp.
           </p>
           <a
-            href="https://wa.me/6281234567890?text=Halo,%20saya%20butuh%20bantuan%20memilih%20template%20undangan"
+            href={`https://wa.me/${waNumber}?text=Halo,%20saya%20butuh%20bantuan%20memilih%20template%20undangan`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-4 bg-green-500 text-white font-semibold rounded-full hover:bg-green-400 transition-all duration-300 hover:shadow-lg"

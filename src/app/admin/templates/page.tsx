@@ -173,37 +173,41 @@ export default function AdminTemplatesPage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Katalog Template</h1>
-          <p className="text-slate-500 mt-2 font-medium">Kelola produk, harga, dan ketersediaan di website.</p>
+          <p className="text-slate-500 mt-1 font-medium text-base">Kelola produk, harga, dan ketersediaan di website.</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative">
+        
+        {/* Controls Bar - subtle normal estetik, clean proportions */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="relative w-56">
             <input 
               type="text" 
               placeholder="Cari template..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-rose-500 w-full sm:w-64 transition-all"
+              className="pl-9 pr-3.5 py-2 bg-white/90 border border-slate-200/80 rounded-xl text-xs font-medium text-slate-700 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-rose-500/80 focus:ring-2 focus:ring-rose-500/10 w-full transition-all shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:border-slate-300"
             />
-            <svg className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
+
           <select 
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-rose-500 transition-all cursor-pointer"
+            className="px-3.5 py-2 bg-white/90 border border-slate-200/80 rounded-xl text-xs font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-rose-500/80 focus:ring-2 focus:ring-rose-500/10 transition-all cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:border-slate-300"
           >
             <option value="all">Semua Status</option>
             <option value="active">Active</option>
             <option value="archived">Archived</option>
           </select>
+
           <select 
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm focus:outline-none focus:border-rose-500 transition-all cursor-pointer"
+            className="px-3.5 py-2 bg-white/90 border border-slate-200/80 rounded-xl text-xs font-medium text-slate-700 focus:bg-white focus:outline-none focus:border-rose-500/80 focus:ring-2 focus:ring-rose-500/10 transition-all cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:border-slate-300"
           >
             <option value="newest">Terbaru</option>
             <option value="price-high">Harga Tertinggi</option>

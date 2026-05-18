@@ -115,7 +115,8 @@ export async function POST(request: Request) {
     await sendEmailNotification(
       customerDetails.email,
       "Hampir Selesai! Pesanan Undangan MyPromise Kamu",
-      pendingEmailHtml
+      pendingEmailHtml,
+      true
     );
 
     return NextResponse.json({

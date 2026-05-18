@@ -53,6 +53,7 @@ export default function DashboardLayout({
   const orderId = params.orderId as string;
   const supabase = createClient();
   const [user, setUser] = useState<any>(null);
+  const [waNumber, setWaNumber] = useState("6281234567890");
 
   useEffect(() => {
     async function loadUser() {
@@ -71,6 +72,17 @@ export default function DashboardLayout({
       }
     }
     if (orderId) loadUser();
+
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data?.whatsappNumber) {
+          let cleaned = data.whatsappNumber.replace(/\D/g, "");
+          if (cleaned.startsWith("0")) cleaned = "62" + cleaned.slice(1);
+          setWaNumber(cleaned);
+        }
+      })
+      .catch(err => console.error("Error loading settings:", err));
   }, [supabase, orderId]);
 
   const nickname = user?.display_name?.split(' ')[0] || "Kak";
@@ -123,7 +135,7 @@ export default function DashboardLayout({
 
         <div className="mt-auto p-6 border-t border-cream-100">
           <a 
-            href="https://wa.me/6289514138681?text=Halo%20Admin%20MyPromise%2C%20saya%20butuh%20bantuan%20terkait%20undangan%20saya." 
+            href={`https://wa.me/${waNumber}?text=Halo%20Admin%20MyPromise%2C%20saya%20butuh%20bantuan%20terkait%20undangan%20saya.`} 
             target="_blank" 
             rel="noopener noreferrer"
             className="group block p-4 bg-gradient-to-br from-rose-500 to-rose-600 text-white rounded-[24px] shadow-lg shadow-rose-500/20 hover:shadow-xl hover:shadow-rose-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"

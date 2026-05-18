@@ -53,7 +53,8 @@ export async function POST(request: Request) {
         await sendEmailNotification(
           order.buyer_email, 
           "Pembayaran Berhasil 🎉 - Dashboard MyPromise", 
-          successEmailHtml
+          successEmailHtml,
+          true
         );
         
         console.log(`✅ Success notifications triggered for ${order.buyer_name}`);

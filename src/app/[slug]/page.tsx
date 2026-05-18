@@ -1,6 +1,8 @@
 import { createAdminClient } from "@/utils/supabase/admin";
 import { notFound } from "next/navigation";
 import MinimalistTemplate from "@/components/invitation/MinimalistTemplate";
+import ModernLuxeTemplate from "@/components/invitation/ModernLuxeTemplate";
+import GardenRomanceTemplate from "@/components/invitation/GardenRomanceTemplate";
 
 export const dynamic = "force-dynamic";
 
@@ -85,25 +87,45 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
   // designConfig will hold template-specific tweaks (backgrounds, fonts, etc.)
   const designConfig = invitation.design_config || {};
 
-  // Logika Pemilihan Template (Switcher)
-  // Saat ini kita fallback ke MinimalistTemplate, 
-  // tapi kodenya sudah siap menerima template lain.
   const renderTemplate = () => {
-    // Nantinya kita bisa switch berdasarkan templateData.slug atau ID
-    // switch(templateData?.id) {
-    //   case 'elegant-001': return <ElegantTemplate ... />
-    // }
+    const templateSlug = templateData?.slug || "minimalist-elegance";
     
-    return (
-      <MinimalistTemplate 
-        invitationId={invitation.id}
-        data={content} 
-        designConfig={designConfig}
-        guestName={guestName} 
-        guestSlug={guestSlug}
-        isDemo={false} 
-      />
-    );
+    switch (templateSlug) {
+      case "modern-luxe":
+        return (
+          <ModernLuxeTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "garden-romance":
+        return (
+          <GardenRomanceTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "minimalist-elegance":
+      default:
+        return (
+          <MinimalistTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+    }
   };
 
   return (

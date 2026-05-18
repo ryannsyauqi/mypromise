@@ -1,7 +1,24 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [waNumber, setWaNumber] = useState("6281234567890");
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then(res => res.json())
+      .then(data => {
+        if (data?.whatsappNumber) {
+          let cleaned = data.whatsappNumber.replace(/\D/g, "");
+          if (cleaned.startsWith("0")) cleaned = "62" + cleaned.slice(1);
+          setWaNumber(cleaned);
+        }
+      })
+      .catch(err => console.error("Error loading settings:", err));
+  }, []);
 
   return (
     <footer className="bg-charcoal-900 text-white py-20 border-t border-white/5">
@@ -24,7 +41,7 @@ export default function Footer() {
               {['Instagram', 'WhatsApp', 'TikTok'].map(social => (
                 <a
                   key={social}
-                  href="#"
+                  href={`https://wa.me/${waNumber}`}
                   className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-rose-500 hover:border-rose-500 transition-all duration-300 group"
                 >
                   <span className="sr-only">{social}</span>
@@ -51,7 +68,9 @@ export default function Footer() {
                 Siap mewujudkan undangan <br /> impian kamu?
               </p>
               <a
-                href="https://wa.me/6281234567890"
+                href={`https://wa.me/${waNumber}?text=Halo%20Admin%20MyPromise%2C%20saya%20tertarik%20membuat%20undangan%20digital.`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-block px-8 py-3.5 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-rose-600 transition-all duration-300 shadow-xl shadow-rose-900/20"
               >
                 Chat via WhatsApp
