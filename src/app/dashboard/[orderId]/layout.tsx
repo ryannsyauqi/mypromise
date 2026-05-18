@@ -72,11 +72,11 @@ export default function DashboardLayout({
     if (orderId) loadUser();
   }, [supabase, orderId]);
 
-  const nickname = user?.display_name?.split(' ')[0] || "Mempelai";
+  const nickname = user?.display_name?.split(' ')[0] || "Kak";
 
   const navItems = [
     { name: "Beranda", href: `/dashboard/${orderId}`, icon: Icons.Home },
-    { name: "Data Mempelai", href: `/dashboard/${orderId}/invitation`, icon: Icons.Edit },
+    { name: "Data Pernikahan", href: `/dashboard/${orderId}/invitation`, icon: Icons.Edit },
     { name: "Pengaturan Link", href: `/dashboard/${orderId}/settings`, icon: Icons.Settings },
     { name: "Daftar Tamu", href: `/dashboard/${orderId}/guests`, icon: Icons.Guests },
   ];
@@ -115,18 +115,26 @@ export default function DashboardLayout({
           </nav>
         </div>
 
-        <div className="mt-auto p-6 space-y-2 border-t border-cream-100">
+        <div className="mt-auto p-6 border-t border-cream-100">
           <a 
             href="https://wa.me/6289514138681?text=Halo%20Admin%20MyPromise%2C%20saya%20butuh%20bantuan%20terkait%20undangan%20saya." 
             target="_blank" 
             rel="noopener noreferrer"
-            className="w-full px-5 py-4 text-emerald-600 hover:bg-emerald-50 transition-all text-[10px] uppercase tracking-[0.2em] font-black flex items-center gap-3 rounded-2xl border border-emerald-100 shadow-sm"
+            className="group block p-4 bg-gradient-to-br from-rose-500 to-rose-600 text-white rounded-[24px] shadow-lg shadow-rose-500/20 hover:shadow-xl hover:shadow-rose-500/30 transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
           >
-            <Icons.WhatsApp /> Bantuan CS (WhatsApp)
+            <div className="flex items-center gap-3 mb-1">
+              <div className="w-9 h-9 rounded-xl bg-white/20 border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
+                <Icons.WhatsApp />
+              </div>
+              <div>
+                <div className="text-[10px] font-black uppercase tracking-wider text-rose-100">Bantuan CS</div>
+                <div className="text-xs font-bold leading-tight">Hubungi via WhatsApp</div>
+              </div>
+            </div>
+            <p className="text-[10px] text-rose-100 font-medium leading-relaxed mt-2.5 pt-2 border-t border-white/10">
+              Punya kendala atau pertanyaan? Tim support kami siap membantu.
+            </p>
           </a>
-          <Link href="/" className="w-full px-5 py-4 text-left text-charcoal-400 hover:text-rose-500 transition-all text-[11px] uppercase tracking-widest font-black flex items-center gap-3 hover:bg-rose-50 rounded-2xl">
-            <Icons.Logout /> Kembali ke Beranda
-          </Link>
         </div>
       </aside>
 
@@ -145,7 +153,7 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        <main className="p-6 md:p-12 max-w-7xl w-full mx-auto">
+        <main className="p-6 md:px-12 md:pt-10 md:pb-6 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>

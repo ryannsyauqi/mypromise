@@ -30,8 +30,9 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
   const order = invitation.orders;
   if (order) {
     const isLifetime = order.notes?.includes('Selamanya') || order.expires_at?.startsWith('2099');
-    if (!isLifetime) {
-      const expiryDate = order.expires_at ? new Date(order.expires_at) : new Date(new Date(order.created_at).setFullYear(new Date(order.created_at).getFullYear() + 1));
+    if (!isLifetime && order.created_at) {
+      const createdDate = new Date(order.created_at);
+      const expiryDate = order.expires_at ? new Date(order.expires_at) : new Date(new Date(createdDate.getTime()).setFullYear(createdDate.getFullYear() + 1));
       if (new Date() > expiryDate) {
         return (
           <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6 text-center">

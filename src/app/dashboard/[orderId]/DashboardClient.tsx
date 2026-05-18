@@ -64,13 +64,23 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
   const order = data?.orders;
   const template = order?.templates;
   const content = data?.content || {};
-  const fieldSchema = template?.field_schema || [];
+  const baseFieldSchema = template?.field_schema || [];
+  const fieldSchema = [...baseFieldSchema];
+  if (!fieldSchema.some((f: any) => f.key === "music_url")) {
+    fieldSchema.push({
+      key: "music_url",
+      label: "File Audio Latar Musik (MP3/WAV)",
+      type: "file",
+      accept: "audio/*",
+      required: true,
+    });
+  }
 
   // Calculate progress based on schema
   const requiredFields = fieldSchema.filter((f: any) => f.required);
   const totalRequired = requiredFields.length || 1;
   const filledRequired = requiredFields.filter((f: any) => {
-    const val = content[f.key];
+    const val = f.key === "music_url" ? (content.music_url || content.music) : content[f.key];
     return val && val.toString().trim() !== "";
   }).length;
 
@@ -90,7 +100,7 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
   };
 
   // Extract Nickname
-  const nickname = order?.buyer_name ? order.buyer_name.split(' ')[0] : "Mempelai";
+  const nickname = order?.buyer_name ? order.buyer_name.split(' ')[0] : "Kak";
 
   // Logic for each step's completion
   const isStep1Done = progressPercent === 100; // Based on required fields
@@ -144,7 +154,7 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
 
             <div className="space-y-6">
               {[
-                { step: 1, title: "Lengkapi Data Mempelai", desc: "Nama, jadwal acara, lokasi, galeri foto dan lain-lain.", href: `/dashboard/${orderId}/invitation`, done: isStep1Done, disabled: false },
+                { step: 1, title: "Lengkapi Data Pernikahan", desc: "Nama, jadwal acara, lokasi, galeri foto dan lain-lain.", href: `/dashboard/${orderId}/invitation`, done: isStep1Done, disabled: false },
                 { step: 2, title: "Kustomisasi Link", desc: "Edit link website kamu disini (ex: mypromise.id/niafahmiforever).", href: `/dashboard/${orderId}/settings`, done: isStep2Done, disabled: !isStep1Done },
                 { step: 3, title: "Kelola Tamu & Bagikan Undangan", desc: "Tambah daftar tamu dan mulai sebarkan undangan kamu.", href: `/dashboard/${orderId}/guests`, done: isStep3Done, disabled: !isStep2Done }
               ].map((item) => {
@@ -218,9 +228,12 @@ export default function DashboardClient({ initialData, orderId }: { initialData:
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </div>
-              <h2 className="text-white text-4xl font-bold leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>
+              <h2 className="text-white text-3xl font-bold leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>
                 Cek Undangan Website
               </h2>
+              <div className="mt-3 inline-block px-3.5 py-1.5 bg-white/20 border border-white/10 backdrop-blur-md text-white font-black uppercase tracking-wider text-[10px] rounded-full shadow-inner">
+                {template?.name ? `Template: ${template.name}` : "Premium Minimalist"}
+              </div>
             </div>
 
             <div className="relative z-10 space-y-4">

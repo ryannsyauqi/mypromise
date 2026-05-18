@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Icons = {
   Check: () => (
@@ -39,15 +40,22 @@ const Icons = {
 };
 
 export default function InvitationSettingsForm({ initialData }: { initialData: any }) {
+  const router = useRouter();
   const order = initialData?.orders;
   const isLifetime = order?.notes?.includes('Selamanya') || order?.expires_at?.startsWith('2099') || false;
 
   let remainingText = "365 Hari";
-  if (!isLifetime && order) {
-    const expiryDate = order.expires_at ? new Date(order.expires_at) : new Date(new Date(order.created_at).setFullYear(new Date(order.created_at).getFullYear() + 1));
-    const diffTime = expiryDate.getTime() - new Date().getTime();
+  let exactExpiryDateFormatted = "";
+  if (!isLifetime && order && order.created_at) {
+    const createdDate = new Date(order.created_at);
+    const expiryDate = order.expires_at ? new Date(order.expires_at) : new Date(new Date(createdDate.getTime()).setFullYear(createdDate.getFullYear() + 1));
+    const today = new Date();
+    const diffTime = expiryDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     remainingText = diffDays > 0 ? `${diffDays} Hari` : "Expired";
+
+    const monthsId = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    exactExpiryDateFormatted = `${expiryDate.getDate()} ${monthsId[expiryDate.getMonth()]} ${expiryDate.getFullYear()}`;
   }
 
   const [slug, setSlug] = useState(initialData.slug || "");
@@ -79,6 +87,7 @@ export default function InvitationSettingsForm({ initialData }: { initialData: a
 
       setSaveStatus("success");
       setIsEditing(false);
+      router.refresh();
       setTimeout(() => setSaveStatus("idle"), 3000);
     } catch (error: any) {
       console.error(error);
@@ -92,9 +101,8 @@ export default function InvitationSettingsForm({ initialData }: { initialData: a
       <form onSubmit={handleSubmit} className="p-8 md:p-12">
         <div className="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8">
-            <div className="space-y-1.5">
-               <label className="text-base md:text-lg font-bold text-charcoal-900 block" style={{ fontFamily: "var(--font-playfair)" }}>Alamat Website Undangan</label>
-               <p className="text-xs md:text-sm text-slate-400">Pastikan URL mudah diingat oleh tamu undangan.</p>
+            <div>
+               <h2 className="text-lg md:text-xl font-bold text-charcoal-900" style={{ fontFamily: "var(--font-playfair)" }}>Edit URL / Link undangan</h2>
             </div>
             
             <div className="flex items-center gap-4">
@@ -150,53 +158,47 @@ export default function InvitationSettingsForm({ initialData }: { initialData: a
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-xs font-medium min-h-[24px]">
-              {saveStatus === "success" && (
-                <div className="flex items-center gap-2 text-emerald-600 animate-scale-in">
-                   <Icons.Check /> <span>Berhasil Diperbarui</span>
-                </div>
-              )}
-              {saveStatus === "error" && (
-                <div className="flex items-center gap-2 text-rose-600 animate-scale-in">
-                   <Icons.Error /> <span>{errorMessage}</span>
-                </div>
-              )}
-              {!saveStatus || saveStatus === "idle" ? (
-                <div className="flex items-center gap-2 text-slate-500 animate-fade-in text-xs">
-                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0"></span>
-                   <span>Gunakan huruf kecil & tanda hubung. Contoh: <strong className="text-charcoal-900 font-bold">niafahmiforever</strong> atau <strong className="text-charcoal-900 font-bold">nia-dan-fahmi</strong></span>
-                </div>
-              ) : null}
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 text-xs font-medium min-h-[24px]">
+                {saveStatus === "success" && (
+                  <div className="flex items-center gap-2 text-emerald-600 animate-scale-in">
+                     <Icons.Check /> <span>Berhasil Diperbarui</span>
+                  </div>
+                )}
+                {saveStatus === "error" && (
+                  <div className="flex items-center gap-2 text-rose-600 animate-scale-in">
+                     <Icons.Error /> <span>{errorMessage}</span>
+                  </div>
+                )}
+                {!saveStatus || saveStatus === "idle" ? (
+                  <div className="flex items-center gap-2 text-slate-500 animate-fade-in text-xs">
+                     <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0"></span>
+                     <span>Gunakan huruf kecil & tanda hubung. Contoh: <strong className="text-charcoal-900 font-bold">niafahmiforever</strong> atau <strong className="text-charcoal-900 font-bold">nia-dan-fahmi</strong></span>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="flex items-start gap-2.5 text-amber-700 text-xs font-medium bg-amber-50/60 border border-amber-200/80 px-4 py-3 rounded-xl shadow-2xs">
+                <svg className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span><strong>Catatan:</strong> Hindari mengubah Link/URL setelah undangan disebarkan agar link tetap bisa diakses.</span>
+              </div>
             </div>
 
-            {/* Status Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 mt-8 border-t border-slate-100">
-               <div className="p-8 bg-slate-50/70 rounded-[32px] border border-slate-100 flex items-center justify-between group cursor-default">
-                  <div className="space-y-1">
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status Link</h4>
-                    <p className="text-xl font-bold text-charcoal-900">Aktif & Siap</p>
-                  </div>
-                  <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-emerald-500 shadow-sm">
-                    <Icons.Check />
-                  </div>
-               </div>
-
-               <div className="p-8 bg-slate-50/70 rounded-[32px] border border-slate-100 flex items-center justify-between group cursor-default">
-                  <div className="space-y-1">
-                    <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Masa Aktif</h4>
-                    <div className="flex items-center gap-2">
-                      <p className={`text-xl font-bold ${isLifetime ? 'text-rose-600' : (remainingText === 'Expired' ? 'text-rose-500' : 'text-charcoal-900')}`}>
-                        {isLifetime ? 'Selamanya' : remainingText}
-                      </p>
-                      {isLifetime && (
-                        <span className="px-2 py-0.5 bg-rose-100/80 text-rose-600 rounded-md text-[9px] font-black uppercase tracking-widest">VIP</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className={`w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm ${isLifetime ? 'text-rose-500 bg-rose-50/80 border-rose-200' : 'text-slate-400'}`}>
-                    <Icons.Globe />
-                  </div>
-               </div>
+            {/* Masa Aktif Info - Minimalist & Real */}
+            <div className="mt-6 pt-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 gap-2">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Masa Aktif:</span>
+                <span className={`font-bold ${isLifetime ? 'text-rose-600 font-black tracking-wide' : 'text-charcoal-900'}`}>
+                  {isLifetime ? 'Selamanya (VIP)' : `${remainingText}`}
+                </span>
+              </div>
+              {!isLifetime && exactExpiryDateFormatted && (
+                <div>
+                  Berlaku hingga: <span className="text-charcoal-900 font-bold">{exactExpiryDateFormatted}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

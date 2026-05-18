@@ -21,9 +21,18 @@ export async function POST(request: Request) {
       console.log("🛠 Creating 'invitations' bucket...");
       const { error: createError } = await supabase.storage.createBucket("invitations", {
         public: true,
-        allowedMimeTypes: ["image/*"],
+        allowedMimeTypes: ["image/*", "audio/*"],
       });
       if (createError) throw createError;
+    } else {
+      try {
+        await supabase.storage.updateBucket("invitations", {
+          public: true,
+          allowedMimeTypes: ["image/*", "audio/*"],
+        });
+      } catch (err) {
+        console.warn("Notice updating bucket:", err);
+      }
     }
 
     // 2. Prepare file

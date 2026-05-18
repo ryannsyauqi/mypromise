@@ -419,3 +419,29 @@ html {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Custom Styled Scrollbar for visible scrolling areas */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rose-300) var(--color-cream-100);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--color-cream-100);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-rose-300);
+  border-radius: 9999px;
+  border: 2px solid var(--color-cream-100);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-rose-400);
+}

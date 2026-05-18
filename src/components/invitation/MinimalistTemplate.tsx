@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import CountdownTimer from "@/components/invitation/CountdownTimer";
 import RSVPForm from "@/components/invitation/RSVPForm";
 import { demoWishes } from "@/lib/demo-data";
@@ -24,10 +24,15 @@ interface InvitationData {
   love_quote?: string;
   bank_account_1?: string;
   bank_account_2?: string;
+  bank_accounts?: { bank: string; number: string; name: string }[];
+  gift_address?: string;
   love_story?: { date: string; title: string; description: string }[];
   photo_hero: string;
   photo_groom: string;
   photo_bride: string;
+  music_url?: string;
+  music?: string;
+  [key: string]: any;
 }
 
 interface MinimalistTemplateProps {
@@ -108,6 +113,28 @@ const Icons = {
       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
     </svg>
   ),
+  Close: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  ),
+  ChevronLeft: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+  ),
+  ChevronRight: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  ),
+  Camera: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-rose-500 inline-block mb-1">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+      <circle cx="12" cy="13" r="4"></circle>
+    </svg>
+  ),
 };
 
 const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2070&auto=format&fit=crop";
@@ -115,11 +142,49 @@ const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1519741497674-61148
 export default function MinimalistTemplate({ invitationId, data, designConfig, guestName, isDemo }: MinimalistTemplateProps) {
   const [isOpened, setIsOpened] = useState(false);
   const [wishes, setWishes] = useState<any[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  
   const displayName = guestName || "Tamu Undangan";
+  const musicUrl = data.music_url || data.music;
 
   const heroImage = data.photo_hero || PLACEHOLDER_IMAGE;
   const groomImage = data.photo_groom || PLACEHOLDER_IMAGE;
   const brideImage = data.photo_bride || PLACEHOLDER_IMAGE;
+  const galleryPhotos = Array.isArray(data.gallery) && data.gallery.length > 0 ? data.gallery : (isDemo ? [
+    "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1606800052052-a08af7148866?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1000&auto=format&fit=crop"
+  ] : []);
+
+  const parseAccounts = (invData: any) => {
+    if (Array.isArray(invData?.bank_accounts) && invData.bank_accounts.length > 0) {
+      return invData.bank_accounts.map((acc: any) => {
+        if (!acc) return null;
+        let b = acc.bank || "";
+        let n = acc.number || "";
+        let nm = acc.name || "";
+        if (b && (b.includes("–") || b.includes("—") || (b.includes("-") && b.length > 15))) {
+          const parts = b.split(/\s*[-–—]\s*/).map((s: string) => s.trim());
+          b = parts[0] || "BCA";
+          n = parts[1] || n;
+          nm = parts[2] || nm;
+        }
+        return { bank: b, number: n, name: nm };
+      }).filter((acc: any) => acc && (acc.number || acc.name));
+    }
+    return [invData?.bank_account_1, invData?.bank_account_2].filter(Boolean).map(acc => {
+      const parts = acc!.split(/\s*[-–—]\s*/).map((p: string) => p.trim());
+      return { bank: parts[0] || "", number: parts[1] || "", name: parts[2] || "" };
+    }).filter(acc => acc && (acc.number || acc.name));
+  };
+
+  const accountsList = parseAccounts(data);
 
   // Fetch real wishes
   useEffect(() => {
@@ -132,7 +197,11 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
         const response = await fetch(`/api/invitations/${invitationId}/wishes`);
         if (response.ok) {
           const wishData = await response.json();
-          setWishes(wishData);
+          if (Array.isArray(wishData)) {
+            setWishes(wishData);
+          } else {
+            setWishes([]);
+          }
         }
       } catch (error) {
         console.error("Failed to load wishes:", error);
@@ -141,40 +210,90 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
     loadWishes();
   }, [invitationId, isDemo]);
 
+  const handleOpenInvitation = () => {
+    setIsOpened(true);
+    if (musicUrl && audioRef.current) {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => console.log("Autoplay prevented by browser:", err));
+    }
+  };
+
+  const toggleAudio = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch((err) => console.log("Play error:", err));
+    }
+  };
+
+  useEffect(() => {
+    if (selectedPhotoIndex === null) {
+      document.body.style.overflow = '';
+      return;
+    }
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedPhotoIndex(null);
+      } else if (e.key === 'ArrowLeft') {
+        setSelectedPhotoIndex(prev => prev === null || prev === 0 ? galleryPhotos.length - 1 : prev - 1);
+      } else if (e.key === 'ArrowRight') {
+        setSelectedPhotoIndex(prev => prev === null || prev === galleryPhotos.length - 1 ? 0 : prev + 1);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedPhotoIndex, galleryPhotos.length]);
+
   return (
     <div className="relative min-h-screen bg-cream-50 overflow-hidden">
       {/* ===== COVER / OPENING ===== */}
       {!isOpened && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-charcoal-900">
-          <img src={heroImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover opacity-40" />
-          <div className="relative z-10 text-center px-6 animate-fade-in">
-            <p className="text-cream-200/60 text-sm uppercase tracking-[0.3em] mb-4">The Wedding of</p>
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-charcoal-950">
+          <img src={heroImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover opacity-35 scale-105 animate-pulse-soft" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/80" />
+          <div className="relative z-10 text-center px-8 py-14 border border-gold-500/30 rounded-3xl backdrop-blur-xs bg-charcoal-900/50 shadow-2xl max-w-lg mx-6 animate-fade-in">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-6 py-1 bg-gradient-to-r from-gold-600 via-gold-400 to-gold-600 rounded-full text-charcoal-950 text-[10px] font-extrabold uppercase tracking-[0.3em] shadow-lg">
+              Undangan Pernikahan
+            </div>
+            <p className="text-cream-200/60 text-sm uppercase tracking-[0.3em] mb-4 mt-2">The Wedding of</p>
             <h1
-              className="text-5xl sm:text-7xl font-bold text-white mb-2"
+              className="text-5xl sm:text-7xl font-bold text-white mb-2 tracking-tight"
               style={{ fontFamily: "var(--font-playfair)" }}
             >
               {data.groom_name}
             </h1>
-            <p className="text-3xl sm:text-4xl text-gold-400 mb-2" style={{ fontFamily: "var(--font-great-vibes)" }}>
+            <p className="text-3xl sm:text-4xl text-gold-400 mb-2 font-light" style={{ fontFamily: "var(--font-great-vibes)" }}>
               &
             </p>
             <h1
-              className="text-5xl sm:text-7xl font-bold text-white mb-8"
+              className="text-5xl sm:text-7xl font-bold text-white mb-8 tracking-tight"
               style={{ fontFamily: "var(--font-playfair)" }}
             >
               {data.bride_name}
             </h1>
+            <div className="w-24 h-px bg-gradient-to-r from-transparent via-gold-500/50 to-transparent mx-auto mb-8" />
 
             <div className="mb-10">
-              <p className="text-cream-200/70 text-sm mb-1">Kepada Yth.</p>
-              <p className="text-white text-xl font-semibold" style={{ fontFamily: "var(--font-playfair)" }}>
+              <p className="text-cream-200/70 text-xs uppercase tracking-widest mb-1.5">Kepada Yth.</p>
+              <p className="text-gold-200 text-2xl font-bold tracking-wide" style={{ fontFamily: "var(--font-playfair)" }}>
                 {displayName}
               </p>
             </div>
 
             <button
-              onClick={() => setIsOpened(true)}
-              className="px-10 py-4 bg-rose-500 text-white font-semibold rounded-full hover:bg-rose-400 transition-all duration-300 hover:shadow-xl hover:shadow-rose-500/30 animate-pulse-soft"
+              onClick={handleOpenInvitation}
+              className="px-10 py-4 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-bold rounded-full hover:from-rose-400 hover:to-rose-500 transition-all duration-500 hover:shadow-2xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 cursor-pointer tracking-wider text-sm uppercase"
             >
               Buka Undangan
             </button>
@@ -182,23 +301,54 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
         </div>
       )}
 
+      {/* ===== FLOATING MUSIC BUTTON ===== */}
+      {isOpened && musicUrl && (
+        <div className="fixed bottom-6 right-6 z-50 animate-fade-in">
+          <button
+            onClick={toggleAudio}
+            className={`w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 cursor-pointer border border-white/10 ${
+              isPlaying
+                ? "bg-rose-500 text-white shadow-rose-500/30 hover:bg-rose-600 scale-100"
+                : "bg-charcoal-800 text-slate-300 hover:bg-charcoal-700 hover:text-white"
+            }`}
+            title={isPlaying ? "Jeda Musik" : "Putar Musik"}
+          >
+            {isPlaying ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="translate-x-0.5">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* AUDIO ELEMENT - Always rendered if musicUrl exists so audioRef is instantly available */}
+      {musicUrl && <audio ref={audioRef} src={musicUrl} loop className="hidden" preload="auto" />}
+
+
       {/* ===== MAIN INVITATION CONTENT ===== */}
       <div className={isOpened ? "animate-fade-in" : "hidden"}>
 
         {/* — Bismillah / Opening — */}
-        <section className="py-20 px-6 text-center bg-cream-50">
-          <p className="text-charcoal-300 text-2xl mb-4" style={{ fontFamily: "var(--font-great-vibes)" }}>
+        <section className="py-24 px-6 text-center bg-gradient-to-b from-cream-100 via-cream-50 to-white relative overflow-hidden border-b border-cream-200/50">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-transparent via-gold-400/40 to-transparent" />
+          <p className="text-gold-600/90 text-3xl sm:text-4xl mb-6 font-normal drop-shadow-xs" style={{ fontFamily: "var(--font-great-vibes)" }}>
             بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
           </p>
-          <p className="text-charcoal-400 text-sm max-w-md mx-auto leading-relaxed">
+          <p className="text-charcoal-700 font-medium text-sm sm:text-base max-w-md mx-auto leading-relaxed tracking-wide">
             Assalamu&apos;alaikum Warahmatullahi Wabarakatuh
           </p>
           {data.love_quote && (
-            <div className="mt-8 max-w-lg mx-auto">
-              <div className="divider-ornament text-charcoal-300 mb-6">✦</div>
-              <p className="text-charcoal-500 text-sm italic leading-relaxed whitespace-pre-line">
-                {data.love_quote}
+            <div className="mt-10 max-w-xl mx-auto relative px-8 py-10 bg-white/80 backdrop-blur-sm rounded-3xl border border-gold-200/60 shadow-lg">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-gold-400 text-lg bg-white px-4 py-0.5 rounded-full border border-gold-200/60 shadow-xs">✦</div>
+              <p className="text-charcoal-600 text-sm sm:text-base italic leading-relaxed whitespace-pre-line font-serif">
+                &ldquo;{data.love_quote}&rdquo;
               </p>
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-gold-400 text-lg bg-white px-4 py-0.5 rounded-full border border-gold-200/60 shadow-xs">✦</div>
             </div>
           )}
         </section>
@@ -221,32 +371,39 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
         </section>
 
         {/* — Couple Introduction — */}
-        <section className="section-padding bg-cream-50">
-          <div className="container-tight px-6">
-            <div className="text-center mb-12">
-              <p className="text-rose-500 text-sm uppercase tracking-wider mb-2">Mempelai</p>
-              <div className="divider-ornament text-charcoal-300">✦</div>
+        <section className="py-24 bg-gradient-to-b from-white via-cream-50 to-white relative overflow-hidden">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-16">
+              <p className="text-rose-500 text-xs font-extrabold uppercase tracking-[0.3em] mb-2">Mempelai Berbahagia</p>
+              <h2 className="text-4xl sm:text-5xl font-bold text-charcoal-900 mb-4" style={{ fontFamily: "var(--font-playfair)" }}>
+                Pasangan Mempelai
+              </h2>
+              <div className="w-20 h-0.5 bg-rose-400/50 mx-auto" />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 sm:gap-16">
               {/* Groom */}
-              <div className="text-center">
-                <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-cream-200 shadow-lg">
-                  <img src={groomImage} alt={data.groom_full_name} className="absolute inset-0 w-full h-full object-cover" />
+              <div className="bg-white p-10 rounded-[2.5rem] border border-cream-200 shadow-xl hover:shadow-2xl transition-all duration-500 group relative overflow-hidden text-center flex flex-col items-center">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-rose-100/30 rounded-bl-full -z-10 group-hover:scale-125 transition-transform duration-700" />
+                <div className="relative w-52 h-52 mx-auto mb-8 rounded-full overflow-hidden border-4 border-gold-300 shadow-2xl group-hover:border-rose-400 transition-colors duration-500">
+                  <img src={groomImage} alt={data.groom_full_name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 </div>
-                <h3 className="text-2xl font-bold text-charcoal-800 mb-1" style={{ fontFamily: "var(--font-playfair)" }}>
+                <h3 className="text-3xl font-bold text-charcoal-900 mb-2 group-hover:text-rose-600 transition-colors duration-300" style={{ fontFamily: "var(--font-playfair)" }}>
                   {data.groom_full_name}
                 </h3>
-                <p className="text-charcoal-400 text-sm">Putra dari {data.groom_parents}</p>
+                <p className="text-rose-500 font-semibold text-xs uppercase tracking-widest mb-3">Mempelai Pria</p>
+                <p className="text-charcoal-500 text-sm leading-relaxed max-w-xs">Putra dari {data.groom_parents}</p>
               </div>
               {/* Bride */}
-              <div className="text-center">
-                <div className="relative w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-cream-200 shadow-lg">
-                  <img src={brideImage} alt={data.bride_full_name} className="absolute inset-0 w-full h-full object-cover" />
+              <div className="bg-white p-10 rounded-[2.5rem] border border-cream-200 shadow-xl hover:shadow-2xl transition-all duration-500 group relative overflow-hidden text-center flex flex-col items-center">
+                <div className="absolute top-0 left-0 w-32 h-32 bg-rose-100/30 rounded-br-full -z-10 group-hover:scale-125 transition-transform duration-700" />
+                <div className="relative w-52 h-52 mx-auto mb-8 rounded-full overflow-hidden border-4 border-gold-300 shadow-2xl group-hover:border-rose-400 transition-colors duration-500">
+                  <img src={brideImage} alt={data.bride_full_name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 </div>
-                <h3 className="text-2xl font-bold text-charcoal-800 mb-1" style={{ fontFamily: "var(--font-playfair)" }}>
+                <h3 className="text-3xl font-bold text-charcoal-900 mb-2 group-hover:text-rose-600 transition-colors duration-300" style={{ fontFamily: "var(--font-playfair)" }}>
                   {data.bride_full_name}
                 </h3>
-                <p className="text-charcoal-400 text-sm">Putri dari {data.bride_parents}</p>
+                <p className="text-rose-500 font-semibold text-xs uppercase tracking-widest mb-3">Mempelai Wanita</p>
+                <p className="text-charcoal-500 text-sm leading-relaxed max-w-xs">Putri dari {data.bride_parents}</p>
               </div>
             </div>
           </div>
@@ -285,49 +442,59 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
         )}
 
         {/* — Event Details — */}
-        <section className="section-padding bg-cream-50">
-          <div className="container-tight px-6">
-            <div className="text-center mb-12">
-              <p className="text-rose-500 text-sm uppercase tracking-wider mb-2">Acara</p>
-              <h2 className="text-3xl font-bold text-charcoal-800" style={{ fontFamily: "var(--font-playfair)" }}>
-                Waktu & Tempat
+        <section className="py-24 bg-cream-50 relative overflow-hidden">
+          <div className="absolute inset-0 bg-radial-gradient from-gold-500/5 via-transparent to-transparent pointer-events-none" />
+          <div className="max-w-5xl mx-auto px-6 relative z-10">
+            <div className="text-center mb-16">
+              <p className="text-rose-500 text-xs font-extrabold uppercase tracking-[0.3em] mb-2">Jadwal Pelaksanaan</p>
+              <h2 className="text-4xl sm:text-5xl font-bold text-charcoal-900 mb-4" style={{ fontFamily: "var(--font-playfair)" }}>
+                Waktu & Tempat Acara
               </h2>
+              <div className="w-20 h-0.5 bg-rose-400/50 mx-auto" />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10">
               {/* Akad */}
-              <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-cream-200">
-                <Icons.Rings />
-                <h3 className="text-xl font-bold text-charcoal-800 mb-4 mt-4" style={{ fontFamily: "var(--font-playfair)" }}>
+              <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 text-center shadow-xl hover:shadow-2xl transition-all duration-500 border border-gold-200/60 relative overflow-hidden group flex flex-col items-center">
+                <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-gold-400 to-rose-400" />
+                <div className="w-16 h-16 rounded-2xl bg-gold-50 border border-gold-200 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                  <Icons.Rings />
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>
                   Akad Nikah
                 </h3>
-                <p className="text-charcoal-600 font-semibold text-sm">{formatEventDate(data.akad_date)}</p>
-                <p className="text-charcoal-400 text-sm mb-3">{data.akad_time} WIB</p>
-                <p className="text-charcoal-700 font-semibold text-sm">{data.akad_venue}</p>
-                <p className="text-charcoal-400 text-xs mt-1 leading-relaxed">{data.akad_address}</p>
+                <div className="w-12 h-px bg-gold-300 mx-auto mb-6" />
+                <p className="text-rose-600 font-bold text-base sm:text-lg mb-1">{formatEventDate(data.akad_date)}</p>
+                <p className="text-charcoal-600 font-semibold text-sm mb-6 bg-cream-100 px-4 py-1.5 rounded-full inline-block shadow-xs">{data.akad_time} WIB</p>
+                <p className="text-charcoal-900 font-extrabold text-base mb-2">{data.akad_venue}</p>
+                <p className="text-charcoal-500 text-xs sm:text-sm leading-relaxed max-w-sm mb-8">{data.akad_address}</p>
                 <a
                   href={getGoogleCalendarUrl(`Akad Nikah ${data.groom_name} & ${data.bride_name}`, data.akad_date, data.akad_time, data.akad_venue, data.akad_address)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 bg-cream-100 text-charcoal-600 text-xs font-medium rounded-full hover:bg-cream-200 transition-all"
+                  className="mt-auto w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-cream-100/80 text-charcoal-800 text-xs sm:text-sm font-bold rounded-xl hover:bg-rose-500 hover:text-white transition-all duration-300 shadow-sm cursor-pointer group/btn"
                 >
                   <Icons.Calendar /> Simpan ke Kalender
                 </a>
               </div>
               {/* Reception */}
-              <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-cream-200">
-                <Icons.Party />
-                <h3 className="text-xl font-bold text-charcoal-800 mb-4 mt-4" style={{ fontFamily: "var(--font-playfair)" }}>
+              <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 text-center shadow-xl hover:shadow-2xl transition-all duration-500 border border-gold-200/60 relative overflow-hidden group flex flex-col items-center">
+                <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-rose-400 to-gold-400" />
+                <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-inner">
+                  <Icons.Party />
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-charcoal-900 mb-2" style={{ fontFamily: "var(--font-playfair)" }}>
                   Resepsi
                 </h3>
-                <p className="text-charcoal-600 font-semibold text-sm">{formatEventDate(data.reception_date)}</p>
-                <p className="text-charcoal-400 text-sm mb-3">{data.reception_time} WIB</p>
-                <p className="text-charcoal-700 font-semibold text-sm">{data.reception_venue}</p>
-                <p className="text-charcoal-400 text-xs mt-1 leading-relaxed">{data.reception_address}</p>
+                <div className="w-12 h-px bg-rose-300 mx-auto mb-6" />
+                <p className="text-rose-600 font-bold text-base sm:text-lg mb-1">{formatEventDate(data.reception_date)}</p>
+                <p className="text-charcoal-600 font-semibold text-sm mb-6 bg-cream-100 px-4 py-1.5 rounded-full inline-block shadow-xs">{data.reception_time} WIB</p>
+                <p className="text-charcoal-900 font-extrabold text-base mb-2">{data.reception_venue}</p>
+                <p className="text-charcoal-500 text-xs sm:text-sm leading-relaxed max-w-sm mb-8">{data.reception_address}</p>
                 <a
                   href={getGoogleCalendarUrl(`Resepsi ${data.groom_name} & ${data.bride_name}`, data.reception_date, data.reception_time, data.reception_venue, data.reception_address)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 mt-5 px-5 py-2.5 bg-cream-100 text-charcoal-600 text-xs font-medium rounded-full hover:bg-cream-200 transition-all"
+                  className="mt-auto w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-cream-100/80 text-charcoal-800 text-xs sm:text-sm font-bold rounded-xl hover:bg-rose-500 hover:text-white transition-all duration-300 shadow-sm cursor-pointer group/btn"
                 >
                   <Icons.Calendar /> Simpan ke Kalender
                 </a>
@@ -335,19 +502,55 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
             </div>
             {/* Maps */}
             {data.maps_link && (
-              <div className="text-center mt-8">
+              <div className="text-center mt-12">
                 <a
                   href={data.maps_link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 border-2 border-rose-400 text-rose-500 font-semibold text-sm rounded-full hover:bg-rose-500 hover:text-white transition-all duration-300"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-charcoal-900 text-white font-bold text-sm uppercase tracking-wider rounded-full hover:bg-rose-600 hover:shadow-xl transition-all duration-300 cursor-pointer shadow-lg"
                 >
-                  <Icons.MapPin /> Buka di Google Maps
+                  <Icons.MapPin /> Buka Lokasi di Google Maps
                 </a>
               </div>
             )}
           </div>
         </section>
+
+        {/* — Momen Bahagia (Galeri Foto) — */}
+        {galleryPhotos.length > 0 && (
+          <section className="py-24 bg-white border-t border-cream-200/60 relative">
+            <div className="max-w-6xl mx-auto px-6">
+              <div className="text-center mb-16">
+                <p className="text-rose-500 text-xs uppercase tracking-[0.3em] font-extrabold mb-2 flex items-center justify-center gap-1.5">
+                  <Icons.Camera /> Galeri Foto
+                </p>
+                <h2 className="text-4xl sm:text-5xl font-bold text-charcoal-900 mb-4" style={{ fontFamily: "var(--font-playfair)" }}>
+                  Momen Kebahagiaan Kami
+                </h2>
+                <div className="w-20 h-0.5 bg-rose-400/50 mx-auto" />
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                {galleryPhotos.map((url: string, index: number) => (
+                  <div
+                    key={index}
+                    onClick={() => setSelectedPhotoIndex(index)}
+                    className="relative aspect-[3/4] rounded-3xl overflow-hidden group border border-cream-200 shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer bg-cream-50"
+                  >
+                    <img
+                      src={url}
+                      alt={`Gallery ${index + 1}`}
+                      className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
+                      <span className="px-5 py-2 bg-white/90 backdrop-blur-sm text-charcoal-900 rounded-full text-xs font-bold tracking-wider uppercase shadow-lg">Lihat Foto</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* — RSVP & Wishes — */}
         <section className="section-padding bg-white">
@@ -368,7 +571,11 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
                   // Refresh wishes after successful RSVP
                   fetch(`/api/invitations/${invitationId}/wishes`)
                     .then(res => res.json())
-                    .then(data => setWishes(data));
+                    .then(data => {
+                      if (Array.isArray(data)) setWishes(data);
+                      else setWishes([]);
+                    })
+                    .catch(e => console.error("Error fetching wishes:", e));
                 }}
               />
             </div>
@@ -410,7 +617,7 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
         </section>
 
         {/* — Gift / Bank Transfer — */}
-        {(data.bank_account_1 || data.bank_account_2) && (
+        {(accountsList.length > 0 || data.gift_address) && (
           <section className="section-padding bg-cream-50">
             <div className="container-tight px-6 text-center">
               <p className="text-rose-500 text-sm uppercase tracking-wider mb-2">Hadiah</p>
@@ -420,24 +627,36 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
               <p className="text-charcoal-400 text-sm mb-8 max-w-sm mx-auto">
                 Doa restu Anda sudah cukup bagi kami. Namun jika ingin memberikan tanda kasih, bisa melalui:
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto">
-                {[data.bank_account_1, data.bank_account_2].filter(Boolean).map((acc, i) => {
-                  const parts = acc!.split("—").map(p => p.trim());
-                  return (
-                    <div key={i} className="bg-white rounded-2xl p-6 border border-cream-200 shadow-sm">
-                      <p className="text-charcoal-700 font-bold text-sm mb-1">{parts[0]}</p>
-                      <p className="text-charcoal-800 font-mono text-lg font-semibold mb-1">{parts[1]}</p>
-                      <p className="text-charcoal-400 text-xs">a.n. {parts[2]}</p>
+              {accountsList.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto mb-8">
+                  {accountsList.map((acc: any, i: number) => (
+                    <div key={i} className="bg-white rounded-2xl p-6 border border-cream-200 shadow-sm text-center">
+                      <p className="text-charcoal-700 font-bold text-sm mb-1">{acc.bank}</p>
+                      <p className="text-charcoal-800 font-mono text-lg font-semibold mb-1">{acc.number}</p>
+                      <p className="text-charcoal-400 text-xs">a.n. {acc.name}</p>
                       <button
-                        onClick={() => navigator.clipboard.writeText(parts[1] || "")}
-                        className="inline-flex items-center gap-1.5 mt-3 text-xs text-rose-500 font-bold hover:text-rose-400 transition-colors"
+                        onClick={() => navigator.clipboard.writeText(acc.number || "")}
+                        className="inline-flex items-center gap-1.5 mt-3 text-xs text-rose-500 font-bold hover:text-rose-400 transition-colors cursor-pointer"
                       >
                         <Icons.Copy /> Salin Nomor
                       </button>
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              )}
+
+              {data.gift_address && (
+                <div className="bg-white rounded-2xl p-8 border border-cream-200 shadow-sm max-w-lg mx-auto text-center space-y-2">
+                  <p className="text-xs uppercase tracking-wider text-rose-500 font-bold">Alamat Pengiriman Kado Fisik</p>
+                  <p className="text-sm text-charcoal-800 font-medium leading-relaxed max-w-md mx-auto">{data.gift_address}</p>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(data.gift_address || "")}
+                    className="inline-flex items-center gap-1.5 pt-2 text-xs text-rose-500 font-bold hover:text-rose-400 transition-colors cursor-pointer"
+                  >
+                    <Icons.Copy /> Salin Alamat
+                  </button>
+                </div>
+              )}
             </div>
           </section>
         )}
@@ -470,6 +689,64 @@ export default function MinimalistTemplate({ invitationId, data, designConfig, g
           </p>
         </div>
       </div>
+
+      {/* ===== LIGHTBOX MODAL (ROOT LEVEL) ===== */}
+      {selectedPhotoIndex !== null && (
+        <div
+          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 p-4 sm:p-8 animate-fade-in backdrop-blur-md cursor-pointer"
+          onClick={() => setSelectedPhotoIndex(null)}
+        >
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setSelectedPhotoIndex(null); }}
+            className="absolute top-6 right-6 text-white/80 hover:text-white p-3.5 rounded-full bg-white/10 hover:bg-white/25 transition-all cursor-pointer z-50 border border-white/10 shadow-lg"
+            title="Tutup (Esc)"
+          >
+            <Icons.Close />
+          </button>
+
+          {galleryPhotos.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPhotoIndex(prev => prev === null || prev === 0 ? galleryPhotos.length - 1 : prev - 1);
+                }}
+                className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-3.5 sm:p-4 rounded-full bg-white/10 hover:bg-white/25 transition-all cursor-pointer z-50 border border-white/10 shadow-lg"
+                title="Sebelumnya (Kiri)"
+              >
+                <Icons.ChevronLeft />
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedPhotoIndex(prev => prev === null || prev === galleryPhotos.length - 1 ? 0 : prev + 1);
+                }}
+                className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 text-white/80 hover:text-white p-3.5 sm:p-4 rounded-full bg-white/10 hover:bg-white/25 transition-all cursor-pointer z-50 border border-white/10 shadow-lg"
+                title="Berikutnya (Kanan)"
+              >
+                <Icons.ChevronRight />
+              </button>
+            </>
+          )}
+
+          <div
+            className="relative max-w-5xl max-h-[90vh] w-auto h-auto rounded-3xl overflow-hidden shadow-2xl border border-white/20 animate-scale-up flex flex-col items-center justify-center cursor-default"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={galleryPhotos[selectedPhotoIndex]}
+              alt={`Gallery preview ${selectedPhotoIndex + 1}`}
+              className="max-h-[85vh] max-w-[90vw] object-contain rounded-3xl mx-auto shadow-2xl select-none"
+            />
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 bg-charcoal-950/85 backdrop-blur-md rounded-full border border-white/20 text-white text-xs font-bold tracking-widest uppercase shadow-xl select-none">
+              {selectedPhotoIndex + 1} / {galleryPhotos.length}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

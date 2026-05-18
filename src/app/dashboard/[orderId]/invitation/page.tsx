@@ -18,15 +18,15 @@ export default async function EditInvitationPage(props: { params: Promise<{ orde
   }
 
   return (
-    <div className="animate-fade-in space-y-8">
+    <div className="animate-fade-in flex flex-col gap-4">
       <div>
         <h1 className="text-3xl font-bold text-charcoal-800" style={{ fontFamily: "var(--font-playfair)" }}>
-          Data Mempelai & Acara
+          Data Pernikahan
         </h1>
-        <p className="text-charcoal-400 mt-2">Isi detail hari bahagia kamu di bawah ini. Perubahan akan tersimpan otomatis.</p>
+        <p className="text-charcoal-400 mt-2">Isi detail hari bahagia kamu di bawah ini dan simpan perubahannya</p>
       </div>
 
-      <div className="bg-white rounded-[40px] border border-cream-200 shadow-sm overflow-hidden">
+      <div style={{ height: 'calc(100vh - 220px)', minHeight: '500px' }}>
         <InvitationForm initialData={invitationData} />
       </div>
     </div>

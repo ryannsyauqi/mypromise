@@ -23,11 +23,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Invitation not found" }, { status: 404 });
     }
 
-    // 2. Update Guest Status in 'guests' table
+    // 2. Update Guest Status and Message in 'guests' table
     // We try to match by name (case insensitive) and order_id
     const { error: guestError } = await supabase
       .from('guests')
-      .update({ status: attendance })
+      .update({ status: attendance, message: message })
       .ilike('name', name)
       .eq('order_id', invitation.order_id);
 

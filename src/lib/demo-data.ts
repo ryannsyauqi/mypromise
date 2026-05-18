@@ -29,6 +29,14 @@ export const demoInvitationData = {
   photo_hero: "/images/demo/hero.png",
   photo_groom: "/images/demo/groom.png",
   photo_bride: "/images/demo/bride.png",
+  gallery: [
+    "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1606800052052-a08af7148866?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1000&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1520854221256-17451cc331bf?q=80&w=1000&auto=format&fit=crop"
+  ],
 };
 
 export const demoWishes: { name: string; message: string; time: string; attendance: "hadir" | "tidak_hadir" | "belum_pasti" }[] = [
