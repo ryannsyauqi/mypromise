@@ -140,9 +140,9 @@ export const getAdminInternalEmail = (
       <span style="font-size: 28px;">🔔</span>
     </div>
     <h2 style="margin: 0; font-size: 22px; font-weight: 800; line-height: 1.3; color: #111827;">
-      [MyPromise] Transaksi ${status.toUpperCase()}
+      New Activity on HQ ⚡️
     </h2>
-    <p style="margin: 5px 0 0 0; font-size: 14px; color: #6b7280;">Pesanan baru dari ${buyerName}</p>
+    <p style="margin: 5px 0 0 0; font-size: 14px; color: #6b7280;">Operator Internal Notification</p>
   </div>
   
   <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 24px; padding: 28px; margin-bottom: 30px;">

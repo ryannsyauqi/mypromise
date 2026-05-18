@@ -9,9 +9,9 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { templateId, templateSlug, amount, customerDetails, isLifetime } = body;
-    
+
     const orderId = `MP-${nanoid(10)}`;
-    
+
     // Generate slug from buyer name
     const slugify = (text: string) => text.toString().toLowerCase().trim()
       .replace(/\s+/g, '-')
@@ -28,10 +28,10 @@ export async function POST(request: Request) {
     // Check for existing slug in both tables
     let isUnique = false;
     let suffix = 0;
-    
+
     while (!isUnique) {
       const currentCheck = suffix === 0 ? baseSlug : `${baseSlug}-${suffix.toString().padStart(3, '0')}`;
-      
+
       // Check invitations table
       const { data: invCheck } = await supabase
         .from('invitations')
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       } else {
         suffix++;
       }
-      
+
       // Safety break to prevent infinite loop
       if (suffix > 999) break;
     }
@@ -111,7 +111,7 @@ export async function POST(request: Request) {
       transaction.redirect_url,
       orderId
     );
-    
+
     await sendEmailNotification(
       customerDetails.email,
       "Hampir Selesai! Pesanan Undangan MyPromise Kamu",
@@ -132,7 +132,7 @@ export async function POST(request: Request) {
     );
 
     await sendAdminInternalNotification(
-      `[Rp ${amount.toLocaleString("id-ID")}] Pesanan Baru Masuk #${orderId}`,
+      `[Rp ${amount.toLocaleString("id-ID")}] New Order Awaiting Payment #${orderId}`,
       adminHtml
     );
 
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
       orderId: orderId,
       invitationSlug: invitationSlug,
     });
-    
+
   } catch (error: any) {
     console.error("❌ Checkout API Fatal Error:", error);
     return NextResponse.json(

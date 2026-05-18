@@ -43,18 +43,18 @@ export async function POST(request: Request) {
           templates:template_id (name)
         `)
         .single();
-      
+
       if (updateError) {
         console.error("❌ Error updating order to paid:", updateError);
       } else if (order) {
         // --- TRIGGER NOTIFICATIONS ---
         const dashboardLink = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://mypromise.id'}/dashboard/${order.id}`;
-        
+
         // 1. Kirim Email ke Customer
         const successEmailHtml = getSuccessPaymentEmail(order.buyer_name, dashboardLink, order.order_number);
         await sendEmailNotification(
-          order.buyer_email, 
-          "Pembayaran Berhasil 🎉 - Dashboard MyPromise", 
+          order.buyer_email,
+          "Pembayaran Berhasil 🎉 - Dashboard MyPromise",
           successEmailHtml
         );
 
@@ -73,10 +73,10 @@ export async function POST(request: Request) {
         );
 
         await sendAdminInternalNotification(
-          `[Rp ${order.amount.toLocaleString("id-ID")}] Pembayaran Berhasil #${order.order_number}`,
+          `[Rp ${order.amount.toLocaleString("id-ID")}] Successful Transaction #${order.order_number}`,
           adminHtml
         );
-        
+
         console.log(`✅ Success notifications triggered for ${order.buyer_name}`);
       }
     } else if (transactionStatus === "cancel" || transactionStatus === "deny" || transactionStatus === "expire") {
