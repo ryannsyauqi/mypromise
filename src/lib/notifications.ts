@@ -47,6 +47,7 @@ export async function sendEmailNotification(to: string, subject: string, html: s
     const settings = getSystemSettings();
     const { data, error } = await resend.emails.send({
       from: `${settings.websiteName} <halo@mypromise.id>`,
+      replyTo: "halo@mypromise.id",
       to: [to],
       subject: subject,
       html: html,
@@ -76,6 +77,7 @@ export async function sendAdminInternalNotification(subject: string, html: strin
 
     const { data, error } = await resend.emails.send({
       from: `${settings.websiteName} HQ <halo@mypromise.id>`,
+      replyTo: "halo@mypromise.id",
       to: [adminEmail],
       subject: subject,
       html: html,

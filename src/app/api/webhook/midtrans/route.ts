@@ -73,7 +73,7 @@ export async function POST(request: Request) {
         );
 
         await sendAdminInternalNotification(
-          `[MyPromise] Pembayaran Berhasil #${order.order_number} - Rp ${order.amount.toLocaleString("id-ID")}`,
+          `[Rp ${order.amount.toLocaleString("id-ID")}] Pembayaran Berhasil #${order.order_number}`,
           adminHtml
         );
         

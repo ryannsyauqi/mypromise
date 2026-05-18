@@ -132,7 +132,7 @@ export async function POST(request: Request) {
     );
 
     await sendAdminInternalNotification(
-      `[MyPromise] Pesanan Baru Masuk #${orderId} - Rp ${amount.toLocaleString("id-ID")}`,
+      `[Rp ${amount.toLocaleString("id-ID")}] Pesanan Baru Masuk #${orderId}`,
       adminHtml
     );
 
