@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Plus_Jakarta_Sans, Great_Vibes } from "next/font/google";
+import { Playfair_Display, Plus_Jakarta_Sans, Great_Vibes, Cormorant_Garamond, Jost, DM_Sans, Libre_Baskerville, Bodoni_Moda } from "next/font/google";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -22,6 +22,45 @@ const greatVibes = Great_Vibes({
   display: "swap",
   weight: ["400"],
 });
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const jost = Jost({
+  variable: "--font-jost",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "700"],
+});
+
+const libreBaskerville = Libre_Baskerville({
+  variable: "--font-libre-baskerville",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+});
+
+const bodoniModa = Bodoni_Moda({
+  variable: "--font-bodoni-moda",
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
 
 export const metadata: Metadata = {
   title: {
@@ -64,7 +103,7 @@ export default function RootLayout({
     <html
       lang="id"
       data-scroll-behavior="smooth"
-      className={`${playfair.variable} ${jakarta.variable} ${greatVibes.variable} h-full antialiased`}
+      className={`${playfair.variable} ${jakarta.variable} ${greatVibes.variable} ${cormorant.variable} ${jost.variable} ${dmSans.variable} ${libreBaskerville.variable} ${bodoniModa.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" style={{ fontFamily: "var(--font-jakarta)" }}>
         {children}

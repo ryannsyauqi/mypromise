@@ -9,10 +9,23 @@ import TemplateCard from "@/components/TemplateCard";
 import { createClient } from "@/utils/supabase/client";
 import { Template } from "@/lib/types";
 
+const categories = [
+  "Elegant Series",
+  "Nusantara Series",
+  "Floral Series",
+  "Minimalist",
+  "Romantic"
+];
+
 export default function HomePage() {
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [activeCategory, setActiveCategory] = useState("Elegant Series");
   const [loading, setLoading] = useState(true);
   const [waNumber, setWaNumber] = useState("6281234567890");
+
+  const activeCategories = loading 
+    ? categories
+    : categories.filter(cat => templates.some(t => t.category === cat));
 
   useEffect(() => {
     async function fetchTemplates() {
@@ -22,11 +35,18 @@ export default function HomePage() {
           .from("templates")
           .select("*")
           .eq("is_active", true)
-          .order("created_at", { ascending: false })
-          .limit(6);
+          .order("created_at", { ascending: false });
 
         if (error) throw error;
-        if (data) setTemplates(data as Template[]);
+        if (data) {
+          const fetched = data as Template[];
+          setTemplates(fetched);
+          
+          const available = categories.filter(cat => fetched.some(t => t.category === cat));
+          if (available.length > 0 && !available.includes(activeCategory)) {
+            setActiveCategory(available[0]);
+          }
+        }
       } catch (err) {
         console.error("Error fetching templates:", err);
       } finally {
@@ -214,10 +234,27 @@ export default function HomePage() {
       {/* ===== KATALOG: REFINED CATALOGUE ===== */}
       <section id="designs" className="py-16 bg-white">
         <div className="container-default px-6">
-          <div className="mb-10 md:mb-16 text-center">
+          <div className="mb-6 md:mb-8 text-center">
             <h2 className="text-[32px] md:text-5xl font-bold text-charcoal-900" style={{ fontFamily: "var(--font-playfair)" }}>
               Pilih Desain Undanganmu
             </h2>
+          </div>
+
+          {/* Category Tabs */}
+          <div className="flex justify-center gap-2 mb-12 overflow-x-auto py-2 no-scrollbar">
+            {activeCategories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-5 py-2 rounded-full text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 whitespace-nowrap border cursor-pointer ${
+                  activeCategory === cat
+                    ? "bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/20"
+                    : "bg-white text-charcoal-600 hover:bg-cream-50/50 border-cream-200"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
@@ -226,7 +263,7 @@ export default function HomePage() {
                 <div key={i} className="aspect-[4/5] bg-slate-100 animate-pulse rounded-3xl" />
               ))
             ) : (
-              templates.map((t, i) => (
+              templates.filter(t => t.category === activeCategory).map((t, i) => (
                 <TemplateCard key={t.id} template={t} index={i} />
               ))
             )}

@@ -68,6 +68,11 @@
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-script: "Great Vibes", cursive;
+  --font-cormorant: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-jost: var(--font-jost), Jost, sans-serif;
+  --font-dm: var(--font-dm-sans), "DM Sans", sans-serif;
+  --font-libre: var(--font-libre-baskerville), "Libre Baskerville", serif;
+  --font-bodoni: var(--font-bodoni-moda), "Bodoni Moda", serif;
 }
 
 /* ===========================

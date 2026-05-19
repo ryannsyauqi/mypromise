@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import MinimalistTemplate from "@/components/invitation/MinimalistTemplate";
 import ModernLuxeTemplate from "@/components/invitation/ModernLuxeTemplate";
 import GardenRomanceTemplate from "@/components/invitation/GardenRomanceTemplate";
+import AurelTemplate from "@/components/invitation/AurelTemplate";
 
 export const dynamic = "force-dynamic";
 
@@ -91,6 +92,17 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
     const templateSlug = templateData?.slug || "minimalist-elegance";
     
     switch (templateSlug) {
+      case "aurel":
+        return (
+          <AurelTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
       case "modern-luxe":
         return (
           <ModernLuxeTemplate 

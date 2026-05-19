@@ -3,6 +3,7 @@
 import MinimalistTemplate from "@/components/invitation/MinimalistTemplate";
 import ModernLuxeTemplate from "@/components/invitation/ModernLuxeTemplate";
 import GardenRomanceTemplate from "@/components/invitation/GardenRomanceTemplate";
+import AurelTemplate from "@/components/invitation/AurelTemplate";
 
 interface DemoClientProps {
   slug: string;
@@ -37,6 +38,8 @@ interface DemoClientProps {
 export default function DemoClient({ slug, guestName, data, templateName }: DemoClientProps) {
   const renderTemplate = () => {
     switch (slug) {
+      case "aurel":
+        return <AurelTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
       case "modern-luxe":
         return <ModernLuxeTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
       case "garden-romance":

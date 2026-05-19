@@ -7,7 +7,14 @@ import TemplateCard from "@/components/TemplateCard";
 import { createClient } from "@/utils/supabase/client";
 import { Template } from "@/lib/types";
 
-const categories = ["Semua", "Minimalist", "Romantic"];
+const categories = [
+  "Semua",
+  "Elegant Series",
+  "Nusantara Series",
+  "Floral Series",
+  "Minimalist",
+  "Romantic"
+];
 
 export default function TemplatesPage() {
   const [activeCategory, setActiveCategory] = useState("Semua");
