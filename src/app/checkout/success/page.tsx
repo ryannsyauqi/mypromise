@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { createAdminClient } from "@/utils/supabase/admin";
@@ -15,6 +16,9 @@ export default async function SuccessPage({
   const orderIdParam = resolvedSearchParams?.order_id;
   const orderNumber = Array.isArray(orderIdParam) ? orderIdParam[0] : orderIdParam;
   
+  const transactionStatus = resolvedSearchParams?.transaction_status;
+  const statusCode = resolvedSearchParams?.status_code;
+
   let dashboardUrl = "/dashboard";
   let isPaid = false;
   let templateSlug = "";
@@ -47,73 +51,19 @@ export default async function SuccessPage({
   } else {
     console.warn("SuccessPage: No order_id found in searchParams");
   }
-  
-  console.log("SuccessPage Debug - Final dashboardUrl:", dashboardUrl, "isPaid:", isPaid);
 
-  if (!isPaid) {
-    const refreshUrl = `/checkout/success?order_id=${orderNumber || ""}`;
-    return (
-      <div className="min-h-screen bg-[#FAFAFA]">
-        <Navbar variant="light-bg" />
-        
-        <main className="pt-24 pb-24 flex items-center justify-center">
-          <div className="max-w-xl w-full px-6 text-center">
-            <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-amber-500/5 border border-amber-100/50 animate-scale-in">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            
-            <div className="mb-6">
-              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-amber-500 mb-2 block">Payment Pending</span>
-              <h1 className="text-3xl md:text-5xl font-bold text-charcoal-900 tracking-tight" style={{ fontFamily: "var(--font-playfair)" }}>
-                Menunggu Pembayaran
-              </h1>
-              <p className="text-slate-500 text-sm md:text-base mt-4 leading-relaxed max-w-md mx-auto font-medium">
-                Sistem kami belum menerima verifikasi pembayaran lunas dari Midtrans untuk pesanan ini.
-              </p>
-            </div>
+  // Determine if the transaction is successful based on database or url parameters
+  const isTransactionSuccess = isPaid || 
+    transactionStatus === 'settlement' || 
+    transactionStatus === 'capture' || 
+    statusCode === '200';
 
-            <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-5 mb-8 text-left max-w-lg mx-auto flex gap-4 animate-fade-in shadow-sm">
-               <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-               </div>
-               <div>
-                  <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">Belum Bayar atau Baru Saja Membayar?</h4>
-                  <p className="text-[11px] md:text-xs text-slate-500 leading-relaxed font-medium">
-                    Jika kamu baru saja membayar, silakan tunggu 1-2 menit lalu <strong>refresh halaman ini</strong>. Jika kamu menutup halaman pembayaran dan ingin mencoba kembali dengan metode pembayaran lain, silakan klik tombol di bawah untuk checkout ulang.
-                  </p>
-               </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
-              <Link
-                href={refreshUrl}
-                className="px-8 py-4.5 bg-rose-500 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl hover:bg-rose-600 transition-all duration-300 shadow-xl shadow-rose-900/10 flex items-center justify-center gap-2"
-              >
-                Refresh Status
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
-                </svg>
-              </Link>
-              
-              <Link
-                href={templateSlug ? `/checkout/${templateSlug}` : "/"}
-                className="px-8 py-4.5 bg-white text-slate-700 font-bold uppercase tracking-[0.15em] text-[10px] rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all duration-300 flex items-center justify-center"
-              >
-                Ulangi Checkout
-              </Link>
-            </div>
-          </div>
-        </main>
-        
-        <Footer />
-      </div>
-    );
+  // If the payment is not successful (e.g. pending/cancel/failed 201/202/etc),
+  // immediately redirect the user back to the checkout page of the template they were purchasing.
+  if (!isTransactionSuccess) {
+    redirect(templateSlug ? `/checkout/${templateSlug}` : "/");
   }
-
+  
   return (
     <div className="min-h-screen bg-[#FAFAFA]">
       <Navbar variant="light-bg" />

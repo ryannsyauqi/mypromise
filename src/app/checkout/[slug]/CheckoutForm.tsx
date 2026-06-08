@@ -61,6 +61,9 @@ export default function CheckoutForm({ template }: CheckoutFormProps) {
           onSuccess: function (result: any) {
             window.location.href = `/checkout/success?order_id=${data.orderId}`;
           },
+          onPending: function (result: any) {
+            setLoading(false);
+          },
           onError: function (result: any) {
             alert("Pembayaran gagal, silakan coba lagi.");
             setLoading(false);
