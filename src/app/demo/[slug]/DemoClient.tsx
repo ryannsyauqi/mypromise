@@ -4,6 +4,14 @@ import MinimalistTemplate from "@/components/invitation/MinimalistTemplate";
 import ModernLuxeTemplate from "@/components/invitation/ModernLuxeTemplate";
 import GardenRomanceTemplate from "@/components/invitation/GardenRomanceTemplate";
 import AurelTemplate from "@/components/invitation/AurelTemplate";
+import CelesteTemplate from "@/components/invitation/CelesteTemplate";
+import MirelleTemplate from "@/components/invitation/MirelleTemplate";
+import SakaTemplate from "@/components/invitation/SakaTemplate";
+import TirtaTemplate from "@/components/invitation/TirtaTemplate";
+import WulanTemplate from "@/components/invitation/WulanTemplate";
+import JasmineTemplate from "@/components/invitation/JasmineTemplate";
+import FernTemplate from "@/components/invitation/FernTemplate";
+import DahliaTemplate from "@/components/invitation/DahliaTemplate";
 
 interface DemoClientProps {
   slug: string;
@@ -40,6 +48,22 @@ export default function DemoClient({ slug, guestName, data, templateName }: Demo
     switch (slug) {
       case "aurel":
         return <AurelTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "celeste":
+        return <CelesteTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "mirelle":
+        return <MirelleTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "saka":
+        return <SakaTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "tirta":
+        return <TirtaTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "wulan":
+        return <WulanTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "jasmine":
+        return <JasmineTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "fern":
+        return <FernTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
+      case "dahlia":
+        return <DahliaTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
       case "modern-luxe":
         return <ModernLuxeTemplate invitationId="demo-id" data={data} guestName={guestName} isDemo />;
       case "garden-romance":

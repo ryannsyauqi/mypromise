@@ -4,6 +4,14 @@ import MinimalistTemplate from "@/components/invitation/MinimalistTemplate";
 import ModernLuxeTemplate from "@/components/invitation/ModernLuxeTemplate";
 import GardenRomanceTemplate from "@/components/invitation/GardenRomanceTemplate";
 import AurelTemplate from "@/components/invitation/AurelTemplate";
+import CelesteTemplate from "@/components/invitation/CelesteTemplate";
+import MirelleTemplate from "@/components/invitation/MirelleTemplate";
+import SakaTemplate from "@/components/invitation/SakaTemplate";
+import TirtaTemplate from "@/components/invitation/TirtaTemplate";
+import WulanTemplate from "@/components/invitation/WulanTemplate";
+import JasmineTemplate from "@/components/invitation/JasmineTemplate";
+import FernTemplate from "@/components/invitation/FernTemplate";
+import DahliaTemplate from "@/components/invitation/DahliaTemplate";
 
 export const dynamic = "force-dynamic";
 
@@ -95,6 +103,94 @@ export default async function InvitationPage(props: { params: Promise<{ slug: st
       case "aurel":
         return (
           <AurelTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "celeste":
+        return (
+          <CelesteTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "mirelle":
+        return (
+          <MirelleTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "saka":
+        return (
+          <SakaTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "tirta":
+        return (
+          <TirtaTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "wulan":
+        return (
+          <WulanTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "jasmine":
+        return (
+          <JasmineTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "fern":
+        return (
+          <FernTemplate 
+            invitationId={invitation.id}
+            data={content} 
+            designConfig={designConfig}
+            guestName={guestName} 
+            guestSlug={guestSlug}
+            isDemo={false} 
+          />
+        );
+      case "dahlia":
+        return (
+          <DahliaTemplate 
             invitationId={invitation.id}
             data={content} 
             designConfig={designConfig}
