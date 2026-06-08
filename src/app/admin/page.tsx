@@ -278,6 +278,7 @@ export default function AdminPage() {
   const chartValues = analytics?.trendData?.map((d: any) => chartMetric === "revenue" ? d.revenue : d.count) || [];
   const realMax = Math.max(...chartValues, 0);
   const maxVal = realMax > 0 ? realMax : (chartMetric === "revenue" ? 100000 : 5);
+  const chartCeiling = maxVal / 0.8;
 
   // Helper to parse complete date strings (e.g., "18 Mei") to override API date decimation
   const getCleanLabel = (d: any) => {
@@ -298,10 +299,10 @@ export default function AdminPage() {
 
   const chartPoints = analytics?.trendData?.map((d: any, i: number) => {
     const val = chartMetric === "revenue" ? d.revenue : d.count;
-    // Wide horizontal layout (starting at x=35 and ending at x=580) to maximize chart space usage
-    const x = 35 + (i / (analytics.trendData.length - 1 || 1)) * 545;
-    // Low baseline (180px) and high ceiling (20px) to maximize the visual height (vertical span) of the bars
-    const y = 180 - (val / maxVal) * 160;
+    // Wide horizontal layout constrained to [45, 555] to prevent bar clipping on the right side
+    const x = 45 + (i / (analytics.trendData.length - 1 || 1)) * 510;
+    // Base is 180px, height scaled using chartCeiling to keep 20% breathing room at the top
+    const y = 180 - (val / chartCeiling) * 160;
     const fullLabel = getCleanLabel(d);
     return { x, y, val, label: fullLabel, rawDate: d.fullDate || fullLabel };
   }) || [];
@@ -456,10 +457,10 @@ export default function AdminPage() {
               {/* Bar Elements */}
               {chartPoints.map((p: any, i: number) => {
                 // Calculate horizontal step between adjacent bars to maintain a pixel-perfect, harmonious 25% gap and 75% bar width
-                const step = 545 / (chartPoints.length - 1 || 1);
+                const step = 510 / (chartPoints.length - 1 || 1);
                 const barWidth = Math.max(6, Math.min(52, step * 0.75));
                 // Segment the total width perfectly so adjacent hover zones touch without overlapping or leaving dead zones
-                const triggerWidth = 545 / (chartPoints.length || 1);
+                const triggerWidth = 510 / (chartPoints.length || 1);
                 const isRevenue = chartMetric === "revenue";
                 return (
                   <g key={i} className="group/bar">
@@ -536,10 +537,10 @@ export default function AdminPage() {
 
             {/* Y-Axis Grid labels - Percentage-positioned to match SVG scaling precisely (Unblocked with pointer-events-none) */}
             <div className="absolute left-1.5 top-[10%] -translate-y-1/2 text-[8px] font-black text-slate-455 bg-white/90 px-1 py-0.5 rounded border border-slate-100 shadow-sm pointer-events-none">
-              {chartMetric === "revenue" ? `Rp ${(maxVal / 1000).toLocaleString("id-ID")}k` : Math.round(maxVal)}
+              {chartMetric === "revenue" ? `Rp ${(chartCeiling / 1000).toLocaleString("id-ID")}k` : Math.round(chartCeiling)}
             </div>
             <div className="absolute left-1.5 top-[50%] -translate-y-1/2 text-[8px] font-black text-slate-455 bg-white/90 px-1 py-0.5 rounded border border-slate-100 shadow-sm pointer-events-none">
-              {chartMetric === "revenue" ? `Rp ${(maxVal / 2 / 1000).toLocaleString("id-ID")}k` : Math.round(maxVal / 2)}
+              {chartMetric === "revenue" ? `Rp ${(chartCeiling / 2 / 1000).toLocaleString("id-ID")}k` : Math.round(chartCeiling / 2)}
             </div>
             <div className="absolute left-1.5 top-[90%] -translate-y-1/2 text-[8px] font-black text-slate-455 bg-white/90 px-1 py-0.5 rounded border border-slate-100 shadow-sm pointer-events-none">0</div>
 
