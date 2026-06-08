@@ -276,7 +276,8 @@ export default function AdminPage() {
 
   // Custom SVG Chart calculations
   const chartValues = analytics?.trendData?.map((d: any) => chartMetric === "revenue" ? d.revenue : d.count) || [];
-  const maxVal = Math.max(...chartValues, chartMetric === "revenue" ? 100000 : 5);
+  const realMax = Math.max(...chartValues, 0);
+  const maxVal = realMax > 0 ? realMax : (chartMetric === "revenue" ? 100000 : 5);
 
   // Helper to parse complete date strings (e.g., "18 Mei") to override API date decimation
   const getCleanLabel = (d: any) => {
