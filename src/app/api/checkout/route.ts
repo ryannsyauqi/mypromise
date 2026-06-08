@@ -56,6 +56,7 @@ export async function POST(request: Request) {
       // Safety break to prevent infinite loop
       if (suffix > 999) break;
     }
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://mypromise.id";
     const parameter = {
       transaction_details: {
         order_id: orderId,
@@ -66,6 +67,11 @@ export async function POST(request: Request) {
         email: customerDetails.email,
         phone: customerDetails.phone,
       },
+      callbacks: {
+        finish: `${baseUrl}/checkout/success?order_id=${orderId}`,
+        unfinish: `${baseUrl}/checkout/${templateSlug}`,
+        error: `${baseUrl}/checkout/${templateSlug}?error=payment_failed`
+      }
     };
 
     const transaction = await snap.createTransaction(parameter);
