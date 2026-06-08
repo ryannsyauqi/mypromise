@@ -299,8 +299,8 @@ export default function AdminPage() {
 
   const chartPoints = analytics?.trendData?.map((d: any, i: number) => {
     const val = chartMetric === "revenue" ? d.revenue : d.count;
-    // Wide horizontal layout constrained to [45, 555] to prevent bar clipping on the right side
-    const x = 45 + (i / (analytics.trendData.length - 1 || 1)) * 510;
+    // Wide horizontal layout centered and balanced within grid boundaries [30, 590]
+    const x = 56 + (i / (analytics.trendData.length - 1 || 1)) * 508;
     // Base is 180px, height scaled using chartCeiling to keep 20% breathing room at the top
     const y = 180 - (val / chartCeiling) * 160;
     const fullLabel = getCleanLabel(d);
@@ -457,10 +457,10 @@ export default function AdminPage() {
               {/* Bar Elements */}
               {chartPoints.map((p: any, i: number) => {
                 // Calculate horizontal step between adjacent bars to maintain a pixel-perfect, harmonious 25% gap and 75% bar width
-                const step = 510 / (chartPoints.length - 1 || 1);
+                const step = 508 / (chartPoints.length - 1 || 1);
                 const barWidth = Math.max(6, Math.min(52, step * 0.75));
                 // Segment the total width perfectly so adjacent hover zones touch without overlapping or leaving dead zones
-                const triggerWidth = 510 / (chartPoints.length || 1);
+                const triggerWidth = 508 / (chartPoints.length || 1);
                 const isRevenue = chartMetric === "revenue";
                 return (
                   <g key={i} className="group/bar">
