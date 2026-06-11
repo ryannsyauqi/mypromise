@@ -231,25 +231,40 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== KATALOG: REFINED CATALOGUE ===== */}
-      <section id="designs" className="py-16 bg-white">
-        <div className="container-default px-6">
-          <div className="mb-6 md:mb-8 text-center">
-            <h2 className="text-[32px] md:text-5xl font-bold text-charcoal-900" style={{ fontFamily: "var(--font-playfair)" }}>
+      {/* ===== KATALOG: HIGHLIGHTED CONVERSION SECTION ===== */}
+      <section id="designs" className="relative py-14 md:py-18 overflow-hidden" style={{ background: 'linear-gradient(180deg, #FFF5F0 0%, #FFE8E0 35%, #FFDDD4 65%, #FFF0EC 100%)' }}>
+        {/* Decorative Glow Accents */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-[10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-rose-300/15 blur-[120px]" />
+          <div className="absolute bottom-[5%] right-[-10%] w-[45%] h-[45%] rounded-full bg-rose-200/20 blur-[100px]" />
+          <div className="absolute top-[40%] left-[60%] w-[25%] h-[25%] rounded-full bg-gold-300/10 blur-[80px]" />
+        </div>
+
+
+
+        <div className="container-default px-6 relative z-10">
+          <div className="mb-6 md:mb-8 text-center space-y-3">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-rose-500/10 border border-rose-300/30 text-rose-500 text-[10px] font-black uppercase tracking-[0.4em]">
+              Koleksi Eksklusif
+            </span>
+            <h2 className="text-[32px] md:text-6xl font-bold text-charcoal-900 leading-tight" style={{ fontFamily: "var(--font-playfair)" }}>
               Pilih Desain Undanganmu
             </h2>
+            <p className="text-charcoal-400 text-sm md:text-base max-w-2xl mx-auto">
+              Temukan desain undangan yang paling merepresentasikan kisah cinta kamu.
+            </p>
           </div>
 
           {/* Category Tabs */}
-          <div className="flex justify-center gap-2 mb-12 overflow-x-auto py-2 no-scrollbar">
+          <div className="flex justify-start md:justify-center gap-2 mb-10 overflow-x-auto py-2 no-scrollbar">
             {activeCategories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2 rounded-full text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 whitespace-nowrap border cursor-pointer ${
+                className={`px-5 py-2.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider transition-all duration-300 whitespace-nowrap border cursor-pointer ${
                   activeCategory === cat
-                    ? "bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/20"
-                    : "bg-white text-charcoal-600 hover:bg-cream-50/50 border-cream-200"
+                    ? "bg-rose-500 text-white border-rose-500 shadow-lg shadow-rose-500/25"
+                    : "bg-white/70 text-charcoal-600 hover:bg-white hover:text-charcoal-800 border-rose-200/50 backdrop-blur-sm"
                 }`}
               >
                 {cat}
@@ -257,10 +272,10 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-8 md:gap-x-8 md:gap-y-12">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-x-8 md:gap-y-12">
             {loading ? (
               [...Array(3)].map((_, i) => (
-                <div key={i} className="aspect-[4/5] bg-slate-100 animate-pulse rounded-3xl" />
+                <div key={i} className="aspect-[4/5] bg-white/50 animate-pulse rounded-3xl" />
               ))
             ) : (
               templates.filter(t => t.category === activeCategory).map((t, i) => (
